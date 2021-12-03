@@ -10,7 +10,7 @@
 library(pacman)
 pacman::p_load(
   "sf", "dplyr", "leaflet", "shinipsum", "shiny", "stringr",
-  "plotly", "DT", "vroom", "feather", "sfarrow"
+  "plotly", "DT", "vroom", "feather", "sfarrow", "shinythemes"
 )
 # enviroscreen data
 envoData <- sfarrow::st_read_feather("data/scores/allScores.feather")
@@ -37,18 +37,23 @@ indicators <- sf::st_drop_geometry(envoData) %>%
 
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(
+ui <- fluidPage(theme = shinytheme("sandstone"),
 
-  # Title -------------------------------------------------------------------
-  # Application title
-  titlePanel("Colorado Enviroscreen"),
-  # Sidebar with a slider input for number of bins
+  # nav panel ---------------------------------------------------------------
+  # not sure if it's needed but probably... 
+  
+  # Title ------------------------------------------------------------------
   fluidRow(
-    h2("landing page image with text overlay"),
-    # Image
-    img(src = "rstudio.png", height = 140, width = 400),
-    # text describing the process
-    h2("text describing the process"),
+    includeCSS("www/banner.css"),
+    HTML(
+      '<header id="showcase">
+    <h1>Colorado Enviroscreen</h1>
+    <p>Mapping Health Equity in Colorado</p>
+    </header>')
+  ),
+
+  fluidRow(
+    h2("text describing the project"),
     p(random_text(nwords = 400))
   ),
 
