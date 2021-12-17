@@ -1,79 +1,59 @@
-### specifically evaluating the select process in shinyt 
+library(shiny)
+library(leaflet)
+
+data(quakes)
+quakes <- quakes[1:10,]
+oil <- readRDS("data/scores/oil.rda")
 
 
+leafIcons_A <- icons(
+  iconUrl = "https://leafletjs.com/examples/custom-icons/leaf-green.png",
+  iconWidth = 38, iconHeight = 95,
+  iconAnchorX = 22, iconAnchorY = 94)
+leafIcons_B <- icons(
+  iconUrl = "https://leafletjs.com/examples/custom-icons/leaf-red.png",
+  iconWidth = 38, iconHeight = 95,
+  iconAnchorX = 22, iconAnchorY = 94)
 
-library(pacman)
-pacman::p_load("sf", "dplyr", "leaflet","shinipsum", "shiny", "stringr",
-               "plotly", "DT", "vroom")
+html_legend_A <- "<img src='https://leafletjs.com/examples/custom-icons/leaf-green.png'>green<br/>"
+html_legend_B <- "<img src='https://leafletjs.com/examples/custom-icons/leaf-red.png'>red<br/>"
 
-
-# enviroscreen data 
-counties <- sf::st_read("data/geometries/county/coloradoCounties.geojson")
-countyScore <- as_tibble(vroom("data/scores/county.csv"))%>% 
-  dplyr::mutate(geom = "County")
-
-
-# connect datasets 
-county1 <- dplyr::left_join(x = counties, y = countyScore, by ="GEOID")
-# Define UI for application that draws a histogram
 ui <- fluidPage(
-  
-  # Application title
-  titlePanel("Colorado Enviroscreen"),
-  # content for the reactive elements of the map 
-  fluidRow(
-    # select geography 
-    column(4,
-           selectInput(
-             inputId = "geom",
-             label = "Select Geographic Scale", 
-             choices = c("County","Census Tract", "Census Block Group"),
-             selected = "County",
-             width = '90%'
-           )
-    ),
-    # select indicator 
-    column(4,
-           selectInput(
-             inputId = "Indicator",
-             label = "Select Layer for Map",
-             choices = indicators,
-             selected = "envExp",
-             width = '90%'
-           )
-    ),
-    # toggle between measured and percentile 
-    column(2, 
-           selectInput(
-             inputId = "Percentile",
-             label = "Measure or Percentile",
-             choices = c("Measured Value", "Percentile Rank"),
-             selected = "Percentile Rank"
-           )    
-           
-    )
-  ),
-  fluidRow(
-    column(10,
-           dataTableOutput("data_table")      
-    )
-  )
+  leafletOutput("map")
 )
-
-
-server <- function(input, output) {
-  # get df from spatial object 
-  df1 <- reactive({
-    countyScore %>%
-      filter(`geom` == input$geom)
-    })
-  
-  # output for datatable
-  output$data_table <- renderDataTable({
-    df1()
+server <- function(input, output, session){
+  output$map <- renderLeaflet({
+    dataA <- quakes[quakes$mag < 4.6,]
+    dataB <- quakes[quakes$mag > 4.6,]
+    
+    map <- leaflet() %>% addTiles() %>%
+      addMarkers(dataA$long, dataA$lat, icon = leafIcons_A, group = "Group A") %>%
+      addMarkers(dataB$long, dataB$lat, icon = leafIcons_B, group = "Group B") %>%
+      addLayersControl(position = "topleft", overlayGroups = c("Group A","Group B")) %>%
+      hideGroup("Group B")%>%
+      addPolylines(
+        data = oil,
+        stroke = TRUE,
+        color = "#54A800",
+        weight = 1,
+        layerId = "Oil and Gas",
+        group = "Oil Community"
+      ) %>%
+      addLayersControl(position = "topleft", overlayGroups = c("Group A","Group B", "Oil Community")) %>%
+      hideGroup("Group B")
+    map
+  })
+  observe({
+    map <- leafletProxy("map") %>% clearControls()
+    if (any(input$map_groups %in% "Group A")) {
+      map <- map %>%
+        addControl(html = html_legend_A, position = "bottomleft") %>%
+        addLegend(title="Group A", position="bottomright", opacity=1, colors="green",labels = "Group A")}
+    if (any(input$map_groups %in% "Group B")) {
+      map <- map %>%
+        addControl(html = html_legend_B, position = "bottomleft") %>%
+        addLegend(title="Group B", position="bottomright", opacity=1,colors="red",labels = "Group B")}
   })
 }
 
-# Run the application 
-shinyApp(ui = ui, server = server)
-
+shinyApp(ui, server)

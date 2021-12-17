@@ -7,25 +7,85 @@
 #    http://shiny.rstudio.com/
 #
 
-library(pacman)
-pacman::p_load(
-  "sf", "dplyr", "leaflet", "shinipsum", "shiny", "stringr",
-  "plotly", "DT", "vroom", "feather", "sfarrow", "shinythemes"
-)
+library(sf)
+library(dplyr)
+library(leaflet)
+library(leaflet.extras)
+library(shinipsum)
+library(shiny)
+library(stringr)
+library(plotly)
+library(DT)
+library(vroom)
+library(shinythemes)
+
+# addCircleMarkers(
+#   data = weather2(),
+#   layerId = ~Site,
+#   lng = ~ long,
+#   lat = ~ lat,
+#   radius = if(input$variable %in% c("Snowfall",
+#                                     "Snow_depth")) {~sqrt(variable)} else {~variable},
+#   color = "black",
+#   weight = 5,
+#   stroke = TRUE,
+#   fillOpacity = 1,
+#   fillColor = "black",
+#   popup = paste("Station:", weather2()$Site, "<br>",
+#                 paste0(input$variable, ":"), weather2()$variable,
+#                 if(input$variable %in% c("Precipitation", "Snowfall",
+#                                          "Snow_depth")) {"mm"} else {"degrees Celcius"}
+#   ),
+
+# https://github.com/ccmothes/poudrePortal
+
+
+
+#### feedback 
+# 
+# nested structure for the indicator selector. 
+# 
+# add link in the introduction text for the website and the method documentation 
+# 
+# multiple features showcase links to exteral references 
+# 
+
+
+# source helpers ----------------------------------------------------------
+lapply(list.files(path = "src",recursive = TRUE, full.names = TRUE), source)
+
+
 # enviroscreen data
-envoData <- sfarrow::st_read_feather("data/scores/allScores.feather")
+envoData <- readRDS("data/scores/allScores.rda")
+
+# addational Data 
+oil <- readRDS("data/scores/oil.rda")
+coal <- readRDS("data/scores/coal.rda")
+rural <- readRDS("data/scores/rural.rda")
+
+# di community 
+di <- getDI()
 
 # purple high
 colorRamp <- c(
-  "#00441b", "#1b7837", "#5aae61", "#a6dba0", "#d9f0d3", "#e7d4e8",
-  "#c2a5cf", "#9970ab", "#762a83", "#40004b"
-)
+  "#fcfbfd",
+  "#efedf5",
+  "#dadaeb",
+  "#bcbddc",
+  "#9e9ac8",
+  "#807dba",
+  "#6a51a3",
+  "#54278f",
+  "#3f007d")
 
-# palMap <- colorNumeric(
-#   palette = colorRamp,
-#   domain = vals,
-#   reverse = FALSE
-# )
+
+# create initial dataset for map  -----------------------------------------
+mapData <- initialMapData(envoData)
+# palette for the map
+palMap <- leaflet::colorNumeric(palette = colorRamp,
+    domain = mapData$`Colorado Enviroscreen Score_pcntl`,
+    reverse = TRUE
+  )
 
 # unique Indicators
 indicators <- sf::st_drop_geometry(envoData) %>%
@@ -33,8 +93,6 @@ indicators <- sf::st_drop_geometry(envoData) %>%
   dplyr::select(!ends_with("_Pctl")) %>%
   dplyr::select(!ends_with("_pcntl")) %>%
   names()
-## currently the period is in the name, due to the file type.... need
-
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(theme = shinytheme("sandstone"),
@@ -75,10 +133,15 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
 
   # Select Reactive Elements ------------------------------------------------
   # content for the reactive elements of the map
-  fluidRow(
+  fluidRow(style = {"border-style: solid; borderColor=:#4d3a7d;"},
+    # action button 
+    column(
+      2,
+      actionButton("button", "Update Map")
+    ),
     # select geography
     column(
-      4,
+      2,
       selectInput(
         inputId = "Geom",
         label = "Select Geographic Scale",
@@ -89,7 +152,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
     ),
     # select indicator
     column(
-      4,
+      3,
       selectInput(
         inputId = "Indicator",
         label = "Select Layer for Map",
@@ -107,13 +170,24 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
         choices = c("Measured Value", "Percentile Rank"),
         selected = "Measured Value"
       )
+    ),
+    # add DI Communities 
+    column(
+      3,
+      selectInput(
+        inputId = "addDI",
+        label = "Disproportionally Impacted Communities",
+        choices = c("Add to Map", "Remove from Map"),
+        selected = "Remove from Map"
+      )
     )
   ),
 
 
   # display map -------------------------------------------------------------
-  fluidRow(
-    leafletOutput("mymap")
+  fluidRow(style = "background-color:#4d3a7d;",
+           tags$style(type = "text/css", "#mymap {height: calc(100vh - 80px) !important;}"),
+           leafletOutput("mymap")
   ),
 
   # describe indicators -----------------------------------------------------
@@ -156,7 +230,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
 )
 
 # Define server logic required to draw a histogram
-server <- function(input, output) {
+server <- function(input, output,session) {
 
   # intro image -------------------------------------------------------------
   # image output
@@ -171,93 +245,13 @@ server <- function(input, output) {
       dplyr::filter(area == input$Geom)
   })
 
-
-  # reactive indicator selection --------------------------------------------
-  # grab options for indicator
-  indicator1 <- reactive({
-    input$Indicator
-  })
-  indicator2 <- reactive({
-    paste0(indicator1(), "_pcntl")
-  })
-  # # grab specific element
-  selection <- reactive({
-    ifelse(
-      test = input$Percentile == "Measured Value",
-      yes = indicator1(),
-      no = indicator2()
-    )
-  })
-
-
-  # troubleshooting print statement -----------------------------------------
-  # output$test1 <- renderPrint(selection())
-
-  # filter for map visualization
-  # join with spatial data based on the geom column
-  spatData <- reactive({
-    df1() %>%
-      dplyr::select(selection())
-  })
-
-
-  # create palettes for map --------------------------------------------------------
-  # generate a palette with the indicator
-  values2 <- reactive({
-    spatData() %>%
-      sf::st_drop_geometry() %>%
-      pull()
-  })
-  # palette for the map
-  palMap <- reactive({
-    leaflet::colorNumeric(
-      palette = colorRamp,
-      domain = values2(),
-      reverse = FALSE
-    )
-  })
-  # palette for the legend
-  palLen <- reactive({
-    colorNumeric(
-      palette = colorRamp,
-      domain = values2(),
-      reverse = TRUE
-    )
-  })
-  
-
-# custom popup ------------------------------------------------------------
-  # spatData2 <- reactive({
-  #   spatData() %>% 
-  #   dplyr::mutate(
-  #     popup = paste0(
-  #       # "<b>", paste0(GEOID," County"),"</b>",
-  #       "<br/><i>", as.character(selection()),"</i>", # needs to be text
-  #       # "<br/><b>Measured:</b> ", !!as.symbol(indicator1),
-  #       # "<br/><b>Percentile:</b> ", !!as.symbol(indicator2)
-  #     )
-  #   )})
-  # 
   # generate map ------------------------------------------------------------
-  output$mymap <- renderLeaflet(
-    leaflet() %>%
-      addTiles() %>%
-      addPolygons(
-        data = spatData(),
-        color = "#454547",
-        weight = 1,
-        smoothFactor = 0.5,
-        opacity = 1.0, fillOpacity = 0.5,
-        fillColor = palMap()(values2()), # https://stackoverflow.com/questions/48953149/dynamic-color-fill-for-polygon-using-leaflet-in-shiny-not-working
-        highlightOptions = highlightOptions(
-          color = "white",
-          weight = 2,
-          bringToFront = TRUE
-        ),
-         popup = "need to make reactive"
-      ) %>%
-      leaflet.extras::addSearchOSM()
-  )
+  ### tie all this into an external function just to clean up the server script. I want the 
+  ### server to be focused on reactive coded not the static stuff. 
+  output$mymap <- renderLeaflet({
+    createMap(mapData = mapData, pal = colorRamp, palMap = palMap,oil=oil, rural = rural, coal = coal)
+  
+    })
 
 # indicator summary -------------------------------------------------------
   # output for indicator summary
@@ -278,6 +272,23 @@ server <- function(input, output) {
     df1() %>% sf::st_drop_geometry(), 
     options = list(fillContainer = TRUE,)
   )
+  
+
+# proxy map elements  -----------------------------------------------------
+  filteredData <- eventReactive(input$button,{
+    d1 <- envoData %>%
+      filter(area %in% input$Geom)
+  })
+
+  observe({
+    leafletProxy("mymap", data = filteredData()) %>%
+      removeShape(layerId = mapData$GEOID) %>%
+      addPolygons(
+        data = filteredData(),
+        group = "Indicator Score",
+        color = "#454547"
+        )
+  })
 }
 
 # Run the application
@@ -286,96 +297,81 @@ shinyApp(ui = ui, server = server)
 
 
 
-
-### this works but lets try something different
-# create the map to start visualization with stock features define in code
-# before the ui
-# output$mymap <- renderLeaflet(
-#   leaflet() %>%
-#     addTiles()%>%
-#     addPolygons(
-#       data = county1,
-#       color = "#454547",
-#       weight = 1,
-#       smoothFactor = 0.5,
-#       opacity = 1.0, fillOpacity = 0.5,
-#       fillColor =  ~palMap(vals),
-#       highlightOptions = highlightOptions(color = "white",
-#                                           weight = 2,
-#                                           bringToFront = TRUE),
-#       popup = "county1"
-#       #group = "Indicator Score",
-#       #options = pathOptions(pane = "index"))
-#     )%>%
-#     leaflet.extras::addSearchOSM()
-# )
-
-
-# proxy for chaging visualization
-# set reactive features based on
-# observe({
-#   # determine Indicator
-#   indicator <- reactive({
-#     input$Indicator
-#   })
-# })
-# output$test1 <- renderText(names(geom1))
-# if(geom1 == "County"){
-#   data1 <- counties
-#
-# elseif(geom1 == "Census Tracts"){
-#   data1 <- censusTracts
-# }else{
-#   data1 <- censusBlockGroups
+# # update map
+# indicator <- eventReactive(input$button,{
+#   # contruct indicator name 
+#   
+#   if(input$Percentile == "Measure Value"){
+#     indicate <- input$Indicator 
+#   }else{
+#     indicate <- paste0(input$Indicator,"_pcntl")
+#   }
 # }
-
-
-# indicator1 <- indicator
-# indicator2 <- paste0(indicator1,"_pcntl")
-#
-# # determine percentile rank or measured
-# indicatorType <- reactive({
-#   input$Percentile
+# )
+# 
+# filteredData <- eventReactive(input$button,{
+#   d1 <- envoData %>%
+#     filter(area %in% input$Geom)%>%
+#     dplyr::select(GEOID, indicator())
 # })
-# selection <- ifelse(
-#   test = indicatorType == "Measured Value",
-#   yes = indicator1,
-#   no = indicator2
-# )
-#
-# values2 <- data1 %>%
-#   dplyr::select(selection)%>%
-#   sf::st_drop_geometry()%>%
-#   pull()
-#
-# # palette for the map
-# palMap <- colorNumeric(
-#   palette = colorRamp,
-#   domain = values2,
-#   reverse = FALSE
-# )
-# #palette for the legend
-# palLen <- colorNumeric(
-#   palette = colorRamp,
-#   domain = values2,
-#   reverse = TRUE
-# )
-
-# leafletProxy("mymap", data = data1) %>%
-#   clearShapes() %>%
-#   addPolygons(
-#     color = "#454547",
-#     weight = 1,
-#     smoothFactor = 0.5,
-#     opacity = 1.0, fillOpacity = 0.5,
-#     fillColor =  ~palMap(values2),
-#     highlightOptions = highlightOptions(color = "white",
-#                                         weight = 2,
-#                                         bringToFront = TRUE),
-#     #popup = ~popup,
-#     #group = "Indicator Score",
-#     #options = pathOptions(pane = "index"))
+# 
+# 
+# # generate palette 
+# palette1 <- reactive({
+#   palMap <- leaflet::colorNumeric(palette = colorRamp,
+#                                   domain = filteredData()[,indicator()],
+#                                   reverse = TRUE
 #   )
-#
-#     })
-#
+# })
+
+
+# observe({
+#   add_di <- input$addDI
+#   proxy <- leafletProxy("mymap")
+#   if(add_di == "Add to Map"){
+#     proxy %>% addPolygons(
+#       data = di,
+#       layerId =  "Disproportionally Impacted Community",
+#       stroke = TRUE,
+#       color = "#51F0CD",
+#       weight = 1,
+#       group =  "Disproportionally Impacted Community"
+#     )
+#   }else{
+#     proxy %>% removeMarker(layerId="Disproportionally Impacted Community")
+#   }
+# })
+# 
+
+
+# diCommunity <- readRDS("data/scores/diCommunities.rda")%>%
+#   mutate(
+#     Mn_FLAG = case_when(
+#       Mn_FLAG == 1 ~ "Yes",
+#       Mn_FLAG == 0 ~ "No"
+#     ),
+#     FLP_FLA = case_when(
+#       FLP_FLA == 1 ~ "Yes",
+#       FLP_FLA == 0 ~ "No"
+#     ),
+#     Br_FLAG = case_when(
+#       Br_FLAG == 1 ~ "Yes",
+#       Br_FLAG == 0 ~ "No"
+#     )
+#     
+#   )%>%
+#   mutate(popup =
+#            paste0(
+#              "<br/><h3>Disproportionally Impacted Community: </h3>",
+#              "<br/><b>Census Block Group: </b>", GEOID,
+#              "<br/>",
+#              "<br/><b>40% of Households are Low Income: </b>", FLP_FLA,
+#              "<br/><b>Percent Low Income: </b>", Pov_PCT,
+#              "<br/>",
+#              "<br/><b>40% of Households are Minority : </b>", Mn_FLAG,
+#              "<br/><b>Percent Minority: </b>", Min_PCT,
+#              "<br/>",
+#              "<br/><b>40% of Households are Housing Burdened : </b>", Br_FLAG,
+#              "<br/><b>Percent Housing Burdened: </b>", HH_Br_P
+#            )
+#            )
