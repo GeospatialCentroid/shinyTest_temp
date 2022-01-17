@@ -18,37 +18,8 @@ library(plotly)
 library(DT)
 library(vroom)
 library(shinythemes)
-
-# addCircleMarkers(
-#   data = weather2(),
-#   layerId = ~Site,
-#   lng = ~ long,
-#   lat = ~ lat,
-#   radius = if(input$variable %in% c("Snowfall",
-#                                     "Snow_depth")) {~sqrt(variable)} else {~variable},
-#   color = "black",
-#   weight = 5,
-#   stroke = TRUE,
-#   fillOpacity = 1,
-#   fillColor = "black",
-#   popup = paste("Station:", weather2()$Site, "<br>",
-#                 paste0(input$variable, ":"), weather2()$variable,
-#                 if(input$variable %in% c("Precipitation", "Snowfall",
-#                                          "Snow_depth")) {"mm"} else {"degrees Celcius"}
-#   ),
-
-# https://github.com/ccmothes/poudrePortal
-
-
-
-#### feedback 
-# 
-# nested structure for the indicator selector. 
-# 
-# add link in the introduction text for the website and the method documentation 
-# 
-# multiple features showcase links to exteral references 
-# 
+library(leafgl)
+library(bslib)
 
 
 # source helpers ----------------------------------------------------------
@@ -56,7 +27,8 @@ lapply(list.files(path = "src",recursive = TRUE, full.names = TRUE), source)
 
 
 # enviroscreen data
-envoData <- readRDS("data/scores/allScores.rda")
+envoData <- readRDS("data/scores/allScores.rda")%>%
+  dplyr::mutate(visParam = `Colorado Enviroscreen Score_pcntl`)
 
 # addational Data 
 oil <- readRDS("data/scores/oil.rda")
@@ -66,159 +38,304 @@ rural <- readRDS("data/scores/rural.rda")
 # di community 
 di <- getDI()
 
-# purple high
-colorRamp <- c(
-  "#fcfbfd",
-  "#efedf5",
-  "#dadaeb",
-  "#bcbddc",
-  "#9e9ac8",
-  "#807dba",
-  "#6a51a3",
-  "#54278f",
-  "#3f007d")
+colorRamp <- c(  "#f2f0f7"  ,"#cbc9e2"  ,"#9e9ac8"  ,"#756bb1"  ,"#54278f")
 
 
 # create initial dataset for map  -----------------------------------------
 mapData <- initialMapData(envoData)
 # palette for the map
 palMap <- leaflet::colorNumeric(palette = colorRamp,
-    domain = mapData$`Colorado Enviroscreen Score_pcntl`,
+    domain = mapData$visParam,
     reverse = TRUE
   )
 
 # unique Indicators
 indicators <- sf::st_drop_geometry(envoData) %>%
-  dplyr::select(-c(area, GEOID)) %>%
+  dplyr::select(-c(name, area, GEOID)) %>%
   dplyr::select(!ends_with("_Pctl")) %>%
   dplyr::select(!ends_with("_pcntl")) %>%
   names()
 
-# Define UI for application that draws a histogram
-ui <- fluidPage(theme = shinytheme("sandstone"),
 
+
+# UI  ---------------------------------------------------------------------
+ui <- fluidPage(theme = bslib::bs_theme(
+  bootswatch = "flatly",
+  #bg = "#FFFFFF",
+  #fg = "#000",
+  primary = "#186D03",
+  secondary = "#DD5B27",
+  success = "#f28e35",
+  base_font = "Trebuchet MS,Helvetica,sans-serif",
+  heading_font = "museo-sans,sans-serif"
+    )%>%
+    bslib::bs_add_rules(sass::sass_file("www/style.scss")),
   # nav panel ---------------------------------------------------------------
   # not sure if it's needed but probably... 
   
+  
+  HTML('<header class="main-header" role="banner">
+    <img src="MountainsToPlains.png" alt="Banner Image"/>
+  </header>'
+  ),
+  
   # Title ------------------------------------------------------------------
   fluidRow(
-    includeCSS("www/banner.css"),
-    HTML(
-      '<header id="showcase">
-    <h1>Colorado Enviroscreen</h1>
-    <p>Mapping Health Equity in Colorado</p>
-    </header>')
+    shiny::titlePanel(h1("Colorado Enviroscreen"))
   ),
 
-  fluidRow(
-    h2("text describing the project"),
-    p(random_text(nwords = 400))
+  fluidRow(style={"padding-left:100px;padding-right:100px;"},
+    p(HTML("</br><a href='#map'>Jump to Map</a>")),
+    p("The Colorado Department of Public Health and Environment and a team at Colorado State University are working on an enhanced environmental health screening tool for Colorado. This interactive mapping tool is called CO EnviroScreen.
+      The tool will enable users to identify disproportionately impacted (DI) communities based on the definition in Colorado’s Environmental Justice Act (HB21-1266). CO EnviroScreen will be one way Colorado addresses current and historic inequities. 
+      The mapping tool aims to:"),
+    p(
+      tags$ol(
+        tags$li("Pinpoint areas that have a disproportionate burden of health and/or environmental harm."), 
+        tags$li("Help users maximize funding and resources for policy changes and other interventions to avoid, minimize, and mitigate environmental health risks."), 
+        tags$li("Advance a healthy and sustainable Colorado where everyone has the same degree of protection from environmental and health hazards.")
+      )
+    ),
+    p("Scroll down for addation information on how to use this resource and the current results of the Colorado Enviroscreen.")
+    
   ),
 
 
   # description of use ------------------------------------------------------
-  fluidRow(
-    column(
-      6,
-      h2("image showing examples of how to use the resource "),
-      plotOutput("image", height = "300px"),
-    ),
-    column(
-      6,
-      h2("supporting text for the image "),
-      p(random_text(nwords = 400))
-    )
+  h2("Understanding the Enviroscreen Tool"),
+  tabsetPanel(
+    tabPanel("Enviroscreen Score", 
+             h3("What is the Enviroscreen Score"),
+             fluidRow(
+               column( align = "center",
+                       6,
+                       h2("example Images "),
+                       plotOutput("image", height = "300px"),
+               ),
+               column(
+                 6,
+                 h2("supporting text"),
+                 p(random_text(nwords = 400))
+               )
+             )), 
+    tabPanel("Using the Map", 
+             h3("How to use the map"),
+             p(
+               tags$ol(
+                 tags$li("Geography scale selector"), 
+                 tags$li("Indicator Selector"), 
+                 tags$li("Measured vs percentile score"),
+                 tags$li("Map Elements (basemap, search, reset"),
+                 tags$li("interaction with tables and figures")
+               )
+             ),
+             fluidRow(
+               column( align = "center",
+                       6,
+                       h2("example Images "),
+                       plotOutput("image", height = "300px"),
+               ),
+               column(
+                 6,
+                 h2("supporting text"),
+                 p(random_text(nwords = 400))
+               )
+             )), 
+    tabPanel("Understanding the Data", 
+             h3("What to do with the data."),
+             fluidRow(column( align = "center",
+              6,
+              h2("example Images "),
+              plotOutput("image", height = "300px"),
+      ),
+      column(
+        6,
+        h2("supporting text"),
+        p(random_text(nwords = 400))
+      )
+    )),
+    tabPanel("Addational Ideas", 
+             h3("These tabs can continue for other discussion points"),
+             fluidRow(
+               column( align = "center",
+              6,
+              h2("example Images "),
+              plotOutput("image", height = "300px"),
+      ),
+      column(
+        6,
+        h2("supporting text"),
+        p(random_text(nwords = 400))
+      )
+    ))
+    
   ),
 
 
   # Select Reactive Elements ------------------------------------------------
   # content for the reactive elements of the map
-  fluidRow(style = {"border-style: solid; borderColor=:#4d3a7d;"},
-    # action button 
-    column(
-      2,
-      actionButton("button", "Update Map")
-    ),
+  fluidRow(id = "map", style = {"border-style: solid; borderColor=:#4d3a7d; padding-left:100px;padding-right:100px;"},
     # select geography
     column(
       2,
-      selectInput(
-        inputId = "Geom",
-        label = "Select Geographic Scale",
-        choices = c("County", "Census Tract", "Census Block Group"),
-        selected = "County",
-        width = "90%"
+      tags$div(title="Click here to select area to display on the map",
+               selectInput(
+                 inputId = "Geom",
+                 label = "Select Geographic Scale",
+                 choices = c("County", "Census Tract", "Census Block Group"),
+                 selected = "County",
+                 width = "90%"
+               )
       )
     ),
     # select indicator
     column(
       3,
+      tags$div(title="Click here to select variable for map",
       selectInput(
         inputId = "Indicator",
         label = "Select Layer for Map",
-        choices = indicators,
+        choices = list(
+          "EnviroScreen Score" = "Colorado Enviroscreen Score",
+          "Group Component Scores" = c("Pollution and Climate Burden", "Population Burden"),
+          "Individual Component Scores" =c("Environmental Exposures",
+                                           "Environmental Effects",
+                                           "Climate",
+                                           "Sensitive Populations",
+                                           "Socioeconomic"),
+          "Environmental Exposures" = c("Ozone"                                                  
+                                        ,"Particulate Matter 2.5"                                 
+                                        ,"Lead Paint in Homes"                                    
+                                        ,"Diesel Particulate Matter"                              
+                                        ,"Traffic Density"                                        
+                                        ,"Hazardous Air Emission" 
+                                      ),
+          "Environmental Effects" = c(
+            "Waste Water Discharge"                                  
+            ,"Proximity to Superfund Sites"                           
+            ,"Proximity to Risk Management Plan Sites"                
+            ,"Proximity to Treatment, Storage and Disposal Facilities"
+          ),
+          "Climate" = c(
+            "Wildfire Risk"                                          
+            ,"Flood Plain Area" 
+          ),
+          "Sensitive Populations" = c(
+            "Population Under Five"                                  
+            ,"Population Over Sixity Four"                            
+            ,"Heart Disease"                                          
+            ,"Asthma"                                                 
+            ,"Life Expectancy"                                        
+            ,"Low Birth Weight" 
+          ),
+          "Socioeconomic" = c(
+            "People of Color"                                        
+            ,"Educational Attainment"                                 
+            ,"Low Income"                                             
+            ,"Linguistic Isolation"                                   
+            ,"Disability" 
+          )
+        ),
         selected = "envExp",
         width = "90%"
+      )
       )
     ),
     # toggle between measured and percentile
     column(
-      2,
+      3,
+      tags$div(title="Click here to show measure value or rank of the variable",
       selectInput(
         inputId = "Percentile",
         label = "Measure or Percentile",
         choices = c("Measured Value", "Percentile Rank"),
         selected = "Measured Value"
       )
+      ),
     ),
-    # add DI Communities 
+    # action button 
     column(
-      3,
-      selectInput(
-        inputId = "addDI",
-        label = "Disproportionally Impacted Communities",
-        choices = c("Add to Map", "Remove from Map"),
-        selected = "Remove from Map"
+      2,
+      tags$div(title="Click here to update map display",
+               actionButton("button", "Update Map")
       )
     )
   ),
 
 
   # display map -------------------------------------------------------------
-  fluidRow(style = "background-color:#4d3a7d;",
-           tags$style(type = "text/css", "#mymap {height: calc(100vh - 80px) !important;}"),
-           leafletOutput("mymap")
+  fluidRow(
+    column(
+      width = 1, style = {"background-color:#4d3a7d;"}),
+    column(
+      width = 10,
+      style = {"border-style: solid; borderColor=:#4d3a7d;"},
+      tags$style(type = "text/css", "#mymap {height: calc(100vh - 80px) !important;}"),
+      leafletOutput("mymap")
+    ),
+    column(
+      width = 1, style = "background-color:#4d3a7d;"
+    ),
   ),
 
   # describe indicators -----------------------------------------------------
   # sentence explaining the indicators
-  h2("two sentences that change based on idicator selection"),
+  h2("indicator description"),
   textOutput("indicatorDesc"),
   br(),
 
   # show plots --------------------------------------------------------------
   # plot of the datasets
   fluidRow(
-    h2("Histograph of 5 component scores. Reactive on the map selection"),
+    h2("Histograms"),
     plotlyOutput("graph")
   ),
   br(),
 
   # Describe plots  --------------------------------------------------------
   # paragraphy explaining the plot
-  h2("text describing the plot"),
+  h2("supporting Text"),
   p(random_text(nwords = 80)),
 
 
   # show reactive table -----------------------------------------------------
   # table showing the results
   fluidRow(
-    h2("Reactive table based on geography selection"),
+    h2("Enviroscreen Score Data"),
     column(
-      10,
-      dataTableOutput("data_table")
-    )
+      12,
+      # Output: Tabset w/ plot, summary, and table ----
+      tabsetPanel(type = "tabs",
+                  tabPanel("Group Component Scores", dataTableOutput("gComponentScore")),
+                  tabPanel("Component Score", dataTableOutput("componentScore")),
+                  tabPanel("Environmental Exposures", dataTableOutput("evnEx")),
+                  tabPanel("Environmental Effects", dataTableOutput("evnEf")),
+                  tabPanel("Climate", dataTableOutput("clim")),
+                  tabPanel("Sensitive Population", dataTableOutput("senPop")),
+                  tabPanel("Socioeconomic", dataTableOutput("socEco"))
+        )
+      )
+    ),
+
+  # download table option  --------------------------------------------------
+  fluidRow(
+    column(2,selectInput("download", "Choose a dataset:",
+                  choices = c("All Data" 
+                              # ,"Group Component Scores"
+                              # ,"Component Score"
+                              # ,"Environmental Exposures"
+                              # ,"Environmental Effects"
+                              # ,"Climate"
+                              # ,"Sensitive Population"
+                              # ,"Socioeconomic"
+                              )
+                  ),
+    ),
+    column(2,downloadButton("downloadData", "Download"))
   ),
+  
+  h3("Addational Resources"),
+  p("We can utilize this space for sharing any relivent reference information."),
 
   # print statement for trouble shooting
   fluidRow(
@@ -249,15 +366,14 @@ server <- function(input, output,session) {
   ### tie all this into an external function just to clean up the server script. I want the 
   ### server to be focused on reactive coded not the static stuff. 
   output$mymap <- renderLeaflet({
-    createMap(mapData = mapData, pal = colorRamp, palMap = palMap,oil=oil, rural = rural, coal = coal)
-  
+    createMap(mapData = mapData, di = di,  pal = colorRamp, palMap = palMap,oil=oil, rural = rural, coal = coal)
     })
 
-# indicator summary -------------------------------------------------------
-  # output for indicator summary
-  output$indicatorDesc <- renderText({
-    paste0(input$Indicator, " : ", shinipsum::random_text(nwords = 40))
-  })
+# # indicator summary -------------------------------------------------------
+#   # output for indicator summary
+#   output$indicatorDesc <- renderText({
+#     paste0(input$Indicator, " : ", shinipsum::random_text(nwords = 40))
+#   })
 
 
 # histogram plots ---------------------------------------------------------
@@ -268,110 +384,236 @@ server <- function(input, output,session) {
 
 # table output ------------------------------------------------------------   
   # output for datatable
-  output$data_table <- renderDataTable(
-    df1() %>% sf::st_drop_geometry(), 
-    options = list(fillContainer = TRUE,)
+  tableData <- reactive({
+    df1() %>% sf::st_drop_geometry()
+  })
+  # group component scores 
+  output$gComponentScore <- renderDataTable(tableData() %>% dplyr::select(
+    "GEOID"
+    ,"name"
+    ,"Colorado Enviroscreen Score"
+    ,"Colorado Enviroscreen Score_pcntl"                            
+    ,"Pollution and Climate Burden"
+    ,"Pollution and Climate Burden_pcntl"
+    ,"Population Burden"                                            
+    ,"Population Burden_pcntl"
+    ))
+  # # component Score
+  # output$componentScore <- renderDataTable(tableData() %>% dplyr::select(
+  #   "GEOID",
+  #   "name"
+  #   ,"Environmental Exposures",
+  #   # "Environmental Exposures_pcntl",
+  #   "Environmental Effects",
+  #   # "Environmental Effects_pcntl",
+  #   "Climate",
+  #   # "Climate_pcntl",
+  #   "Sensitive Populations",
+  #   # "Sensitive Populations_pcntl",
+  #   "Socioeconomic"
+  #   # "Socioeconomic_pcntl"
+  # ))
+  # # component Score
+  # output$evnEx <- renderDataTable(tableData() %>% dplyr::select(
+  #   "GEOID"
+  #   ,"name"
+  #   ,"Ozone"
+  #   ,"Ozone_pcntl"                                                  
+  #   ,"Particulate Matter 2.5"
+  #   ,"Particulate Matter 2.5_pcntl"                                 
+  #   ,"Lead Paint in Homes"                                    
+  #   ,"Lead Paint in Homes_pcntl"                                    
+  #   ,"Diesel Particulate Matter"                              
+  #   ,"Diesel Particulate Matter_pcntl"                              
+  #   ,"Traffic Density"                                        
+  #   ,"Traffic Density_pcntl"                                        
+  #   ,"Hazardous Air Emission"
+  #   ,"Hazardous Air Emission_pcntl" 
+  # ))
+  # # component Score
+  # output$evnEf <- renderDataTable(tableData() %>% dplyr::select(
+  #   "GEOID"
+  #   ,"name"
+  #   ,"Waste Water Discharge"                                  
+  #   ,"Waste Water Discharge_pcntl"                                  
+  #   ,"Proximity to Superfund Sites"                           
+  #   ,"Proximity to Superfund Sites_pcntl"                           
+  #   ,"Proximity to Risk Management Plan Sites_pcntl"                
+  #   ,"Proximity to Risk Management Plan Sites"                
+  #   ,"Proximity to Treatment, Storage and Disposal Facilities"
+  #   ,"Proximity to Treatment, Storage and Disposal Facilities_pcntl"
+  # ))
+  # # component Score
+  # output$clim <- renderDataTable(tableData() %>% dplyr::select(
+  #   "GEOID"
+  #   ,"name"
+  #   ,"Wildfire Risk"                                          
+  #   ,"Wildfire Risk_pcntl"
+  #   ,"Flood Plain Area" 
+  #   ,"Flood Plain Area_pcntl" 
+  # ))
+  # # component Score
+  # output$senPop <-  renderDataTable(tableData() %>% dplyr::select(
+  #   "GEOID"
+  #   ,"name"
+  #   ,"Population Under Five"                                  
+  #   ,"Population Under Five_pcntl"                                  
+  #   ,"Population Over Sixity Four"                            
+  #   ,"Population Over Sixity Four_pcntl"                            
+  #   ,"Heart Disease"                                          
+  #   ,"Heart Disease_pcntl"                                          
+  #   ,"Asthma"                                                 
+  #   ,"Asthma_pcntl"                                                 
+  #   ,"Life Expectancy_pcntl"                                        
+  #   ,"Life Expectancy"                                        
+  #   ,"Low Birth Weight"            
+  #   ,"Low Birth Weight_pcntl" 
+  # ))
+  # # component Score
+  # output$socEco <- renderDataTable(tableData() %>% dplyr::select(
+  #   "GEOID"
+  #   ,"name"
+  #   ,"People of Color"                                        
+  #   ,"People of Color_pcntl"                                        
+  #   ,"Educational Attainment"
+  #   ,"Educational Attainment_pcntl"                                 
+  #   ,"Low Income"            
+  #   ,"Low Income_pcntl"      
+  #   ,"Linguistic Isolation"                              
+  #   ,"Linguistic Isolation_pcntl"                             
+  #   ,"Disability"                                                   
+  #   ,"Disability_pcntl" 
+  # ))
+  # download data -----------------------------------------------------------
+  
+  # Reactive value for selected dataset ----
+  datasetInput <- reactive({
+    switch(input$download,
+           "All Data" = df1()
+           # ,"Group Component Scores" = output$gcomponentScore 
+           # ,"Component Score" = output$componentScore 
+           # ,"Environmental Exposures" = output$evnEx
+           # ,"Environmental Effects" =output$evnEf
+           # ,"Climate" = output$clim 
+           # ,"Sensitive Population" = output$senPop
+           # ,"Socioeconomic" = socEcoTable()
+           )
+  })
+
+  # Downloadable csv of selected dataset ----
+  output$downloadData <- downloadHandler(
+    filename = function() {
+      paste(input$download,"_",input$Geom, ".csv", sep = "")
+    },
+    content = function(file) {
+      write.csv(datasetInput(), file, row.names = FALSE)
+    }
   )
   
-
+  # add highlight layer on selection  ---------------------------------------
+  # observeEvent(input$mymap_shape_click, {
+  #   
+  #   #capture the info of the clicked polygon
+  #   click <- input$mymap_shape_click
+  #   
+  #   #subset your table with the id of the clicked polygon 
+  #   mapSelection <- envoData[envoData$GEOID == click$id, ]
+  #   print(mapSelection)
+  #   
+  #   leafletProxy("mymap") %>%
+  #     addPolygons(
+  #       data = mapSelection,
+  #       fillColor =  "green",
+  #       layerId = "single",
+  #       fillOpacity = 0.9)
+  # })
+  
 # proxy map elements  -----------------------------------------------------
-  filteredData <- eventReactive(input$button,{
-    d1 <- envoData %>%
-      filter(area %in% input$Geom)
+  observeEvent(input$button, {
+    ### helpful source https://stackoverflow.com/questions/37433569/changing-leaflet-map-according-to-input-without-redrawing
+    # geography 
+    geo <- input$Geom 
+    
+    # indicator 
+    in1 <- input$Indicator
+    indicator1 <- in1
+    indicator2 <- paste0(in1,"_pcntl")
+    
+    if(input$Percentile == "Measured Value"){
+      indicator <- indicator1 
+    }
+    if(input$Percentile == "Percentile Rank"){
+      indicator <- indicator2
+    }
+    
+    # filter and assign visparam 
+    ed2 <- envoData[envoData$area == geo, ]
+    ed2 <- ed2 %>%
+      mutate(visParam = !!as.symbol(indicator))%>% # https://stackoverflow.com/questions/62862705/r-shiny-mutate-replace-how-to-mutate-specific-column-selected-from-selectinput
+      st_cast("POLYGON")
+    
+    
+    ed2 <- ed2 %>%
+      dplyr::mutate(
+        popup = paste0(
+          "<br/><strong>", as.character(in1),"</strong>", # needs to be text
+          paste0("<br/><strong>",name,"</strong>"),
+          paste0(if(in1 %in% c("Colorado Enviroscreen Score",
+                                    "Pollution Burden",
+                                    "Climate Burden",
+                                    "Environmental Exposures",
+                                    "Environmental Effects",
+                                    "Climate",
+                                    "Sensitive Populations",
+                                    "Socioeconomic"
+          )){
+            paste0("<br/><b>Percentile:</b> ", round(!!as.symbol(indicator2), digits =  0))
+          }else{
+            paste0("<br/><b>Measured:</b> ", round(!!as.symbol(indicator1), digits = 2),
+                   "<br/><b>Percentile:</b> ", round(!!as.symbol(indicator2), digits =  0))
+          })
+      ))
+    
+    # palette 
+    pal1 <- leaflet::colorNumeric(palette = colorRamp,
+                                  domain = ed2$visParam,
+                                  reverse = TRUE)
+    
+    leafletProxy("mymap") %>%
+      clearGroup(group = "Indicator Score") %>%
+      addGlPolygons(
+        data = ed2,
+        layerId = ed2$GEOID,
+        fillColor =  ~pal1(ed2$visParam),
+        group = "Indicator Score",
+        fillOpacity = 0.9,
+        popup = ed2$popup
+      )
+
   })
 
-  observe({
-    leafletProxy("mymap", data = filteredData()) %>%
-      removeShape(layerId = mapData$GEOID) %>%
-      addPolygons(
-        data = filteredData(),
-        group = "Indicator Score",
-        color = "#454547"
-        )
-  })
+# add disproportionally impacted communities ------------------------------
+  # observe({
+  #   if(input$addDI == "Add to Map"){
+  #     leafletProxy("mymap")%>%
+  #       addGlPolygons(
+  #       data = di,
+  #       layerId =  "di",
+  #       stroke = TRUE,
+  #       color = "#51F0CD",
+  #       weight = 1,
+  #       popup = di$popup,
+  #       group =  "Disproportionally Impacted Community"
+  #     )
+  #   }
+  #   if(input$addDI == "Remove from Map"){
+  #     leafletProxy("mymap") %>% clearGroup(group="Disproportionally Impacted Community")
+  #   }
+  # 
+  # })
 }
 
 # Run the application
 shinyApp(ui = ui, server = server)
-
-
-
-
-# # update map
-# indicator <- eventReactive(input$button,{
-#   # contruct indicator name 
-#   
-#   if(input$Percentile == "Measure Value"){
-#     indicate <- input$Indicator 
-#   }else{
-#     indicate <- paste0(input$Indicator,"_pcntl")
-#   }
-# }
-# )
-# 
-# filteredData <- eventReactive(input$button,{
-#   d1 <- envoData %>%
-#     filter(area %in% input$Geom)%>%
-#     dplyr::select(GEOID, indicator())
-# })
-# 
-# 
-# # generate palette 
-# palette1 <- reactive({
-#   palMap <- leaflet::colorNumeric(palette = colorRamp,
-#                                   domain = filteredData()[,indicator()],
-#                                   reverse = TRUE
-#   )
-# })
-
-
-# observe({
-#   add_di <- input$addDI
-#   proxy <- leafletProxy("mymap")
-#   if(add_di == "Add to Map"){
-#     proxy %>% addPolygons(
-#       data = di,
-#       layerId =  "Disproportionally Impacted Community",
-#       stroke = TRUE,
-#       color = "#51F0CD",
-#       weight = 1,
-#       group =  "Disproportionally Impacted Community"
-#     )
-#   }else{
-#     proxy %>% removeMarker(layerId="Disproportionally Impacted Community")
-#   }
-# })
-# 
-
-
-# diCommunity <- readRDS("data/scores/diCommunities.rda")%>%
-#   mutate(
-#     Mn_FLAG = case_when(
-#       Mn_FLAG == 1 ~ "Yes",
-#       Mn_FLAG == 0 ~ "No"
-#     ),
-#     FLP_FLA = case_when(
-#       FLP_FLA == 1 ~ "Yes",
-#       FLP_FLA == 0 ~ "No"
-#     ),
-#     Br_FLAG = case_when(
-#       Br_FLAG == 1 ~ "Yes",
-#       Br_FLAG == 0 ~ "No"
-#     )
-#     
-#   )%>%
-#   mutate(popup =
-#            paste0(
-#              "<br/><h3>Disproportionally Impacted Community: </h3>",
-#              "<br/><b>Census Block Group: </b>", GEOID,
-#              "<br/>",
-#              "<br/><b>40% of Households are Low Income: </b>", FLP_FLA,
-#              "<br/><b>Percent Low Income: </b>", Pov_PCT,
-#              "<br/>",
-#              "<br/><b>40% of Households are Minority : </b>", Mn_FLAG,
-#              "<br/><b>Percent Minority: </b>", Min_PCT,
-#              "<br/>",
-#              "<br/><b>40% of Households are Housing Burdened : </b>", Br_FLAG,
-#              "<br/><b>Percent Housing Burdened: </b>", HH_Br_P
-#            )
-#            )
+## display in browser for styling elements 
+# options = list(launch.browser = TRUE)

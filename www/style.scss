@@ -1,0 +1,51 @@
+p {
+  padding: 35px 70px;
+}
+
+
+h1, h2, h3, h4, h5, h6
+{
+  padding: 35px 70px;
+  text-align: center;
+}
+
+
+
+shiny-text-output shiny-bound-output{
+  padding: 10px 20px;
+}
+
+.main-header {
+  text-align: center;
+}
+
+.optgroup-header{ 
+  font-weight: 600;
+  background-color: coral;
+  text-size-adjust: 1.5;
+}
+
+showcase{
+  background-image:url('MountainsToPlains.png');
+  background-size:cover;
+  background-position:center;
+  height:40vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:0 20px;
+}
+
+showcase h1{
+  font-size:50px;
+  line-height:1.2;
+  color: white;
+}
+
+showcase p{
+  font-size:20px;
+  color: white;
+}
+

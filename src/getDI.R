@@ -7,6 +7,19 @@
 #' @examples
 #' 
 #' 
+#' 
+#' 
+
+# Add categories and specific visualization parameters 
+# Will need to add custom legend as well
+# low income : rgb(253,209,138)   #fdd18a
+# 
+# people of color : id="rgb(173,225,233)"   #ade1df
+# 
+# housing burden : rgb(81,161,152) #51a198
+# 
+# more then one categoy :rgb(192,149,180) #c095b4
+# 
 getDI <- function(){
   
   diCommunity <- readRDS("data/scores/diCommunities.rda")%>%
@@ -26,7 +39,7 @@ getDI <- function(){
     )%>%
     mutate(popup =
              paste0(
-               "<br/><h3>Disproportionally Impacted Community: </h3>",
+               "<br/><strong>Disproportionally Impacted Community: </strong>",
                "<br/><b>Census Block Group: </b>", GEOID,
                "<br/>",
                "<br/><b>40% of Households are Low Income: </b>", FLP_FLA,
@@ -38,6 +51,7 @@ getDI <- function(){
                "<br/><b>40% of Households are Housing Burdened : </b>", Br_FLAG,
                "<br/><b>Percent Housing Burdened: </b>", HH_Br_P
              )
-          )
+          )%>%
+    as('sf')
   return(diCommunity)
 }

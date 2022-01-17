@@ -11,16 +11,17 @@
 #' @examples
 #'
 #'
+#'
 
-createMap <- function(mapData, pal, palMap, oil, rural, coal) {
-  mymap <- leaflet() %>%
-    # add z levels ------------------------------------------------------------
+createMap <- function(mapData,pal, palMap, oil, rural, coal, di) {
+  map <- leaflet() %>%
+  # add z levels ------------------------------------------------------------
   addMapPane("index", zIndex = 410) %>%
     addMapPane("binary", zIndex = 420) %>%
     addMapPane("di", zIndex = 421) %>%
     # add tiles ---------------------------------------------------------------
   addProviderTiles("CartoDB.DarkMatter", group = "Dark") %>%
-    addProviderTiles("OpenStreetMap", group = "OpenStreetMap") %>%
+  addProviderTiles("OpenStreetMap", group = "OpenStreetMap") # %>%
     addProviderTiles("Stamen.Toner", group = "Light")%>%
     # add search function -----------------------------------------------------
   leaflet.extras::addSearchOSM(options = leaflet.extras::searchOptions(autoCollapse = TRUE, hideMarkerOnCollapse = TRUE)) %>%
@@ -33,37 +34,52 @@ createMap <- function(mapData, pal, palMap, oil, rural, coal) {
     opacity = 1.0,
     fillOpacity = 0.5,
     fillColor = ~ palMap(`Colorado Enviroscreen Score_pcntl`),
-    # https://stackoverflow.com/questions/48953149/dynamic-color-fill-for-polygon-using-leaflet-in-shiny-not-working
-    highlightOptions = highlightOptions(
-      color = "white",
-      weight = 2,
-      bringToFront = TRUE
-    ),
+    # # https://stackoverflow.com/questions/48953149/dynamic-color-fill-for-polygon-using-leaflet-in-shiny-not-working
+    # highlightOptions = highlightOptions(
+    #   color = "white",
+    #   weight = 2,
+    #   bringToFront = TRUE
+    # ),
     popup = mapData$popup,
     options = pathOptions(pane = "index"),
     layerId = mapData$GEOID,
     group = "Indicator Score"
-  ) %>%
+  )%>%
+  # addGlPolygons(
+  #   data = mapData,
+  #   fillOpacity = 0.9,
+  #   fillColor = ~ palMap(visParam),
+  #   popup = mapData$popup,
+  #   options = pathOptions(pane = "index"),
+  #   layerId = mapData$GEOID,
+  #   group = "Indicator Score"
+  #   ) # %>%
     addPolyLine(sf1 = oil, group = "Oil and Gas Community") %>%
     addPolyLine(sf1 = rural, group = "Rural Community") %>%
     addPolyLine(sf1 = coal, group = "Coal Community") %>%
+    # addPolygons(
+    #   data = di,
+    #   popup = di$popup,
+    #   group = "Disproportionatly Impacted Community"
+    # )%>%
     # add legend --------------------------------------------------------------
   addLegend(
     "topright",
     colors = pal,
     title = "Est. Values",
-    labels = c("Most Burdened", "", "", "", "", "", "", "", "Least Burdened"),
+    labels = c("Most Burdened", "", "", "", "Least Burdened"),
     opacity = 1
     # labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))
   ) %>%
     # add control groups ------------------------------------------------------
   addLayersControl(
-    baseGroups = c("Dark","Light", "OpenStreetMap"),
+    baseGroups = c("Light","Dark", "OpenStreetMap"),
     overlayGroups = c(
       "Indicator Score",
       "Coal Community",
       "Rural Community",
-      "Oil and Gas Community"
+      "Oil and Gas Community",
+      "Disproportionatly Impacted Community"
     ),
     options = layersControlOptions(collapsed = FALSE),
     position = "topleft"
@@ -80,10 +96,13 @@ createMap <- function(mapData, pal, palMap, oil, rural, coal) {
         "Coal Community",
         "Rural Community",
         "Oil and Gas Community",
-        "Disproportionally Impacted Community"
-      )
-    ) %>%
-    # add map reset -----------------------------------------------------------
-  addResetMapButton()
-  return(mymap)
+        "Disproportionatly Impacted Community"))%>%
+  # add map reset -----------------------------------------------------------
+  addResetMapButton()%>%
+  leaflet.extras::addSearchOSM(
+      options = leaflet.extras::searchOptions(
+        autoCollapse = TRUE,
+        hideMarkerOnCollapse = TRUE))
+
+  return(map)
 }
