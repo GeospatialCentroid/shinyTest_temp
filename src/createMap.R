@@ -18,13 +18,15 @@ createMap <- function(mapData,pal, palMap, oil, rural, coal, di) {
   # add z levels ------------------------------------------------------------
   addMapPane("index", zIndex = 410) %>%
     addMapPane("binary", zIndex = 420) %>%
-    addMapPane("di", zIndex = 421) %>%
+    addMapPane("di", zIndex = 409) %>%
     # add tiles ---------------------------------------------------------------
   addProviderTiles("CartoDB.DarkMatter", group = "Dark") %>%
-  addProviderTiles("OpenStreetMap", group = "OpenStreetMap") # %>%
+  addProviderTiles("OpenStreetMap", group = "OpenStreetMap")%>%
     addProviderTiles("Stamen.Toner", group = "Light")%>%
     # add search function -----------------------------------------------------
-  leaflet.extras::addSearchOSM(options = leaflet.extras::searchOptions(autoCollapse = TRUE, hideMarkerOnCollapse = TRUE)) %>%
+  leaflet.extras::addSearchOSM(
+    options = leaflet.extras::searchOptions(autoCollapse = TRUE,
+    hideMarkerOnCollapse = TRUE)) %>%
     # add spatial Data --------------------------------------------------------
   addPolygons(
     data = mapData,
@@ -34,34 +36,25 @@ createMap <- function(mapData,pal, palMap, oil, rural, coal, di) {
     opacity = 1.0,
     fillOpacity = 0.5,
     fillColor = ~ palMap(`Colorado Enviroscreen Score_pcntl`),
-    # # https://stackoverflow.com/questions/48953149/dynamic-color-fill-for-polygon-using-leaflet-in-shiny-not-working
-    # highlightOptions = highlightOptions(
-    #   color = "white",
-    #   weight = 2,
-    #   bringToFront = TRUE
-    # ),
+    # https://stackoverflow.com/questions/48953149/dynamic-color-fill-for-polygon-using-leaflet-in-shiny-not-working
+    highlightOptions = highlightOptions(
+      color = "white",
+      weight = 2,
+      bringToFront = TRUE
+    ),
     popup = mapData$popup,
     options = pathOptions(pane = "index"),
     layerId = mapData$GEOID,
     group = "Indicator Score"
   )%>%
-  # addGlPolygons(
-  #   data = mapData,
-  #   fillOpacity = 0.9,
-  #   fillColor = ~ palMap(visParam),
-  #   popup = mapData$popup,
-  #   options = pathOptions(pane = "index"),
-  #   layerId = mapData$GEOID,
-  #   group = "Indicator Score"
-  #   ) # %>%
     addPolyLine(sf1 = oil, group = "Oil and Gas Community") %>%
     addPolyLine(sf1 = rural, group = "Rural Community") %>%
     addPolyLine(sf1 = coal, group = "Coal Community") %>%
-    # addPolygons(
-    #   data = di,
-    #   popup = di$popup,
-    #   group = "Disproportionatly Impacted Community"
-    # )%>%
+    addPolygons(
+      data = di,
+      popup = di$popup,
+      group = "Disproportionatly Impacted Community"
+    )%>%
     # add legend --------------------------------------------------------------
   addLegend(
     "topright",

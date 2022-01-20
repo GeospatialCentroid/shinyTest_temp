@@ -11,15 +11,13 @@ library(sf)
 library(dplyr)
 library(leaflet)
 library(leaflet.extras)
-library(shinipsum)
 library(shiny)
 library(stringr)
 library(plotly)
 library(DT)
 library(vroom)
-library(shinythemes)
-library(leafgl)
 library(bslib)
+# library(rmapshaper)
 
 
 # source helpers ----------------------------------------------------------
@@ -36,10 +34,14 @@ coal <- readRDS("data/scores/coal.rda")
 rural <- readRDS("data/scores/rural.rda")
 
 # di community 
-di <- getDI()
+di <- getDI()# %>%
+  # I'd like to use rmapshaper::ms_simplify but it is not installing properly on my computer. 
+  # sf::st_simplify(preserveTopology = TRUE, dTolerance = 100)
 
 colorRamp <- c(  "#f2f0f7"  ,"#cbc9e2"  ,"#9e9ac8"  ,"#756bb1"  ,"#54278f")
 
+# selector for tables 
+p <- "temp"
 
 # create initial dataset for map  -----------------------------------------
 mapData <- initialMapData(envoData)
@@ -59,7 +61,8 @@ indicators <- sf::st_drop_geometry(envoData) %>%
 
 
 # UI  ---------------------------------------------------------------------
-ui <- fluidPage(theme = bslib::bs_theme(
+ui <- fluidPage(
+  theme = bslib::bs_theme(
   bootswatch = "flatly",
   #bg = "#FFFFFF",
   #fg = "#000",
@@ -70,15 +73,15 @@ ui <- fluidPage(theme = bslib::bs_theme(
   heading_font = "museo-sans,sans-serif"
     )%>%
     bslib::bs_add_rules(sass::sass_file("www/style.scss")),
-  # nav panel ---------------------------------------------------------------
-  # not sure if it's needed but probably... 
+  # # nav panel ---------------------------------------------------------------
+  # # not sure if it's needed but probably... 
+  # 
   
-  
-  HTML('<header class="main-header" role="banner">
-    <img src="MountainsToPlains.png" alt="Banner Image"/>
-  </header>'
-  ),
-  
+  # HTML('<header class="main-header" role="banner">
+  #   <img src="MountainsToPlains.png" alt="Banner Image"/>
+  # </header>'
+  # ),
+  # 
   # Title ------------------------------------------------------------------
   fluidRow(
     shiny::titlePanel(h1("Colorado Enviroscreen"))
@@ -103,73 +106,76 @@ ui <- fluidPage(theme = bslib::bs_theme(
 
   # description of use ------------------------------------------------------
   h2("Understanding the Enviroscreen Tool"),
-  tabsetPanel(
-    tabPanel("Enviroscreen Score", 
-             h3("What is the Enviroscreen Score"),
-             fluidRow(
-               column( align = "center",
-                       6,
-                       h2("example Images "),
-                       plotOutput("image", height = "300px"),
-               ),
-               column(
-                 6,
-                 h2("supporting text"),
-                 p(random_text(nwords = 400))
-               )
-             )), 
-    tabPanel("Using the Map", 
-             h3("How to use the map"),
-             p(
-               tags$ol(
-                 tags$li("Geography scale selector"), 
-                 tags$li("Indicator Selector"), 
-                 tags$li("Measured vs percentile score"),
-                 tags$li("Map Elements (basemap, search, reset"),
-                 tags$li("interaction with tables and figures")
-               )
-             ),
-             fluidRow(
-               column( align = "center",
-                       6,
-                       h2("example Images "),
-                       plotOutput("image", height = "300px"),
-               ),
-               column(
-                 6,
-                 h2("supporting text"),
-                 p(random_text(nwords = 400))
-               )
-             )), 
-    tabPanel("Understanding the Data", 
-             h3("What to do with the data."),
-             fluidRow(column( align = "center",
-              6,
-              h2("example Images "),
-              plotOutput("image", height = "300px"),
-      ),
-      column(
-        6,
-        h2("supporting text"),
-        p(random_text(nwords = 400))
-      )
-    )),
-    tabPanel("Addational Ideas", 
-             h3("These tabs can continue for other discussion points"),
-             fluidRow(
-               column( align = "center",
-              6,
-              h2("example Images "),
-              plotOutput("image", height = "300px"),
-      ),
-      column(
-        6,
-        h2("supporting text"),
-        p(random_text(nwords = 400))
-      )
-    ))
-    
-  ),
+  p("Need to brainstorm all elements that need addational descriptive information"),
+  # fluidRow(
+  #   tabsetPanel(
+  #     tabPanel("Enviroscreen Score",
+  #              h3("What is the Enviroscreen Score"),
+  #              fluidRow(
+  #                column( align = "center",
+  #                        6,
+  #                        h2("example Images "),
+  #                        plotOutput("image", height = "300px"),
+  #                ),
+  #                column(
+  #                  6,
+  #                  h2("supporting text"),
+  #                  p(random_text(nwords = 400))
+  #                )
+  #              )),
+  #     tabPanel("Using the Map",
+  #              h3("How to use the map"),
+  #              p(
+  #                tags$ol(
+  #                  tags$li("Geography scale selector"),
+  #                  tags$li("Indicator Selector"),
+  #                  tags$li("Measured vs percentile score"),
+  #                  tags$li("Map Elements (basemap, search, reset"),
+  #                  tags$li("interaction with tables and figures")
+  #                )
+  #              ),
+  #              fluidRow(
+  #                column( align = "center",
+  #                        6,
+  #                        h2("example Images "),
+  #                        plotOutput("image", height = "300px"),
+  #                ),
+  #                column(
+  #                  6,
+  #                  h2("supporting text"),
+  #                  p(random_text(nwords = 400))
+  #                )
+  #              )),
+  #     tabPanel("Understanding the Data",
+  #              h3("What to do with the data."),
+  #              fluidRow(column( align = "center",
+  #                               6,
+  #                               h2("example Images "),
+  #                               plotOutput("image", height = "300px"),
+  #              ),
+  #              column(
+  #                6,
+  #                h2("supporting text"),
+  #                p(random_text(nwords = 400))
+  #              )
+  #              )),
+  #     tabPanel("Addational Ideas",
+  #              h3("These tabs can continue for other discussion points"),
+  #              fluidRow(
+  #                column( align = "center",
+  #                        6,
+  #                        h2("example Images "),
+  #                        plotOutput("image", height = "300px"),
+  #                ),
+  #                column(
+  #                  6,
+  #                  h2("supporting text"),
+  #                  p(random_text(nwords = 400))
+  #                )
+  #              ))
+  #   ),
+  # ),
+  
 
 
   # Select Reactive Elements ------------------------------------------------
@@ -286,27 +292,25 @@ ui <- fluidPage(theme = bslib::bs_theme(
 
   # show plots --------------------------------------------------------------
   # plot of the datasets
-  fluidRow(
-    h2("Histograms"),
-    plotlyOutput("graph")
-  ),
-  br(),
+  
+  h2("Graphs"),
+  # plotlyOutput("graph1", width = "100%", height = 200),
+  
 
   # Describe plots  --------------------------------------------------------
   # paragraphy explaining the plot
   h2("supporting Text"),
-  p(random_text(nwords = 80)),
+  p("Description of the plot elements"),
 
 
   # show reactive table -----------------------------------------------------
   # table showing the results
-  fluidRow(
     h2("Enviroscreen Score Data"),
     column(
       12,
       # Output: Tabset w/ plot, summary, and table ----
       tabsetPanel(type = "tabs",
-                  tabPanel("Group Component Scores", dataTableOutput("gComponentScore")),
+                  tabPanel("Group Component Scores", dataTableOutput("gcomponentScore")),
                   tabPanel("Component Score", dataTableOutput("componentScore")),
                   tabPanel("Environmental Exposures", dataTableOutput("evnEx")),
                   tabPanel("Environmental Effects", dataTableOutput("evnEf")),
@@ -314,8 +318,7 @@ ui <- fluidPage(theme = bslib::bs_theme(
                   tabPanel("Sensitive Population", dataTableOutput("senPop")),
                   tabPanel("Socioeconomic", dataTableOutput("socEco"))
         )
-      )
-    ),
+      ),
 
   # download table option  --------------------------------------------------
   fluidRow(
@@ -351,9 +354,9 @@ server <- function(input, output,session) {
 
   # intro image -------------------------------------------------------------
   # image output
-  output$image <- renderImage({
-    random_image()
-  })
+  # output$image <- renderImage({
+  #   random_image()
+  # })
 
   # reactive geometry selection --------------------------------------------------
   # select table
@@ -366,124 +369,124 @@ server <- function(input, output,session) {
   ### tie all this into an external function just to clean up the server script. I want the 
   ### server to be focused on reactive coded not the static stuff. 
   output$mymap <- renderLeaflet({
-    createMap(mapData = mapData, di = di,  pal = colorRamp, palMap = palMap,oil=oil, rural = rural, coal = coal)
+    createMap(mapData = mapData, di = di,
+              pal = colorRamp, palMap = palMap,
+              oil=oil, rural = rural, coal = coal)
     })
 
 # # indicator summary -------------------------------------------------------
-#   # output for indicator summary
-#   output$indicatorDesc <- renderText({
-#     paste0(input$Indicator, " : ", shinipsum::random_text(nwords = 40))
-#   })
+  # output for indicator summary
+  output$indicatorDesc <- renderText({
+    # paste0(input$Indicator, " : ", shinipsum::random_text(nwords = 40))
+  })
 
 
 # histogram plots ---------------------------------------------------------
+  
   # output for ployly
-  output$graph <- renderPlotly({
-    random_ggplotly()
-  })
+  # output$graph1 <- renderPlotly({
+  #   plotly::plot_ly()
+  # })
 
 # table output ------------------------------------------------------------   
   # output for datatable
   tableData <- reactive({
     df1() %>% sf::st_drop_geometry()
-  })
+    }
+  )
+  
   # group component scores 
-  output$gComponentScore <- renderDataTable(tableData() %>% dplyr::select(
+  output$gcomponentScore <- renderDataTable(tableData() %>% dplyr::select(
     "GEOID"
     ,"name"
-    ,"Colorado Enviroscreen Score"
+    ,"Colorado Enviroscreen Score"                                  
     ,"Colorado Enviroscreen Score_pcntl"                            
-    ,"Pollution and Climate Burden"
-    ,"Pollution and Climate Burden_pcntl"
+    ,"Pollution and Climate Burden"                                 
+    ,"Pollution and Climate Burden_pcntl"                           
     ,"Population Burden"                                            
     ,"Population Burden_pcntl"
     ))
-  # # component Score
-  # output$componentScore <- renderDataTable(tableData() %>% dplyr::select(
-  #   "GEOID",
-  #   "name"
-  #   ,"Environmental Exposures",
-  #   # "Environmental Exposures_pcntl",
-  #   "Environmental Effects",
-  #   # "Environmental Effects_pcntl",
-  #   "Climate",
-  #   # "Climate_pcntl",
-  #   "Sensitive Populations",
-  #   # "Sensitive Populations_pcntl",
-  #   "Socioeconomic"
-  #   # "Socioeconomic_pcntl"
-  # ))
-  # # component Score
-  # output$evnEx <- renderDataTable(tableData() %>% dplyr::select(
-  #   "GEOID"
-  #   ,"name"
-  #   ,"Ozone"
-  #   ,"Ozone_pcntl"                                                  
-  #   ,"Particulate Matter 2.5"
-  #   ,"Particulate Matter 2.5_pcntl"                                 
-  #   ,"Lead Paint in Homes"                                    
-  #   ,"Lead Paint in Homes_pcntl"                                    
-  #   ,"Diesel Particulate Matter"                              
-  #   ,"Diesel Particulate Matter_pcntl"                              
-  #   ,"Traffic Density"                                        
-  #   ,"Traffic Density_pcntl"                                        
-  #   ,"Hazardous Air Emission"
-  #   ,"Hazardous Air Emission_pcntl" 
-  # ))
-  # # component Score
-  # output$evnEf <- renderDataTable(tableData() %>% dplyr::select(
-  #   "GEOID"
-  #   ,"name"
-  #   ,"Waste Water Discharge"                                  
-  #   ,"Waste Water Discharge_pcntl"                                  
-  #   ,"Proximity to Superfund Sites"                           
-  #   ,"Proximity to Superfund Sites_pcntl"                           
-  #   ,"Proximity to Risk Management Plan Sites_pcntl"                
-  #   ,"Proximity to Risk Management Plan Sites"                
-  #   ,"Proximity to Treatment, Storage and Disposal Facilities"
-  #   ,"Proximity to Treatment, Storage and Disposal Facilities_pcntl"
-  # ))
-  # # component Score
-  # output$clim <- renderDataTable(tableData() %>% dplyr::select(
-  #   "GEOID"
-  #   ,"name"
-  #   ,"Wildfire Risk"                                          
-  #   ,"Wildfire Risk_pcntl"
-  #   ,"Flood Plain Area" 
-  #   ,"Flood Plain Area_pcntl" 
-  # ))
-  # # component Score
-  # output$senPop <-  renderDataTable(tableData() %>% dplyr::select(
-  #   "GEOID"
-  #   ,"name"
-  #   ,"Population Under Five"                                  
-  #   ,"Population Under Five_pcntl"                                  
-  #   ,"Population Over Sixity Four"                            
-  #   ,"Population Over Sixity Four_pcntl"                            
-  #   ,"Heart Disease"                                          
-  #   ,"Heart Disease_pcntl"                                          
-  #   ,"Asthma"                                                 
-  #   ,"Asthma_pcntl"                                                 
-  #   ,"Life Expectancy_pcntl"                                        
-  #   ,"Life Expectancy"                                        
-  #   ,"Low Birth Weight"            
-  #   ,"Low Birth Weight_pcntl" 
-  # ))
-  # # component Score
-  # output$socEco <- renderDataTable(tableData() %>% dplyr::select(
-  #   "GEOID"
-  #   ,"name"
-  #   ,"People of Color"                                        
-  #   ,"People of Color_pcntl"                                        
-  #   ,"Educational Attainment"
-  #   ,"Educational Attainment_pcntl"                                 
-  #   ,"Low Income"            
-  #   ,"Low Income_pcntl"      
-  #   ,"Linguistic Isolation"                              
-  #   ,"Linguistic Isolation_pcntl"                             
-  #   ,"Disability"                                                   
-  #   ,"Disability_pcntl" 
-  # ))
+  # component Score
+  output$componentScore <- renderDataTable(tableData() %>% dplyr::select(
+    "GEOID",
+    "name"
+    ,"Environmental Exposures",
+    "Environmental Effects",
+    "Climate",
+    "Sensitive Populations",
+    "Socioeconomic"
+  ))
+  # enviromental exposures Score
+  output$evnEx <- renderDataTable(tableData() %>% dplyr::select(
+    "GEOID"
+    ,"name"
+    ,"Ozone"
+    ,"Ozone_pcntl"
+    ,"Particulate Matter 2.5"
+    ,"Particulate Matter 2.5_pcntl"
+    ,"Lead Paint in Homes"
+    ,"Lead Paint in Homes_pcntl"
+    ,"Diesel Particulate Matter"
+    ,"Diesel Particulate Matter_pcntl"
+    ,"Traffic Density"
+    ,"Traffic Density_pcntl"
+    ,"Hazardous Air Emission"
+    ,"Hazardous Air Emission_pcntl"
+  ))
+  # enviromental effects Score
+  output$evnEf <- renderDataTable(tableData() %>% dplyr::select(
+    "GEOID"
+    ,"name"
+    ,"Waste Water Discharge"
+    ,"Waste Water Discharge_pcntl"
+    ,"Proximity to Superfund Sites"
+    ,"Proximity to Superfund Sites_pcntl"
+    ,"Proximity to Risk Management Plan Sites_pcntl"
+    ,"Proximity to Risk Management Plan Sites"
+    ,"Proximity to Treatment, Storage and Disposal Facilities"
+    ,"Proximity to Treatment, Storage and Disposal Facilities_pcntl"
+  ))
+  # component Score
+  output$clim <- renderDataTable(tableData() %>% dplyr::select(
+    "GEOID"
+    ,"name"
+    ,"Wildfire Risk"
+    ,"Wildfire Risk_pcntl"
+    ,"Flood Plain Area"
+    ,"Flood Plain Area_pcntl"
+  ))
+  # component Score
+  output$senPop <-  renderDataTable(tableData() %>% dplyr::select(
+    "GEOID"
+    ,"name"
+    ,"Population Under Five"
+    ,"Population Under Five_pcntl"
+    ,"Population Over Sixity Four"
+    ,"Population Over Sixity Four_pcntl"
+    ,"Heart Disease"
+    ,"Heart Disease_pcntl"
+    ,"Asthma"
+    ,"Asthma_pcntl"
+    ,"Life Expectancy_pcntl"
+    ,"Life Expectancy"
+    ,"Low Birth Weight"
+    ,"Low Birth Weight_pcntl"
+  ))
+  # component Score
+  output$socEco <- renderDataTable(tableData() %>% dplyr::select(
+    "GEOID"
+    ,"name"
+    ,"People of Color"
+    ,"People of Color_pcntl"
+    ,"Educational Attainment"
+    ,"Educational Attainment_pcntl"
+    ,"Low Income"
+    ,"Low Income_pcntl"
+    ,"Linguistic Isolation"
+    ,"Linguistic Isolation_pcntl"
+    ,"Disability"
+    ,"Disability_pcntl"
+  ))
   # download data -----------------------------------------------------------
   
   # Reactive value for selected dataset ----
@@ -510,23 +513,7 @@ server <- function(input, output,session) {
     }
   )
   
-  # add highlight layer on selection  ---------------------------------------
-  # observeEvent(input$mymap_shape_click, {
-  #   
-  #   #capture the info of the clicked polygon
-  #   click <- input$mymap_shape_click
-  #   
-  #   #subset your table with the id of the clicked polygon 
-  #   mapSelection <- envoData[envoData$GEOID == click$id, ]
-  #   print(mapSelection)
-  #   
-  #   leafletProxy("mymap") %>%
-  #     addPolygons(
-  #       data = mapSelection,
-  #       fillColor =  "green",
-  #       layerId = "single",
-  #       fillOpacity = 0.9)
-  # })
+
   
 # proxy map elements  -----------------------------------------------------
   observeEvent(input$button, {
@@ -581,36 +568,32 @@ server <- function(input, output,session) {
     
     leafletProxy("mymap") %>%
       clearGroup(group = "Indicator Score") %>%
-      addGlPolygons(
+      addPolygons(
         data = ed2,
+        color = "#454547",
+        weight = 1,
+        smoothFactor = 0.5,
+        opacity = 1.0,
         layerId = ed2$GEOID,
-        fillColor =  ~pal1(ed2$visParam),
-        group = "Indicator Score",
         fillOpacity = 0.9,
-        popup = ed2$popup
+        fillColor =  ~pal1(ed2$visParam),
+        popup = ed2$popup,
+        highlightOptions = highlightOptions(
+          color = "white",
+          weight = 2,
+          bringToFront = TRUE
+        ),
+        options = pathOptions(pane = "index"),
+        group = "Indicator Score"
+        
       )
-
   })
 
-# add disproportionally impacted communities ------------------------------
-  # observe({
-  #   if(input$addDI == "Add to Map"){
-  #     leafletProxy("mymap")%>%
-  #       addGlPolygons(
-  #       data = di,
-  #       layerId =  "di",
-  #       stroke = TRUE,
-  #       color = "#51F0CD",
-  #       weight = 1,
-  #       popup = di$popup,
-  #       group =  "Disproportionally Impacted Community"
-  #     )
-  #   }
-  #   if(input$addDI == "Remove from Map"){
-  #     leafletProxy("mymap") %>% clearGroup(group="Disproportionally Impacted Community")
-  #   }
-  # 
-  # })
+# # click observer event ----------------------------------------------------
+#   observeEvent(input$mymap_shape_click, { 
+#     p <- input$mymap_shape_click$id  # typo was on this line
+#     print(p)
+#   })
 }
 
 # Run the application
