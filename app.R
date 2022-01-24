@@ -90,23 +90,23 @@ ui <- fluidPage(
   fluidRow(style={"padding-left:100px;padding-right:100px;"},
     p(HTML("</br><a href='#map'>Jump to Map</a>")),
     p("The Colorado Department of Public Health and Environment and a team at Colorado State University are working on an enhanced environmental health screening tool for Colorado. This interactive mapping tool is called CO EnviroScreen.
-      The tool will enable users to identify disproportionately impacted (DI) communities based on the definition in Colorado’s Environmental Justice Act (HB21-1266). CO EnviroScreen will be one way Colorado addresses current and historic inequities. 
+      The tool will enable users to identify disproportionately impacted (DI) communities based on the definition in Colorado’s Environmental Justice Act (HB21-1266). CO EnviroScreen will be one way Colorado addresses current and historic inequities.
       The mapping tool aims to:"),
     p(
       tags$ol(
-        tags$li("Pinpoint areas that have a disproportionate burden of health and/or environmental harm."), 
-        tags$li("Help users maximize funding and resources for policy changes and other interventions to avoid, minimize, and mitigate environmental health risks."), 
+        tags$li("Pinpoint areas that have a disproportionate burden of health and/or environmental harm."),
+        tags$li("Help users maximize funding and resources for policy changes and other interventions to avoid, minimize, and mitigate environmental health risks."),
         tags$li("Advance a healthy and sustainable Colorado where everyone has the same degree of protection from environmental and health hazards.")
       )
     ),
     p("Scroll down for addation information on how to use this resource and the current results of the Colorado Enviroscreen.")
-    
+
   ),
 
-
-  # description of use ------------------------------------------------------
-  h2("Understanding the Enviroscreen Tool"),
-  p("Need to brainstorm all elements that need addational descriptive information"),
+  # 
+  # # description of use ------------------------------------------------------
+  # h2("Understanding the Enviroscreen Tool"),
+  # p("Need to brainstorm all elements that need addational descriptive information"),
   # fluidRow(
   #   tabsetPanel(
   #     tabPanel("Enviroscreen Score",
@@ -175,7 +175,7 @@ ui <- fluidPage(
   #              ))
   #   ),
   # ),
-  
+  # 
 
 
   # Select Reactive Elements ------------------------------------------------
