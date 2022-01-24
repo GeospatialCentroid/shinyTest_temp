@@ -19,28 +19,6 @@ library(DT)
 library(vroom)
 library(shinythemes)
 
-# addCircleMarkers(
-#   data = weather2(),
-#   layerId = ~Site,
-#   lng = ~ long,
-#   lat = ~ lat,
-#   radius = if(input$variable %in% c("Snowfall",
-#                                     "Snow_depth")) {~sqrt(variable)} else {~variable},
-#   color = "black",
-#   weight = 5,
-#   stroke = TRUE,
-#   fillOpacity = 1,
-#   fillColor = "black",
-#   popup = paste("Station:", weather2()$Site, "<br>",
-#                 paste0(input$variable, ":"), weather2()$variable,
-#                 if(input$variable %in% c("Precipitation", "Snowfall",
-#                                          "Snow_depth")) {"mm"} else {"degrees Celcius"}
-#   ),
-
-# https://github.com/ccmothes/poudrePortal
-
-
-
 #### feedback 
 # 
 # nested structure for the indicator selector. 
@@ -215,7 +193,7 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
   fluidRow(
     h2("Reactive table based on geography selection"),
     column(
-      10,
+      12,
       dataTableOutput("data_table")
     )
   ),
@@ -269,14 +247,13 @@ server <- function(input, output,session) {
 # table output ------------------------------------------------------------   
   # output for datatable
   output$data_table <- renderDataTable(
-    df1() %>% sf::st_drop_geometry(), 
-    options = list(fillContainer = TRUE,)
+    df1() %>% sf::st_drop_geometry()
   )
   
 
 # proxy map elements  -----------------------------------------------------
   filteredData <- eventReactive(input$button,{
-    d1 <- envoData %>%
+    d1 <- envoData() %>%
       filter(area %in% input$Geom)
   })
 
@@ -295,83 +272,3 @@ server <- function(input, output,session) {
 shinyApp(ui = ui, server = server)
 
 
-
-
-# # update map
-# indicator <- eventReactive(input$button,{
-#   # contruct indicator name 
-#   
-#   if(input$Percentile == "Measure Value"){
-#     indicate <- input$Indicator 
-#   }else{
-#     indicate <- paste0(input$Indicator,"_pcntl")
-#   }
-# }
-# )
-# 
-# filteredData <- eventReactive(input$button,{
-#   d1 <- envoData %>%
-#     filter(area %in% input$Geom)%>%
-#     dplyr::select(GEOID, indicator())
-# })
-# 
-# 
-# # generate palette 
-# palette1 <- reactive({
-#   palMap <- leaflet::colorNumeric(palette = colorRamp,
-#                                   domain = filteredData()[,indicator()],
-#                                   reverse = TRUE
-#   )
-# })
-
-
-# observe({
-#   add_di <- input$addDI
-#   proxy <- leafletProxy("mymap")
-#   if(add_di == "Add to Map"){
-#     proxy %>% addPolygons(
-#       data = di,
-#       layerId =  "Disproportionally Impacted Community",
-#       stroke = TRUE,
-#       color = "#51F0CD",
-#       weight = 1,
-#       group =  "Disproportionally Impacted Community"
-#     )
-#   }else{
-#     proxy %>% removeMarker(layerId="Disproportionally Impacted Community")
-#   }
-# })
-# 
-
-
-# diCommunity <- readRDS("data/scores/diCommunities.rda")%>%
-#   mutate(
-#     Mn_FLAG = case_when(
-#       Mn_FLAG == 1 ~ "Yes",
-#       Mn_FLAG == 0 ~ "No"
-#     ),
-#     FLP_FLA = case_when(
-#       FLP_FLA == 1 ~ "Yes",
-#       FLP_FLA == 0 ~ "No"
-#     ),
-#     Br_FLAG = case_when(
-#       Br_FLAG == 1 ~ "Yes",
-#       Br_FLAG == 0 ~ "No"
-#     )
-#     
-#   )%>%
-#   mutate(popup =
-#            paste0(
-#              "<br/><h3>Disproportionally Impacted Community: </h3>",
-#              "<br/><b>Census Block Group: </b>", GEOID,
-#              "<br/>",
-#              "<br/><b>40% of Households are Low Income: </b>", FLP_FLA,
-#              "<br/><b>Percent Low Income: </b>", Pov_PCT,
-#              "<br/>",
-#              "<br/><b>40% of Households are Minority : </b>", Mn_FLAG,
-#              "<br/><b>Percent Minority: </b>", Min_PCT,
-#              "<br/>",
-#              "<br/><b>40% of Households are Housing Burdened : </b>", Br_FLAG,
-#              "<br/><b>Percent Housing Burdened: </b>", HH_Br_P
-#            )
-#            )
