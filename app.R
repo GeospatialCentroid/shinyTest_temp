@@ -18,6 +18,7 @@ library(plotly)
 library(DT)
 library(vroom)
 library(shinythemes)
+library(bslib)
 
 #### feedback 
 # 
@@ -34,7 +35,8 @@ lapply(list.files(path = "src",recursive = TRUE, full.names = TRUE), source)
 
 
 # enviroscreen data
-envoData <- readRDS("data/scores/allScores.rda")
+envoData <- readRDS("data/scores/allScores.rda")%>%
+  dplyr::mutate(visParam = `Colorado Enviroscreen Score_pcntl`)
 
 # addational Data 
 oil <- readRDS("data/scores/oil.rda")
@@ -45,25 +47,14 @@ rural <- readRDS("data/scores/rural.rda")
 di <- getDI()
 
 # purple high
-colorRamp <- c(
-  "#fcfbfd",
-  "#efedf5",
-  "#dadaeb",
-  "#bcbddc",
-  "#9e9ac8",
-  "#807dba",
-  "#6a51a3",
-  "#54278f",
-  "#3f007d")
-
+colorRamp <- c("#f2f0f7"  ,"#cbc9e2"  ,"#9e9ac8"  ,"#756bb1"  ,"#54278f")
 
 # create initial dataset for map  -----------------------------------------
 mapData <- initialMapData(envoData)
 # palette for the map
 palMap <- leaflet::colorNumeric(palette = colorRamp,
-    domain = mapData$`Colorado Enviroscreen Score_pcntl`,
-    reverse = TRUE
-  )
+                                domain = mapData$visParam,
+                                reverse = TRUE)
 
 # unique Indicators
 indicators <- sf::st_drop_geometry(envoData) %>%
@@ -73,99 +64,193 @@ indicators <- sf::st_drop_geometry(envoData) %>%
   names()
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(theme = shinytheme("sandstone"),
-
-  # nav panel ---------------------------------------------------------------
+ui <- fluidPage( 
+  theme = bslib::bs_theme(
+  bootswatch = "flatly",
+  #bg = "#FFFFFF",
+  #fg = "#000",
+  primary = "#186D03",
+  secondary = "#DD5B27",
+  success = "#f28e35",
+  base_font = "Trebuchet MS,Helvetica,sans-serif",
+  heading_font = "museo-sans,sans-serif"
+  )%>%
+  bslib::bs_add_rules(sass::sass_file("www/style.scss")),
+  # # nav panel ---------------------------------------------------------------
   # not sure if it's needed but probably... 
   
   # Title ------------------------------------------------------------------
+  shiny::titlePanel(h1("Colorado Enviroscreen")),
+  
   fluidRow(
-    includeCSS("www/banner.css"),
-    HTML(
-      '<header id="showcase">
-    <h1>Colorado Enviroscreen</h1>
-    <p>Mapping Health Equity in Colorado</p>
-    </header>')
+  
+  p("The Colorado Department of Public Health and Environment and a team at Colorado State University are working on an enhanced environmental health screening tool for Colorado. This interactive mapping tool is called CO EnviroScreen.
+      The tool will enable users to identify disproportionately impacted (DI) communities based on the definition in Colorado’s Environmental Justice Act (HB21-1266). CO EnviroScreen will be one way Colorado addresses current and historic inequities.
+      The mapping tool aims to:"),
+  p(
+    tags$ol(
+      tags$li("Pinpoint areas that have a disproportionate burden of health and/or environmental harm."),
+      tags$li("Help users maximize funding and resources for policy changes and other interventions to avoid, minimize, and mitigate environmental health risks."),
+      tags$li("Advance a healthy and sustainable Colorado where everyone has the same degree of protection from environmental and health hazards.")
+    )
   ),
-
-  fluidRow(
-    h2("text describing the project"),
-    p(random_text(nwords = 400))
+  p("Scroll down for addation information on how to use this resource and the current results of the Colorado Enviroscreen."),
   ),
 
 
   # description of use ------------------------------------------------------
-  fluidRow(
-    column(
-      6,
-      h2("image showing examples of how to use the resource "),
-      plotOutput("image", height = "300px"),
-    ),
-    column(
-      6,
-      h2("supporting text for the image "),
-      p(random_text(nwords = 400))
-    )
-  ),
+  tabsetPanel(
+        tabPanel("Enviroscreen Score",
+                 h3("What is the Enviroscreen Score"),
+                 fluidRow(
+                   column(6,
+                           h2("example Images ")
+                   ),
+                   column(6,
+                     h2("supporting text")
+                  ),
+                 )),
+        tabPanel("Using the Map",
+                 h3("How to use the map"),
+                 p(
+                   tags$ol(
+                     tags$li("Geography scale selector"),
+                     tags$li("Indicator Selector"),
+                     tags$li("Measured vs percentile score"),
+                     tags$li("Map Elements (basemap, search, reset"),
+                     tags$li("interaction with tables and figures")
+                   )
+                 ),
+                 fluidRow(
+                   column(6,
+                           h2("example Images "),
+                   ),
+                   column(
+                     6,
+                     h2("supporting text")
+                     )
+                 )),
+        tabPanel("Understanding the Data",
+                 h3("What to do with the data."),
+                 fluidRow(column(6,
+                                  h2("example Images "),
+                 ),
+                 column(6,
+                   h2("supporting text"),
+                 )
+                 )),
+        tabPanel("Addational Ideas",
+                 h3("These tabs can continue for other discussion points"),
+                 fluidRow(
+                   column(align = "center", 6,
+                           h2("example Images "),
+                          random_text(nchars = 1000 )
+                   ),
+                   column(6,
+                     h2("supporting text"),
+                   )
+                 ))
+      ),
 
 
   # Select Reactive Elements ------------------------------------------------
   # content for the reactive elements of the map
-  fluidRow(style = {"border-style: solid; borderColor=:#4d3a7d;"},
-    # action button 
-    column(
-      2,
-      actionButton("button", "Update Map")
-    ),
-    # select geography
-    column(
-      2,
-      selectInput(
-        inputId = "Geom",
-        label = "Select Geographic Scale",
-        choices = c("County", "Census Tract", "Census Block Group"),
-        selected = "County",
-        width = "90%"
-      )
-    ),
-    # select indicator
-    column(
-      3,
-      selectInput(
-        inputId = "Indicator",
-        label = "Select Layer for Map",
-        choices = indicators,
-        selected = "envExp",
-        width = "90%"
-      )
-    ),
-    # toggle between measured and percentile
-    column(
-      2,
-      selectInput(
-        inputId = "Percentile",
-        label = "Measure or Percentile",
-        choices = c("Measured Value", "Percentile Rank"),
-        selected = "Measured Value"
-      )
-    ),
-    # add DI Communities 
-    column(
-      3,
-      selectInput(
-        inputId = "addDI",
-        label = "Disproportionally Impacted Communities",
-        choices = c("Add to Map", "Remove from Map"),
-        selected = "Remove from Map"
-      )
-    )
+  fluidRow(id = "map", style = {"border-style: solid; borderColor=:#4d3a7d; padding-left:100px;padding-right:100px;"},
+           # select geography
+           column(
+             2,
+             offset = 1,
+             tags$div(title="Click here to select area to display on the map",
+                      selectInput(
+                        inputId = "Geom",
+                        label = "Select Geographic Scale",
+                        choices = c("County", "Census Tract", "Census Block Group"),
+                        selected = "County",
+                        width = "90%"
+                      )
+             )
+           ),
+           # select indicator
+           column(
+             3,
+             tags$div(title="Click here to select variable for map",
+                      selectInput(
+                        inputId = "Indicator",
+                        label = "Select Layer for Map",
+                        choices = list(
+                          "EnviroScreen Score" = "Colorado Enviroscreen Score",
+                          "Group Component Scores" = c("Pollution and Climate Burden", "Population Burden"),
+                          "Individual Component Scores" =c("Environmental Exposures",
+                                                           "Environmental Effects",
+                                                           "Climate",
+                                                           "Sensitive Populations",
+                                                           "Socioeconomic"),
+                          "Environmental Exposures" = c("Ozone"                                                  
+                                                        ,"Particulate Matter 2.5"                                 
+                                                        ,"Lead Paint in Homes"                                    
+                                                        ,"Diesel Particulate Matter"                              
+                                                        ,"Traffic Density"                                        
+                                                        ,"Hazardous Air Emission" 
+                          ),
+                          "Environmental Effects" = c(
+                            "Waste Water Discharge"                                  
+                            ,"Proximity to Superfund Sites"                           
+                            ,"Proximity to Risk Management Plan Sites"                
+                            ,"Proximity to Treatment, Storage and Disposal Facilities"
+                          ),
+                          "Climate" = c(
+                            "Wildfire Risk"                                          
+                            ,"Flood Plain Area" 
+                          ),
+                          "Sensitive Populations" = c(
+                            "Population Under Five"                                  
+                            ,"Population Over Sixity Four"                            
+                            ,"Heart Disease"                                          
+                            ,"Asthma"                                                 
+                            ,"Life Expectancy"                                        
+                            ,"Low Birth Weight" 
+                          ),
+                          "Socioeconomic" = c(
+                            "People of Color"                                        
+                            ,"Educational Attainment"                                 
+                            ,"Low Income"                                             
+                            ,"Linguistic Isolation"                                   
+                            ,"Disability" 
+                          )
+                        ),
+                        selected = "envExp",
+                        width = "90%"
+                      )
+             )
+           ),
+           # toggle between measured and percentile
+           column(
+             3,
+             tags$div(title="Click here to show measure value or rank of the variable",
+                      selectInput(
+                        inputId = "Percentile",
+                        label = "Measure or Percentile",
+                        choices = c("Measured Value", "Percentile Rank"),
+                        selected = "Measured Value"
+                      )
+             ),
+           ),
+           # action button 
+           column(
+             2,
+             tags$div(title="Click here to update map display",
+                      actionButton("button", "Update Map")
+             )
+           )
   ),
+  
 
 
   # display map -------------------------------------------------------------
-  fluidRow(style = "background-color:#4d3a7d;",
-           tags$style(type = "text/css", "#mymap {height: calc(100vh - 80px) !important;}"),
-           leafletOutput("mymap")
+  fluidRow(tags$style(type = "text/css", "#mymap {height: calc(100vh - 80px) !important;}"),style = {"background-color:#4d3a7d;"},
+           column(1),
+           column(10, leafletOutput("mymap")),
+           column(1)
   ),
 
   # describe indicators -----------------------------------------------------
@@ -253,7 +338,7 @@ server <- function(input, output,session) {
 
 # proxy map elements  -----------------------------------------------------
   filteredData <- eventReactive(input$button,{
-    d1 <- envoData() %>%
+    d1 <- envoData %>%
       filter(area %in% input$Geom)
   })
 

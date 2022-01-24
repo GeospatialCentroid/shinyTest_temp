@@ -19,6 +19,44 @@ html_legend_A <- "<img src='https://leafletjs.com/examples/custom-icons/leaf-gre
 html_legend_B <- "<img src='https://leafletjs.com/examples/custom-icons/leaf-red.png'>red<br/>"
 
 ui <- fluidPage(
+  tabsetPanel(
+    tabPanel("Enviroscreen Score",
+             h3("What is the Enviroscreen Score"),
+             fluidRow(
+               column( align = "center",
+                       6,
+                       h2("content")
+               ),
+               column(
+                 6,
+                 h2("supporting text"),
+               )
+             )),
+    tabPanel("Enviroscreen Score",
+             h3("What is the Enviroscreen Score"),
+             fluidRow(
+               column( align = "center",
+                       6,
+                       h2("content")
+               ),
+               column(
+                 6,
+                 h2("supporting text"),
+               )
+             )),
+    tabPanel("Enviroscreen Score",
+             h3("What is the Enviroscreen Score"),
+             fluidRow(
+               column( align = "center",
+                       6,
+                       h2("content")
+               ),
+               column(
+                 6,
+                 h2("supporting text"),
+               )
+             ))
+  ),
   leafletOutput("map")
 )
 server <- function(input, output, session){

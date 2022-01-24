@@ -52,7 +52,7 @@ createMap <- function(mapData, pal, palMap, oil, rural, coal) {
     "topright",
     colors = pal,
     title = "Est. Values",
-    labels = c("Most Burdened", "", "", "", "", "", "", "", "Least Burdened"),
+    labels = c("Most Burdened", "", "", "", "Least Burdened"),
     opacity = 1
     # labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))
   ) %>%
