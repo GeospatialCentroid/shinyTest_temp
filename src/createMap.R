@@ -91,7 +91,7 @@ createMap <- function(mapData,pal, palMap, oil, rural, coal, di) {
         "Oil and Gas Community",
         "Disproportionatly Impacted Community"))%>%
   # add map reset -----------------------------------------------------------
-  addResetMapButton()%>%
+  leaflet.extras::addResetMapButton()%>%
   leaflet.extras::addSearchOSM(
       options = leaflet.extras::searchOptions(
         autoCollapse = TRUE,

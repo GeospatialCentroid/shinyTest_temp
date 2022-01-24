@@ -66,9 +66,9 @@ ui <- fluidPage(
   bootswatch = "flatly",
   #bg = "#FFFFFF",
   #fg = "#000",
-  primary = "#186D03",
-  secondary = "#DD5B27",
-  success = "#f28e35",
+  primary = "#245d38",# green 
+  secondary = "#001970", #blue 
+  success = "#245d38", # green
   base_font = "Trebuchet MS,Helvetica,sans-serif",
   heading_font = "museo-sans,sans-serif"
     )%>%
@@ -83,10 +83,9 @@ ui <- fluidPage(
   # ),
   # 
   # Title ------------------------------------------------------------------
-  fluidRow(
-    shiny::titlePanel(h1("Colorado Enviroscreen"))
-  ),
-
+  shiny::titlePanel(h1("Colorado Enviroscreen")),
+  
+  
   fluidRow(style={"padding-left:100px;padding-right:100px;"},
     p(HTML("</br><a href='#map'>Jump to Map</a>")),
     p("The Colorado Department of Public Health and Environment and a team at Colorado State University are working on an enhanced environmental health screening tool for Colorado. This interactive mapping tool is called CO EnviroScreen.
@@ -103,87 +102,79 @@ ui <- fluidPage(
 
   ),
 
-  # 
-  # # description of use ------------------------------------------------------
-  # h2("Understanding the Enviroscreen Tool"),
-  # p("Need to brainstorm all elements that need addational descriptive information"),
-  # fluidRow(
-  #   tabsetPanel(
-  #     tabPanel("Enviroscreen Score",
-  #              h3("What is the Enviroscreen Score"),
-  #              fluidRow(
-  #                column( align = "center",
-  #                        6,
-  #                        h2("example Images "),
-  #                        plotOutput("image", height = "300px"),
-  #                ),
-  #                column(
-  #                  6,
-  #                  h2("supporting text"),
-  #                  p(random_text(nwords = 400))
-  #                )
-  #              )),
-  #     tabPanel("Using the Map",
-  #              h3("How to use the map"),
-  #              p(
-  #                tags$ol(
-  #                  tags$li("Geography scale selector"),
-  #                  tags$li("Indicator Selector"),
-  #                  tags$li("Measured vs percentile score"),
-  #                  tags$li("Map Elements (basemap, search, reset"),
-  #                  tags$li("interaction with tables and figures")
-  #                )
-  #              ),
-  #              fluidRow(
-  #                column( align = "center",
-  #                        6,
-  #                        h2("example Images "),
-  #                        plotOutput("image", height = "300px"),
-  #                ),
-  #                column(
-  #                  6,
-  #                  h2("supporting text"),
-  #                  p(random_text(nwords = 400))
-  #                )
-  #              )),
-  #     tabPanel("Understanding the Data",
-  #              h3("What to do with the data."),
-  #              fluidRow(column( align = "center",
-  #                               6,
-  #                               h2("example Images "),
-  #                               plotOutput("image", height = "300px"),
-  #              ),
-  #              column(
-  #                6,
-  #                h2("supporting text"),
-  #                p(random_text(nwords = 400))
-  #              )
-  #              )),
-  #     tabPanel("Addational Ideas",
-  #              h3("These tabs can continue for other discussion points"),
-  #              fluidRow(
-  #                column( align = "center",
-  #                        6,
-  #                        h2("example Images "),
-  #                        plotOutput("image", height = "300px"),
-  #                ),
-  #                column(
-  #                  6,
-  #                  h2("supporting text"),
-  #                  p(random_text(nwords = 400))
-  #                )
-  #              ))
-  #   ),
-  # ),
-  # 
+
+  # description of use ------------------------------------------------------
+  h2("Understanding the Enviroscreen Tool"),
+  tabsetPanel(
+    tabPanel("Enviroscreen Score",
+             h3("What is the Enviroscreen Score"),
+             fluidRow(
+               column( align = "center",
+                       6,
+                       h2("example Images "),
+               ),
+               column(
+                 6,
+                 h2("supporting text"),
+               )
+             )),
+    tabPanel("Using the Map",
+             h3("How to use the map"),
+             p(
+               tags$ol(
+                 tags$li("Geography scale selector"),
+                 tags$li("Indicator Selector"),
+                 tags$li("Measured vs percentile score"),
+                 tags$li("Map Elements (basemap, search, reset"),
+                 tags$li("interaction with tables and figures")
+               )
+             ),
+             fluidRow(
+               column( align = "center",
+                       6,
+                       h2("example Images "),
+               ),
+               column(
+                 6,
+                 h2("supporting text"),
+               )
+             )),
+    tabPanel("Understanding the Data",
+             h3("What to do with the data."),
+             fluidRow(column( align = "center",
+                              6,
+                              h2("example Images "),
+             ),
+             column(
+               6,
+               h2("supporting text"),
+             )
+             )),
+    tabPanel("Addational Ideas",
+             h3("These tabs can continue for other discussion points"),
+             fluidRow(
+               column( align = "center",
+                       6,
+                       h2("example Images "),
+               ),
+               column(
+                 6,
+                 h2("supporting text"),
+               )
+             ))
+  ),
+
 
 
   # Select Reactive Elements ------------------------------------------------
   # content for the reactive elements of the map
+  br(), 
+  h2("Select Elements to display on the map"),
   fluidRow(id = "map", style = {"border-style: solid; borderColor=:#4d3a7d; padding-left:100px;padding-right:100px;"},
     # select geography
     column(
       2,
+      offset = 1, 
       tags$div(title="Click here to select area to display on the map",
                selectInput(
                  inputId = "Geom",
@@ -270,18 +261,10 @@ ui <- fluidPage(
 
 
   # display map -------------------------------------------------------------
-  fluidRow(
-    column(
-      width = 1, style = {"background-color:#4d3a7d;"}),
-    column(
-      width = 10,
-      style = {"border-style: solid; borderColor=:#4d3a7d;"},
-      tags$style(type = "text/css", "#mymap {height: calc(100vh - 80px) !important;}"),
-      leafletOutput("mymap")
-    ),
-    column(
-      width = 1, style = "background-color:#4d3a7d;"
-    ),
+  fluidRow(tags$style(type = "text/css", "#mymap {height: calc(100vh - 80px) !important;}"),style = {"background-color:#4d3a7d;"},
+           column(1),
+           column(10, leafletOutput("mymap")),
+           column(1)
   ),
 
   # describe indicators -----------------------------------------------------
@@ -292,9 +275,10 @@ ui <- fluidPage(
 
   # show plots --------------------------------------------------------------
   # plot of the datasets
-  
   h2("Graphs"),
-  # plotlyOutput("graph1", width = "100%", height = 200),
+  fluidRow(
+    plotlyOutput("graph1")
+  ),
   
 
   # Describe plots  --------------------------------------------------------
@@ -305,21 +289,17 @@ ui <- fluidPage(
 
   # show reactive table -----------------------------------------------------
   # table showing the results
-    h2("Enviroscreen Score Data"),
-    column(
-      12,
-      # Output: Tabset w/ plot, summary, and table ----
-      tabsetPanel(type = "tabs",
-                  tabPanel("Group Component Scores", dataTableOutput("gcomponentScore")),
-                  tabPanel("Component Score", dataTableOutput("componentScore")),
-                  tabPanel("Environmental Exposures", dataTableOutput("evnEx")),
-                  tabPanel("Environmental Effects", dataTableOutput("evnEf")),
-                  tabPanel("Climate", dataTableOutput("clim")),
-                  tabPanel("Sensitive Population", dataTableOutput("senPop")),
-                  tabPanel("Socioeconomic", dataTableOutput("socEco"))
-        )
-      ),
-
+  h2("Enviroscreen Score Data"),
+  # Output: Tabset w/ plot, summary, and table ----
+  tabsetPanel(type = "tabs",
+              tabPanel("Group Component Scores", dataTableOutput("gcomponentScore")),
+              tabPanel("Component Score", dataTableOutput("componentScore")),
+              tabPanel("Environmental Exposures", dataTableOutput("evnEx")),
+              tabPanel("Environmental Effects", dataTableOutput("evnEf")),
+              tabPanel("Climate", dataTableOutput("clim")),
+              tabPanel("Sensitive Population", dataTableOutput("senPop")),
+              tabPanel("Socioeconomic", dataTableOutput("socEco"))
+    ),
   # download table option  --------------------------------------------------
   fluidRow(
     column(2,selectInput("download", "Choose a dataset:",
@@ -340,13 +320,13 @@ ui <- fluidPage(
   h3("Addational Resources"),
   p("We can utilize this space for sharing any relivent reference information."),
 
-  # print statement for trouble shooting
-  fluidRow(
-    column(
-      12,
-      textOutput("test1")
-    )
-  )
+  # # print statement for trouble shooting
+  # fluidRow(
+  #   column(
+  #     12,
+  #     textOutput("test1")
+  #   )
+  # )
 )
 
 # Define server logic required to draw a histogram
@@ -384,9 +364,10 @@ server <- function(input, output,session) {
 # histogram plots ---------------------------------------------------------
   
   # output for ployly
-  # output$graph1 <- renderPlotly({
-  #   plotly::plot_ly()
-  # })
+  output$graph1 <- renderPlotly({
+    p1<- plot_ly(iris)
+    p1
+  })
 
 # table output ------------------------------------------------------------   
   # output for datatable
@@ -575,7 +556,7 @@ server <- function(input, output,session) {
         smoothFactor = 0.5,
         opacity = 1.0,
         layerId = ed2$GEOID,
-        fillOpacity = 0.9,
+        fillOpacity = 0.5,
         fillColor =  ~pal1(ed2$visParam),
         popup = ed2$popup,
         highlightOptions = highlightOptions(
