@@ -5,9 +5,9 @@ account: geocentroid
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5475280
-bundleId: 5503989
+bundleId: 5528335
 url: https://geocentroid.shinyapps.io/shinyTest/
-when: 1643065451.21594
-lastSyncTime: 1643065451.21594
+when: 1643668702.90403
+lastSyncTime: 1643668702.90403
 asMultiple: FALSE
 asStatic: FALSE

@@ -17,7 +17,9 @@ library(plotly)
 library(DT)
 library(vroom)
 library(bslib)
-# library(rmapshaper)
+library(shinipsum)
+library(rmapshaper)
+library(readr)
 
 
 # source helpers ----------------------------------------------------------
@@ -32,6 +34,7 @@ envoData <- readRDS("data/scores/allScores.rda")%>%
 oil <- readRDS("data/scores/oil.rda")
 coal <- readRDS("data/scores/coal.rda")
 rural <- readRDS("data/scores/rural.rda")
+descriptors <- read_csv("data/descriptions/indicatorDesc.csv")
 
 # di community 
 di <- getDI()# %>%
@@ -39,9 +42,6 @@ di <- getDI()# %>%
   # sf::st_simplify(preserveTopology = TRUE, dTolerance = 100)
 
 colorRamp <- c(  "#f2f0f7"  ,"#cbc9e2"  ,"#9e9ac8"  ,"#756bb1"  ,"#54278f")
-
-# selector for tables 
-p <- "temp"
 
 # create initial dataset for map  -----------------------------------------
 mapData <- initialMapData(envoData)
@@ -58,7 +58,25 @@ indicators <- sf::st_drop_geometry(envoData) %>%
   dplyr::select(!ends_with("_pcntl")) %>%
   names()
 
+#hist data
+histData <- envoData %>%
+  sf::st_drop_geometry()%>%
+  dplyr::filter(area == "County")%>%
+  dplyr::select(
+    "GEOID"                                                   
+    ,"Colorado Enviroscreen Score"                            
+    ,"Pollution and Climate Burden"                           
+    ,"Population Burden"                                      
+    ,"Environmental exposures"                                
+    ,"Environmental effects"                                   
+    ,"Climate Vulnerability"                                  
+    ,"Sensitive population"                                   
+    ,"Demographics"
+  )
 
+# set empty parameter for histogram funciton 
+## set to non GEOID number for the histogram generate on loading. 
+geoidMap <- "100"
 
 # UI  ---------------------------------------------------------------------
 ui <- fluidPage(
@@ -83,7 +101,7 @@ ui <- fluidPage(
   # ),
   # 
   # Title ------------------------------------------------------------------
-  shiny::titlePanel(h1("Colorado Enviroscreen")),
+  shiny::titlePanel(h1("Colorado Enviroscreen"),windowTitle = "Colorado Enviroscreen"),
   
   
   fluidRow(style={"padding-left:100px;padding-right:100px;"},
@@ -108,16 +126,15 @@ ui <- fluidPage(
   tabsetPanel(
     tabPanel("Enviroscreen Score",
              h3("What is the Enviroscreen Score"),
-             fluidRow(
-               column( align = "center",
-                       6,
-                       h2("example Images "),
-               ),
-               column(
-                 6,
-                 h2("supporting text"),
+             p(
+               tags$ol(
+                 tags$li("Definition"),
+                 tags$li("How the score was developed"),
+                 tags$li("Intended use"),
+                 tags$li("limitations"),
                )
-             )),
+             ),
+    ),
     tabPanel("Using the Map",
              h3("How to use the map"),
              p(
@@ -130,8 +147,7 @@ ui <- fluidPage(
                )
              ),
              fluidRow(
-               column( align = "center",
-                       6,
+               column(6,
                        h2("example Images "),
                ),
                column(
@@ -141,19 +157,33 @@ ui <- fluidPage(
              )),
     tabPanel("Understanding the Data",
              h3("What to do with the data."),
-             fluidRow(column( align = "center",
-                              6,
-                              h2("example Images "),
+             p(
+               tags$ol(
+                 tags$li("Component scores"),
+                 tags$li("temporality considerations "),
+                 tags$li("Assumptions in the data"),
+                 tags$li("limitations"),
+                 tags$li("links to the background documentations")
+               )
              ),
-             column(
-               6,
-               h2("supporting text"),
-             )
-             )),
-    tabPanel("Addational Ideas",
+    ),
+    tabPanel("Example",
+      h3("Showcase how someone would go about answering a question"),
+      p(
+        tags$ol(
+          tags$li("I care about climate, what does this resource tell me about the climate impacts present in my neighborhood"),
+          tags$li("Select Climate indicator and update map"),
+          tags$li("Use the serach tool "),
+          tags$li("check out the table to see what goes into climate score "),
+          tags$li("change geography to get more specific"),
+          tags$li("download the data to view it elsewhere")
+        )
+      ),
+    ),
+    tabPanel("Addational Content",
              h3("These tabs can continue for other discussion points"),
              fluidRow(
-               column( align = "center",
+               column(
                        6,
                        h2("example Images "),
                ),
@@ -161,8 +191,9 @@ ui <- fluidPage(
                  6,
                  h2("supporting text"),
                )
-             ))
-  ),
+             )
+            )
+    ),
 
 
 
@@ -195,45 +226,45 @@ ui <- fluidPage(
         choices = list(
           "EnviroScreen Score" = "Colorado Enviroscreen Score",
           "Group Component Scores" = c("Pollution and Climate Burden", "Population Burden"),
-          "Individual Component Scores" =c("Environmental Exposures",
-                                           "Environmental Effects",
-                                           "Climate",
-                                           "Sensitive Populations",
-                                           "Socioeconomic"),
-          "Environmental Exposures" = c("Ozone"                                                  
-                                        ,"Particulate Matter 2.5"                                 
-                                        ,"Lead Paint in Homes"                                    
-                                        ,"Diesel Particulate Matter"                              
-                                        ,"Traffic Density"                                        
-                                        ,"Hazardous Air Emission" 
+          "Individual Component Scores" =c("Environmental exposures",
+                                           "Environmental effects",
+                                           "Climate Vulnerability",
+                                           "Sensitive population",
+                                           "Demographics"),
+          "Environmental exposures" = c("Ozone"                                                  
+                                        ,"Particles"                                 
+                                        ,"Lead exposure risk"                                    
+                                        ,"Diesel PM"                              
+                                        ,"Traffic proximity and volume"                                        
+                                        ,"Air Toxics Emissions" 
                                       ),
-          "Environmental Effects" = c(
-            "Waste Water Discharge"                                  
-            ,"Proximity to Superfund Sites"                           
-            ,"Proximity to Risk Management Plan Sites"                
-            ,"Proximity to Treatment, Storage and Disposal Facilities"
+          "Environmental effects" = c(
+            "Wastewater Discharge Indicator"                                  
+            ,"Proximity to National Priorities List (NPL) sites"                           
+            ,"Proximity to RMP Sites"                
+            ,"Proximity to Hazardous Waste Facilities"
           ),
           "Climate" = c(
             "Wildfire Risk"                                          
-            ,"Flood Plain Area" 
+            ,"Flood Plains" 
           ),
-          "Sensitive Populations" = c(
-            "Population Under Five"                                  
-            ,"Population Over Sixity Four"                            
-            ,"Heart Disease"                                          
-            ,"Asthma"                                                 
+          "Sensitive population" = c(
+            "Population under 5"                                  
+            ,"Population over 64"                            
+            ,"Heart disease in adults"                                          
+            ,"Asthma hospitalization rate"                                                 
             ,"Life Expectancy"                                        
-            ,"Low Birth Weight" 
+            ,"Low weight birth rate" 
           ),
-          "Socioeconomic" = c(
-            "People of Color"                                        
-            ,"Educational Attainment"                                 
-            ,"Low Income"                                             
-            ,"Linguistic Isolation"                                   
-            ,"Disability" 
+          "Demographics" = c(
+            "Percent people of color"                                        
+            ,"Percent less than high school education"                                 
+            ,"Percent low income"                                             
+            ,"Percent linguistic isolation"                                   
+            ,"Percent disability" 
           )
         ),
-        selected = "envExp",
+        selected = "Colorado Enviroscreen Score",
         width = "90%"
       )
       )
@@ -258,8 +289,6 @@ ui <- fluidPage(
       )
     )
   ),
-
-
   # display map -------------------------------------------------------------
   fluidRow(tags$style(type = "text/css", "#mymap {height: calc(100vh - 80px) !important;}"),style = {"background-color:#4d3a7d;"},
            column(1),
@@ -269,16 +298,18 @@ ui <- fluidPage(
 
   # describe indicators -----------------------------------------------------
   # sentence explaining the indicators
-  h2("indicator description"),
-  textOutput("indicatorDesc"),
+  h2("Indicator Description"),
+  fluidRow(style={"padding-left:100px;padding-right:100px;"},
+    p(
+      textOutput("indicatorDesc")  
+    )
+  ),
   br(),
 
   # show plots --------------------------------------------------------------
   # plot of the datasets
   h2("Graphs"),
-  fluidRow(
-    plotlyOutput("graph1")
-  ),
+  plotlyOutput("plot2"),
   
 
   # Describe plots  --------------------------------------------------------
@@ -294,11 +325,11 @@ ui <- fluidPage(
   tabsetPanel(type = "tabs",
               tabPanel("Group Component Scores", dataTableOutput("gcomponentScore")),
               tabPanel("Component Score", dataTableOutput("componentScore")),
-              tabPanel("Environmental Exposures", dataTableOutput("evnEx")),
-              tabPanel("Environmental Effects", dataTableOutput("evnEf")),
-              tabPanel("Climate", dataTableOutput("clim")),
-              tabPanel("Sensitive Population", dataTableOutput("senPop")),
-              tabPanel("Socioeconomic", dataTableOutput("socEco"))
+              tabPanel("Environmental exposures", dataTableOutput("evnEx")),
+              tabPanel("Environmental effects", dataTableOutput("evnEf")),
+              tabPanel("Climate Vulnerability", dataTableOutput("clim")),
+              tabPanel("Sensitive population", dataTableOutput("senPop")),
+              tabPanel("Demographics", dataTableOutput("socEco"))
     ),
   # download table option  --------------------------------------------------
   fluidRow(
@@ -320,13 +351,6 @@ ui <- fluidPage(
   h3("Addational Resources"),
   p("We can utilize this space for sharing any relivent reference information."),
 
-  # # print statement for trouble shooting
-  # fluidRow(
-  #   column(
-  #     12,
-  #     textOutput("test1")
-  #   )
-  # )
 )
 
 # Define server logic required to draw a histogram
@@ -348,36 +372,57 @@ server <- function(input, output,session) {
   # generate map ------------------------------------------------------------
   ### tie all this into an external function just to clean up the server script. I want the 
   ### server to be focused on reactive coded not the static stuff. 
-  output$mymap <- renderLeaflet({
-    createMap(mapData = mapData, di = di,
+   output$mymap <- renderLeaflet({
+     # render leaflet object 
+     createMap(mapData = mapData, di = di,
               pal = colorRamp, palMap = palMap,
               oil=oil, rural = rural, coal = coal)
     })
 
 # # indicator summary -------------------------------------------------------
-  # output for indicator summary
+  # output for indicator summary'
+  desc1 <- descriptors
   output$indicatorDesc <- renderText({
-    # paste0(input$Indicator, " : ", shinipsum::random_text(nwords = 40))
+    ind1 <- input$Indicator
+    desc1 <- descriptors %>% dplyr::filter(Indicator == ind1) %>% dplyr::select("Desc") %>% pull()
+    paste0(input$Indicator, " : ", as.character(desc1))
   })
 
 
 # histogram plots ---------------------------------------------------------
-  
+  # if input changes reset map value 
+  plotGroup <- c( "Colorado Enviroscreen Score", "Environmental exposures","Environmental effects",
+                  "Climate Vulnerability","Sensitive population","Demographics")
   # output for ployly
-  output$graph1 <- renderPlotly({
-    p1<- plot_ly(iris)
-    p1
+  output$plot2 <- renderPlotly({
+    plots1 <- list()
+    for(i in seq_along(plotGroup)){
+      plots1[[i]] <- genPlots(dataframe = df1(),parameter = plotGroup[i], geoid = input$mymap_shape_click)
+    }
+    subplot(plots1,nrows = 1,shareY = TRUE, titleX = TRUE)
   })
-
+  
+  
 # table output ------------------------------------------------------------   
   # output for datatable
+  
   tableData <- reactive({
-    df1() %>% sf::st_drop_geometry()
+    geoid1 <- input$mymap_shape_click
+    if(is.null(geoid1$id)){
+      df1() %>% sf::st_drop_geometry()
+    }else{
+      genTable(tableData = df1(), geoid = input$mymap_shape_click)
     }
-  )
+    })  
+  
+  
+  ### coloring tables is something to come back too 
+  # https://stackoverflow.com/questions/24736956/r-highlighting-shiny-data-table
+  # https://rstudio.github.io/DT/010-style.html
   
   # group component scores 
-  output$gcomponentScore <- renderDataTable(tableData() %>% dplyr::select(
+  output$gcomponentScore <- renderDataTable(tableData()%>%
+      dplyr::select(
     "GEOID"
     ,"name"
     ,"Colorado Enviroscreen Score"                                  
@@ -391,11 +436,11 @@ server <- function(input, output,session) {
   output$componentScore <- renderDataTable(tableData() %>% dplyr::select(
     "GEOID",
     "name"
-    ,"Environmental Exposures",
-    "Environmental Effects",
-    "Climate",
-    "Sensitive Populations",
-    "Socioeconomic"
+    ,"Environmental exposures",
+    "Environmental effects",
+    "Climate Vulnerability",
+    "Sensitive population",
+    "Demographics"
   ))
   # enviromental exposures Score
   output$evnEx <- renderDataTable(tableData() %>% dplyr::select(
@@ -403,70 +448,70 @@ server <- function(input, output,session) {
     ,"name"
     ,"Ozone"
     ,"Ozone_pcntl"
-    ,"Particulate Matter 2.5"
-    ,"Particulate Matter 2.5_pcntl"
-    ,"Lead Paint in Homes"
-    ,"Lead Paint in Homes_pcntl"
-    ,"Diesel Particulate Matter"
-    ,"Diesel Particulate Matter_pcntl"
-    ,"Traffic Density"
-    ,"Traffic Density_pcntl"
-    ,"Hazardous Air Emission"
-    ,"Hazardous Air Emission_pcntl"
+    ,"Particles"                                              
+    ,"Particles_pcntl"                                         
+    ,"Lead exposure risk"                                     
+    ,"Lead exposure risk_pcntl"                                
+    ,"Diesel PM"                                              
+    ,"Diesel PM_pcntl"                                         
+    ,"Traffic proximity and volume"                           
+    ,"Traffic proximity and volume_pcntl"                      
+    ,"Air Toxics Emissions"                                   
+    ,"Air Toxics Emissions_pcntl"
   ))
   # enviromental effects Score
   output$evnEf <- renderDataTable(tableData() %>% dplyr::select(
     "GEOID"
     ,"name"
-    ,"Waste Water Discharge"
-    ,"Waste Water Discharge_pcntl"
-    ,"Proximity to Superfund Sites"
-    ,"Proximity to Superfund Sites_pcntl"
-    ,"Proximity to Risk Management Plan Sites_pcntl"
-    ,"Proximity to Risk Management Plan Sites"
-    ,"Proximity to Treatment, Storage and Disposal Facilities"
-    ,"Proximity to Treatment, Storage and Disposal Facilities_pcntl"
+    ,"Wastewater Discharge Indicator"                         
+    ,"Wastewater Discharge Indicator_pcntl"                    
+    ,"Proximity to National Priorities List (NPL) sites"      
+    ,"Proximity to National Priorities List (NPL) sites_pcntl" 
+    ,"Proximity to RMP Sites"                                 
+    ,"Proximity to RMP Sites_pcntl"                            
+    ,"Proximity to Hazardous Waste Facilities"                
+    ,"Proximity to Hazardous Waste Facilities_pcntl"
   ))
   # component Score
   output$clim <- renderDataTable(tableData() %>% dplyr::select(
     "GEOID"
     ,"name"
-    ,"Wildfire Risk"
-    ,"Wildfire Risk_pcntl"
-    ,"Flood Plain Area"
-    ,"Flood Plain Area_pcntl"
+    ,"Wildfire Risk"                                          
+    ,"Wildfire Risk_pcntl"                                     
+    ,"Flood Plains"                                           
+    ,"Flood Plains_pcntl"
   ))
   # component Score
   output$senPop <-  renderDataTable(tableData() %>% dplyr::select(
     "GEOID"
     ,"name"
-    ,"Population Under Five"
-    ,"Population Under Five_pcntl"
-    ,"Population Over Sixity Four"
-    ,"Population Over Sixity Four_pcntl"
-    ,"Heart Disease"
-    ,"Heart Disease_pcntl"
-    ,"Asthma"
-    ,"Asthma_pcntl"
-    ,"Life Expectancy_pcntl"
-    ,"Life Expectancy"
-    ,"Low Birth Weight"
-    ,"Low Birth Weight_pcntl"
+    ,"Population under 5"                                     
+    ,"Population under 5_pcntl"                                
+    ,"Population over 64"                                     
+    ,"Population over 64_pcntl"                                
+    ,"Heart disease in adults"                                
+    ,"Heart disease in adults_pcntl"                           
+    ,"Asthma hospitalization rate"                            
+    ,"Asthma hospitalization rate_pcntl"                       
+    ,"Life Expectancy"                                        
+    ,"Life Expectancy_pcntl"                                   
+    ,"Low weight birth rate"                                  
+    ,"Low weight birth rate_pcntl"
   ))
   # component Score
   output$socEco <- renderDataTable(tableData() %>% dplyr::select(
     "GEOID"
     ,"name"
-    ,"People of Color"
-    ,"People of Color_pcntl"
-    ,"Educational Attainment"
-    ,"Educational Attainment_pcntl"
-    ,"Low Income"
-    ,"Low Income_pcntl"
-    ,"Linguistic Isolation"
-    ,"Linguistic Isolation_pcntl"
-    ,"Disability"
-    ,"Disability_pcntl"
+    ,"Percent people of color"                                
+    ,"Percent people of color_pcntl"                           
+    ,"Percent less than high school education"                
+    ,"Percent less than high school education_pcntl"           
+    ,"Percent low income"                                     
+    ,"Percent low income_pcntl"                                
+    ,"Percent linguistic isolation"                           
+    ,"Percent linguistic isolation_pcntl"                      
+    ,"Percent disability"                                     
+    ,"Percent disability_pcntl"
   ))
   # download data -----------------------------------------------------------
   
@@ -570,11 +615,11 @@ server <- function(input, output,session) {
       )
   })
 
-# # click observer event ----------------------------------------------------
-#   observeEvent(input$mymap_shape_click, { 
-#     p <- input$mymap_shape_click$id  # typo was on this line
-#     print(p)
-#   })
+  # click observer event ----------------------------------------------------
+  observeEvent(input$mymap_shape_click, {
+    geoidMap <- input$mymap_shape_click$id  # typo was on this line
+    print(geoidMap)
+  })
 }
 
 # Run the application

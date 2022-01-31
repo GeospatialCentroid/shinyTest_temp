@@ -15,18 +15,20 @@
 
 createMap <- function(mapData,pal, palMap, oil, rural, coal, di) {
   map <- leaflet() %>%
-  # add z levels ------------------------------------------------------------
+    # add z levels ------------------------------------------------------------
   addMapPane("index", zIndex = 410) %>%
     addMapPane("binary", zIndex = 420) %>%
     addMapPane("di", zIndex = 409) %>%
     # add tiles ---------------------------------------------------------------
   addProviderTiles("CartoDB.DarkMatter", group = "Dark") %>%
-  addProviderTiles("OpenStreetMap", group = "OpenStreetMap")%>%
+    addProviderTiles("OpenStreetMap", group = "OpenStreetMap")%>%
     addProviderTiles("Stamen.Toner", group = "Light")%>%
     # add search function -----------------------------------------------------
   leaflet.extras::addSearchOSM(
     options = leaflet.extras::searchOptions(autoCollapse = TRUE,
-    hideMarkerOnCollapse = TRUE)) %>%
+                                            hideMarkerOnCollapse = TRUE))%>%
+    # add map reset -----------------------------------------------------------
+  leaflet.extras::addResetMapButton() %>%
     # add spatial Data --------------------------------------------------------
   addPolygons(
     data = mapData,
@@ -76,7 +78,7 @@ createMap <- function(mapData,pal, palMap, oil, rural, coal, di) {
     ),
     options = layersControlOptions(collapsed = FALSE),
     position = "topleft"
-  ) %>%
+  )%>%
     htmlwidgets::onRender("
         function() {
             $('.leaflet-control-layers-overlays').prepend('<label style=\"text-align:center\">Map Layers</label>');
@@ -89,13 +91,7 @@ createMap <- function(mapData,pal, palMap, oil, rural, coal, di) {
         "Coal Community",
         "Rural Community",
         "Oil and Gas Community",
-        "Disproportionatly Impacted Community"))%>%
-  # add map reset -----------------------------------------------------------
-  leaflet.extras::addResetMapButton()%>%
-  leaflet.extras::addSearchOSM(
-      options = leaflet.extras::searchOptions(
-        autoCollapse = TRUE,
-        hideMarkerOnCollapse = TRUE))
+        "Disproportionatly Impacted Community"))
 
   return(map)
 }
