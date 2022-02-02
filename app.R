@@ -17,7 +17,7 @@ library(plotly)
 library(DT)
 library(vroom)
 library(bslib)
-library(shinipsum)
+# library(shinipsum)
 library(rmapshaper)
 library(readr)
 
@@ -77,6 +77,7 @@ histData <- envoData %>%
 # set empty parameter for histogram funciton 
 ## set to non GEOID number for the histogram generate on loading. 
 geoidMap <- "100"
+geoids <- "08001"
 
 # UI  ---------------------------------------------------------------------
 ui <- fluidPage(
@@ -281,11 +282,18 @@ ui <- fluidPage(
       )
       ),
     ),
-    # action button 
+    # action button : update map elements
     column(
-      2,
+      1,
       tags$div(title="Click here to update map display",
                actionButton("button", "Update Map")
+      )
+    ),
+    # action button 
+    column(
+      1,
+      tags$div(title="Click to remove highilights features",
+               actionButton("button_remove", "Remove Highlighted Areas")
       )
     )
   ),
@@ -309,7 +317,7 @@ ui <- fluidPage(
   # show plots --------------------------------------------------------------
   # plot of the datasets
   h2("Graphs"),
-  plotlyOutput("plot2"),
+  plotlyOutput("plot2",width = "100%"),
   
 
   # Describe plots  --------------------------------------------------------
@@ -321,6 +329,13 @@ ui <- fluidPage(
   # show reactive table -----------------------------------------------------
   # table showing the results
   h2("Enviroscreen Score Data"),
+  # add selection to map button 
+  fluidRow(column(
+    2, offset = 10,
+    tags$div(title="Click here to add selections to map display",
+             actionButton("button_table", "Highlight Selection to Map")
+    )
+  )),
   # Output: Tabset w/ plot, summary, and table ----
   tabsetPanel(type = "tabs",
               tabPanel("Group Component Scores", dataTableOutput("gcomponentScore")),
@@ -356,11 +371,8 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output,session) {
 
-  # intro image -------------------------------------------------------------
-  # image output
-  # output$image <- renderImage({
-  #   random_image()
-  # })
+  # storing GEOIDs from table selection -------------------------------------
+  RV<-reactiveValues(Clicks=list())
 
   # reactive geometry selection --------------------------------------------------
   # select table
@@ -399,7 +411,7 @@ server <- function(input, output,session) {
     for(i in seq_along(plotGroup)){
       plots1[[i]] <- genPlots(dataframe = df1(),parameter = plotGroup[i], geoid = input$mymap_shape_click)
     }
-    subplot(plots1,nrows = 1,shareY = TRUE, titleX = TRUE)
+    subplot(plots1, nrows = 1, shareY = TRUE, titleX = TRUE)
   })
   
   
@@ -432,6 +444,47 @@ server <- function(input, output,session) {
     ,"Population Burden"                                            
     ,"Population Burden_pcntl"
     ))
+  
+  
+  # click observer event ----------------------------------------------------
+  ### each table has it's own observer that assigned to the same variable. 
+  ### this allows only selection from specific table to be added to map 
+  observeEvent(input$gcomponentScore_rows_selected, {
+    s1 <- input$gcomponentScore_rows_selected  # typo was on this line
+    print(RV$Clicks )
+    RV$Clicks <- tableData() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
+  })
+  observeEvent(input$componentScore_rows_selected, {
+    s1 <- input$componentScore_rows_selected 
+    RV$Clicks <- tableData() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
+    print(RV$Clicks )
+  })
+  observeEvent(input$evnEx_rows_selected, {
+    s1 <- input$evnEx_rows_selected 
+    RV$Clicks <- tableData() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
+    print(s1)
+  })
+  observeEvent(input$evnEf_rows_selected, {
+    s1 <- input$evnEf_rows_selected 
+    RV$Clicks <- tableData() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
+    print(RV$Clicks )
+  })
+  observeEvent(input$clim_rows_selected, {
+    s1 <- input$clim_rows_selected 
+    RV$Clicks <- tableData() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
+    print(RV$Clicks )
+  })
+  observeEvent(input$senPop_rows_selected, {
+    s1 <- input$senPop_rows_selected 
+    RV$Clicks <- tableData() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
+    print(RV$Clicks )
+  })
+  observeEvent(input$socEco_rows_selected, {
+    s1 <- input$socEco_rows_selected 
+    RV$Clicks <- tableData() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
+    print(RV$Clicks )
+  })
+
   # component Score
   output$componentScore <- renderDataTable(tableData() %>% dplyr::select(
     "GEOID",
@@ -613,6 +666,26 @@ server <- function(input, output,session) {
         group = "Indicator Score"
         
       )
+  })
+  # add selected features to map 
+  observeEvent(input$button_table, {
+    print(RV$Clicks)
+    mapFeatures <- envoData %>% select("GEOID") %>% dplyr::filter(GEOID %in% RV$Clicks)
+      # add features to map 
+      leafletProxy("mymap") %>%
+        clearGroup(group = "Table Highlight") %>%
+        addPolygons(
+          data = mapFeatures,
+          options = pathOptions(pane = "index"),
+          group = "Table Highlight"
+        )
+    })
+  
+  # remove selected features from map 
+  observeEvent(input$button_remove, {
+    # add features to map 
+    leafletProxy("mymap") %>%
+      clearGroup(group = "Table Highlight") 
   })
 
   # click observer event ----------------------------------------------------

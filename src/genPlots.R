@@ -10,13 +10,22 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
   # set title for the plot 
   title <- parameter
   
+  minBin <- min(t1$breaks)
+  maxBin <- max(t1$breaks)
+  
   # generate plot regardless of geoid selection 
   p1 <- plot_ly(df1,x=~value, nbinsx = length(unique(df1$bins)))%>%
     add_histogram(
       marker = list(color = "#009add",
                     line = list(width = 2,
                                 color = 'rgb(0, 0, 0)')))%>%
-    layout(xaxis = list(title = title))%>%
+    layout(xaxis = list(title = title,
+               ticktext = list("Least Burdened", "Most Burdened"), 
+               tickvals = list(minBin,maxBin),
+               tickmode = "array",
+               tickangle = 45
+             ), 
+           yaxis = list(title = "Number of Areas"))%>%
     hide_legend()
   
   # if geoid is in feature, reassign p1 and produce altered plot 
