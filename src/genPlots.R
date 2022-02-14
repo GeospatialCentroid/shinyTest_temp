@@ -10,6 +10,16 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
   # set title for the plot 
   title <- parameter
   
+  if(parameter %in% c("Sensitive population")){
+    xlabel <- "Susceptibility"
+  }
+  if(parameter %in% c("Demographics")){
+    xlabel <- "Vulnerability"
+  }
+  if(parameter %in% c("Colorado Enviroscreen Score" ,"Environmental exposures","Environmental effects","Climate Vulnerability")){
+    xlabel <- "Burden"
+  }
+  
   minBin <- min(t1$breaks)
   maxBin <- max(t1$breaks)
   
@@ -19,8 +29,8 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
       marker = list(color = "#009add",
                     line = list(width = 2,
                                 color = 'rgb(0, 0, 0)')))%>%
-    layout(xaxis = list(title = title,
-               ticktext = list("Least Burdened", "Most Burdened"), 
+    layout(xaxis = list(title = xlabel,
+               ticktext = list("Least", "Most"), 
                tickvals = list(minBin,maxBin),
                tickmode = "array",
                tickangle = 45
@@ -49,7 +59,13 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
           marker = list(color = colors$color,
                         line = list(width = 2,
                                     color = 'rgb(0, 0, 0)')))%>%
-        layout(xaxis = list(title = title))%>%
+        layout(xaxis = list(title = xlabel,
+                           ticktext = list("Least", "Most"), 
+                           tickvals = list(minBin,maxBin),
+                           tickmode = "array",
+                           tickangle = 45
+        ),
+        yaxis = list(title = "Number of Areas"))%>%
         hide_legend() 
     }
   }

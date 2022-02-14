@@ -25,27 +25,7 @@ shiny-text-output shiny-bound-output{
   text-size-adjust: 1.5;
 }
 
-showcase{
-  background-image:url('MountainsToPlains.png');
-  background-size:cover;
-  background-position:center;
-  height:40vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  padding:0 20px;
+.nav-tabs .nav-link.active,.nav-tabs>li>a.active,{
+    color: #245D38;
+    background: #ffcd00;
 }
-
-showcase h1{
-  font-size:50px;
-  line-height:1.2;
-  color: white;
-}
-
-showcase p{
-  font-size:20px;
-  color: white;
-}
-

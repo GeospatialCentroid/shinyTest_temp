@@ -52,6 +52,14 @@ getDI <- function(){
                "<br/><b>Percent Housing Burdened: </b>", HH_Br_P
              )
           )%>%
+    mutate(
+      color = as.factor(case_when(
+        Mn_FLAG == "Yes" & FLP_FLA == "No" & Br_FLAG == "No" ~ "People of Color",
+        Mn_FLAG == "No" & FLP_FLA == "Yes" & Br_FLAG == "No" ~ "Low Income",
+        Mn_FLAG == "No" & FLP_FLA == "No" & Br_FLAG == "Yes" ~ "Housing Burden",
+        TRUE ~ "More then one category"
+      ))
+    )%>%
     as('sf')
   return(diCommunity)
 }

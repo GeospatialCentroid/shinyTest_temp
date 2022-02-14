@@ -8,17 +8,14 @@
 #' @return leaftlet map object
 #' @export
 #'
-#' @examples
 #'
-#'
-#'
+createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di) {
 
-createMap <- function(mapData,pal, palMap, oil, rural, coal, di) {
   map <- leaflet() %>%
     # add z levels ------------------------------------------------------------
-  addMapPane("index", zIndex = 410) %>%
-    addMapPane("binary", zIndex = 420) %>%
-    addMapPane("di", zIndex = 409) %>%
+  addMapPane("index", zIndex = 408) %>%
+    addMapPane("binary", zIndex = 409) %>%
+    addMapPane("di", zIndex = 410) %>%
     # add tiles ---------------------------------------------------------------
   addProviderTiles("CartoDB.DarkMatter", group = "Dark") %>%
     addProviderTiles("OpenStreetMap", group = "OpenStreetMap")%>%
@@ -54,8 +51,12 @@ createMap <- function(mapData,pal, palMap, oil, rural, coal, di) {
     addPolyLine(sf1 = coal, group = "Coal Community") %>%
     addPolygons(
       data = di,
+      fillColor =  ~diPal(`color`),
+      color = "#454547",
+      weight = 1,
+      fillOpacity = 0.8,
       popup = di$popup,
-      group = "Disproportionatly Impacted Community"
+      group = "Disproportionately Impacted Community"
     )%>%
     # add legend --------------------------------------------------------------
   addLegend(
@@ -63,9 +64,19 @@ createMap <- function(mapData,pal, palMap, oil, rural, coal, di) {
     colors = pal,
     title = "Est. Values",
     labels = c("Most Burdened", "", "", "", "Least Burdened"),
-    opacity = 1
+    opacity = 1,
+    layerId = "firstLegend",
+    group = "Indicator Score"
     # labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))
   ) %>%
+  addLegend("topright",
+            colors = c("#fdd18a", "#ade1e9","#51a198","#c095b4"), 
+            title = "Disproportionately Impacted Community",
+            labels = c("Low Income", "People of Color",
+                       "Housing Burden", "More then one category"),
+            opacity = 1,
+            group = "Disproportionately Impacted Community"
+            )%>%
     # add control groups ------------------------------------------------------
   addLayersControl(
     baseGroups = c("Light","Dark", "OpenStreetMap"),
@@ -74,7 +85,7 @@ createMap <- function(mapData,pal, palMap, oil, rural, coal, di) {
       "Coal Community",
       "Rural Community",
       "Oil and Gas Community",
-      "Disproportionatly Impacted Community"
+      "Disproportionately Impacted Community"
     ),
     options = layersControlOptions(collapsed = FALSE),
     position = "topleft"
@@ -91,7 +102,7 @@ createMap <- function(mapData,pal, palMap, oil, rural, coal, di) {
         "Coal Community",
         "Rural Community",
         "Oil and Gas Community",
-        "Disproportionatly Impacted Community"))
+        "Disproportionately Impacted Community"))
 
   return(map)
 }
