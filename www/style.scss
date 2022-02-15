@@ -1,15 +1,31 @@
 p {
-  padding: 35px 70px;
+  padding-left:50px;
+  padding-right:50px;
+  text-align:left;
 }
 
 
 h1, h2, h3, h4, h5, h6
 {
-  padding: 35px 70px;
-  text-align: center;
+  padding: 20px 50px;
+  text-align: left;
 }
 
+ol, ul, dl {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    text-align:left;
+    padding-left:100px;
+    padding-right:50px;
+}
 
+div.row.boarderElement{
+  border-style: solid;
+  border-color :#4d3a7d;
+  border-bottom-width: thin;
+  padding-left:50px;
+  padding-right:50px;
+}
 
 shiny-text-output shiny-bound-output{
   padding: 10px 20px;
@@ -25,7 +41,20 @@ shiny-text-output shiny-bound-output{
   text-size-adjust: 1.5;
 }
 
-.nav-tabs .nav-link.active,.nav-tabs>li>a.active,{
-    color: #245D38;
+a {
+    color: #0000FF;
+}
+
+a.nav-link{
+  color: #245D38 !important;
+}
+.nav-tabs .nav-link.active, .nav-tabs>li>a.active,{
     background: #ffcd00;
+}
+
+.nav-tabs .nav-link, .nav-tabs>li>a, .nav-tabs .nav-pills>li>a, .nav-tabs ul.nav.navbar-nav>li>a {
+    margin-bottom: -1px;
+    border: 1px solid;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
 }

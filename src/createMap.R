@@ -79,7 +79,6 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di) {
             )%>%
     # add control groups ------------------------------------------------------
   addLayersControl(
-    baseGroups = c("Light","Dark", "OpenStreetMap"),
     overlayGroups = c(
       "Indicator Score",
       "Coal Community",
@@ -87,6 +86,7 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di) {
       "Oil and Gas Community",
       "Disproportionately Impacted Community"
     ),
+    baseGroups = c("Light","Dark", "OpenStreetMap"),
     options = layersControlOptions(collapsed = FALSE),
     position = "topleft"
   )%>%

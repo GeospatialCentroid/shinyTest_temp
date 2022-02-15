@@ -95,7 +95,7 @@ annotations = list(
     xanchor = "center",  
     yanchor = "bottom",  
     showarrow = FALSE),
-  list(x = 0.26,  
+  list(x = 0.22,  
     y = 1.0,  
     text = "<b> Environmental exposures </b>",  
     font=list(size=16),
@@ -161,128 +161,125 @@ ui <- fluidPage(
     bslib::bs_add_rules(sass::sass_file("www/style.scss")),
 
   # Title ------------------------------------------------------------------
-  shiny::titlePanel( title=div("Colorado Enviroscreen - Beta Test Version February 2022", img(src="MountainsToPlains.png")
+  shiny::titlePanel( title=div(style="text-align:left;","Colorado EnviroScreen", br(),"Beta Test Version February 2022", img(src="MountainsToPlains.png")
                                ,windowTitle = "Colorado Enviroscreen - Beta ")),
   
-  fluidRow(style={"padding-left:100px;padding-right:100px;"},
+  fluidRow(
     p(HTML("</br><a href='#map'>Jump to Map</a>")),
-    p("The Colorado Department of Public Health and Environment and a team at Colorado State University are working on an enhanced environmental health screening tool for Colorado. This interactive mapping tool is called CO EnviroScreen. 
-      To learn more about the project please vist CDPHE ",
-      tags$a(href = "https://cdphe.colorado.gov/enviroscreen", "Colorado EnviroScreen webpage. ", target = "_blank"),
-      "The tool will enable users to identify disproportionately impacted (DI) communities based on the definition in Colorado’s Environmental Justice Act (HB21-1266). CO EnviroScreen will be one way Colorado addresses current and historic inequities.
-      The mapping tool aims to:"),
+    p("The Colorado Department of Public Health and Environment and a team at Colorado State University are working on an enhanced environmental health screening tool for Colorado. This interactive mapping tool is called Colorado EnviroScreen. To learn more about the project, please visit CDPHE’s",
+      tags$a(href = "https://cdphe.colorado.gov/enviroscreen", "Colorado EnviroScreen webpage.", target = "_blank"),
+      "EnviroScreen will enable users to identify disproportionately impacted (DI) communities based on the definition in Colorado’s Environmental Justice Act (HB21-1266). Colorado EnviroScreen will be one way that Colorado addresses current and historic inequities."),
+  ),
+  fluidRow(
+    p("The mapping tool aims to:")),
+  fluidRow(
     p(
-      tags$ol(
-        tags$li("Pinpoint areas that have a disproportionate burden of health and/or environmental harm."),
-        tags$li("Help users maximize funding and resources for policy changes and other interventions to avoid, minimize, and mitigate environmental health risks."),
+      tags$ul(
+        tags$li("Pinpoint areas where DI communities also have a greater health burden and/or more environmental risks."),
+        tags$li("Help users advocate for funding, interventions, and policy changes to avoid, minimize, and mitigate environmental health risks."),
         tags$li("Advance a healthy and sustainable Colorado where everyone has the same degree of protection from environmental and health hazards.")
-      )
-    ),
-    br(),
-    p("Click here for more information about CDPHE’s work to",
+      ))),
+  fluidRow(
+    p("Click here for more information about CDPHE’s work to ",
       tags$a(href = "https://cdphe.colorado.gov/environmental-justice", "advance environmental justice", target = "_blank"),
       ", ",
       tags$a(href = "https://cdphe.colorado.gov/environment/toxicology-and-environmental-epidemiology", "understand the connection between the environment and our health", target = "_blank"),
-      ", and ",
+      " , and ",
       tags$a(href = "https://cdphe.colorado.gov/air-pollution/climate-change#equity", "advance climate equity.", target = "_blank"),
-     ),
-
-  ),
-  fluidRow(style={"padding-left:100px;padding-right:100px;"},
-           p("Scroll down for addation information on how to use this resource and the current results of the Colorado Enviroscreen.")
+     )),
+  fluidRow(
+           p("Scroll down for additional information about how to use Colorado EnviroScreen.")
   ),
 
 
   # description of use ------------------------------------------------------
-  tags$style(HTML("
-        .a.nav-link.active{
-    	background: #ffcd00
-        }")),
-  fluidRow(style = {"border-style: solid; borderColor=:#4d3a7d;"},
+  # tags$style(HTML("
+  #       .a.nav-link.active{
+  #   	background: #ffcd00
+  #       }")),
+  fluidRow(class = "boarderElement", 
     h2("Understanding the Enviroscreen Tool")  
   ),
   br(),
   tabsetPanel(
-    tabPanel("EnviroScreen score",
-             tags$strong("EnviroScreen score"),
+    tabPanel("EnviroScreen Score",
+             br(),
+             tags$strong("EnviroScreen Score"),
              p(
-               "Colorado EnviroScreen is an environmental justice mapping tool that uses 
-               population and environmental factors to calculate an EnviroScreen score.
-               A higher EnviroScreen score means the area is more likely to be affected 
-               by environmental injustice. There are scores for each county, census tract, 
-               and census block group in Colorado. CDPHE expects to make improvements and
-               additions to the tool in response to feedback or as new data become available.",
+               "Colorado EnviroScreen is an environmental justice mapping tool that uses population and environmental factors to calculate an EnviroScreen score.",
                br(),
-               "Although EnviroScreen provides a robust measure of cumulative environmental 
-               burden, it is not a perfect tool. The tool uses limited environmental and 
-               sociodemographic data to calculate the EnviroScreen score. "
+               "A higher EnviroScreen score means the area is more likely to be affected by environmental injustice. There are scores for each county, census tract, and census block group in Colorado. CDPHE expects to make improvements and additions to the tool in response to feedback or as new data become available",
+               br(),
+               "Although EnviroScreen provides a robust measure of cumulative environmental burden, it is not a perfect tool. The tool uses limited environmental and sociodemographic data to calculate the EnviroScreen score.",
              ),
              p(
-               "Colorado EnviroScreen does not:",
+               "Colorado EnviroScreen does NOT:",
                
-               tags$ol(
+               tags$ul(
                  tags$li("Define all areas that might be affected by environmental injustice or specific environmental burdens."),
                  tags$li("Tell us about individuals who have health problems that make them more likely to experience negative effects from environmental exposures."),
                  tags$li("Take all environmental exposures into account."),
-                 tags$li("Tell us about smaller areas within a county, census tract, or census block groups that may be more vulnerable to environmental exposures."),
+                 tags$li("Tell us about smaller areas within a county, census tract, or census block group that may be more vulnerable to environmental exposures."),
               )
+             ),
+             p(
+               "For more information about how to use environmental justice mapping tools, 
+    please review the Climate Equity Data Viewer guide (available in", 
+    tags$a(href = "https://drive.google.com/file/d/1iytdPG5iK2VBNpIy8k6oT6lU6-QKMLOa/view?usp=sharing", "English", target = "_blank"),
+    "and ",
+    tags$a(href = "https://drive.google.com/file/d/17rQ90fNt3DF-0PbySpGjo2tiy9AmDiCc/view?usp=sharing", "Spanish", target = "_blank"),
+    ")."
              ),
     ),
     tabPanel("Using the Map",
-             tags$strong("Using the map"),
+             br(),
+             tags$strong("Using the Map"),
+             p("The default view of the map shows the state of Colorado. Individual counties, census tracts, or census block groups are color-coded, based on their climate equity score. The legend on the right-hand side of the map shows what these colors represent. The lighter the color, the worse the EnviroScreen score."),
+             br(),
              p(
-               "The default view of the map shows the state of Colorado. Individual counties,
-               census tracts, or census block groups are color-coded, based on their climate
-               equity score. The legend on the right-hand side of the map shows what these
-               colors represent. The lighter colors mean a worse EnviroScreen score",
-               br(),
-               "The data viewer map is interactive. Users can zoom in and out, drag
-               the map to a different location,  and click on a location to
-               learn more about its EnviroScreen score. Explore these features:",
-               tags$ol(
-                 tags$li("Use your mouse or trackpad to scroll up and down to zoom in and out of the map."),
-                 tags$li("Click, hold, and move your cursor to drag to a new location."),
+               "The map is interactive. You can zoom in and out, drag the map to a different location,  and click on a location to learn more about its EnviroScreen score. Explore these features:"
+             ),
+             p(
+               tags$ul(
+                 tags$li("Search for an address, city, ZIP code, or place name by using the magnifying glass icon, typing the location into the search bar, and selecting the location from the populated drop-down list."),
+                 tags$li("Zoom in and out of the map by scrolling up and down with your mouse or trackpad. "),
+                 tags$li("Drag the map to a new location by clicking, holding, and moving your cursor."),
                  tags$li("Click on a location to view more information for that location in the graph and table below the map.")
                  ),
-               br(),
-               "Users can search for an address, city, ZIP code, or place name using the magnifying glass icon and “Search using OSM Geocoder” search bar.",
              )
             ),
-    tabPanel("Understanding the data",
-             tags$strong("Understanding the data"),
+    tabPanel("Understanding the Data",
+             br(),
+             tags$strong("Understanding the Data"),
              p(
-               "EnviroScreen displays a cumulative impact EnviroScreen score derived from
-               relative rankings (percentiles) of individual data indicators. These individual
-               data indicators are aggregated into topic- based sub-components. These 
-               sub-components are aggregated further into the Environmental Burden and
-               Population Characteristics scores.  These two scores are multiplied together
-               to get the EnviroScreen score. In this tool, the EnviroScreen percentile is 
-               the default data visualized on the map. Sub-component scores and individual 
-               datasets are also available for display." 
-               
+               "EnviroScreen displays a cumulative impact EnviroScreen score that is derived from relative rankings (percentiles) of individual data indicators. Individual data indicators are aggregated into topic-based scores. These topic-based scores are aggregated further into the Pollution & Climate Burden and Socioeconomics & Demographics scores. The Pollution & Climate Burden and Socioeconomics & Demographics scores are multiplied together to calculate the EnviroScreen score. The EnviroScreen score is the default data visualized on the map. Sub-component scores and individual datasets are also available for display by selecting from the “Select Layer for Map” dropdown above the map." 
              ),
     ),
     tabPanel("Example",
+             br(),
              tags$strong("Example"),
       p("A non-profit group wants to apply for a grant it will use to install more air 
         pollution monitoring in its community. The grant rules say applicants
         have to show that their community needs the funds. The group knows science-based 
         information will strengthen its application. The group uses Colorado EnviroScreen
-        to get more information about their community.",
-        br(),
-        "Here’s how the community group would use the tools in Colorado EnviroScreen:",
+        to get more information about their community."
+        ),
+      p("Here’s how the community group would use the tools in Colorado EnviroScreen:",
         tags$ol(
-          tags$li("The non-profit staff navigates to the Colorado EnviroScreen webpage."),
-          tags$li("They use  the “search” feature to find the census tract where their community office is located. "),
-          tags$li("They click this area on the map and scroll below the map to view the additional information."),
-          tags$li("They compare their overall and component EnviroScreen scores to compare their community with the rest of the state. "),
-          tags$li("They download the data for their community at the bottom of the page."),
-          tags$li("They use this information to write a compelling grant application for community air monitors.")
+          tags$li("They start by using the search feature (magnifying glass in the upper right of map) to find the census tract in which its community office is located."),
+          tags$li("They click this area on the map and scroll below the map to view additional information."),
+          tags$li("They compare their census tract’s overall and component EnviroScreen scores to compare their community with the rest of the state."),
+          tags$li("They download the data for their census tract at the bottom of the page. "),
+          tags$li("They use this information to write a compelling grant application for community air monitors."),
         )
       ), 
     ),
     tabPanel("Additional Content",
-             tags$em("Coming Soon!")
+             br(),
+             p(
+               tags$em("Coming Soon!") 
+             ),
+             br(),
             )
     ),
 
@@ -292,7 +289,7 @@ ui <- fluidPage(
   # content for the reactive elements of the map
   br(), 
   # h2("Colorado Enviroscreen Displayed"),
-  fluidRow(id = "map", style = {"border-style: solid; borderColor=:#4d3a7d; padding-left:100px;padding-right:100px;"},
+  fluidRow(class = "boarderElement", id = "map", 
     # select geography
     column(
       2,
@@ -388,6 +385,13 @@ ui <- fluidPage(
     ),
     br(),
     tags$blockquote(textOutput("indicatorDesc")),
+    p(
+      tags$strong("Coal Community"),": Areas designated Coal Community are census block groups that have a coal-burning power plant within the county. All census tracts and block groups within these counties are considered coal communities.",
+      br(),
+      tags$strong("Oil & Gas Community"),": Oil and Gas Communities are  census block groups that have active oil and gas operations within the county. All census tracts and block groups within these counties are considered oil and gas communities.",
+      br(),
+      tags$strong("Rural Community"),": The U.S. Census Bureau's urban areas are densely populated and include residential, commercial, and other properties. Counties that include these urban areas are considered urban. Rural Communities encompass all counties not included within urban counties.",
+    )
   ),
   
   
@@ -404,26 +408,22 @@ ui <- fluidPage(
   # show plots --------------------------------------------------------------
   # plot of the datasets
   br(),
-  fluidRow(style = {"border-style: solid; borderColor=:#4d3a7d;"},
+  fluidRow(class = "boarderElement",
     plotlyOutput("plot2",width = "100%"),
     # Describe plots  --------------------------------------------------------
     # paragraph explaining the plot
     # h2("Understanding the Charts"),
-    p("The EnviroScreen score combines five components. When you click a location
-    on the map, the orange bars in this chart will show the score for that
-    location. The orange bars show how the location compares to the rest of
-    Colorado for each component score. Together, the charts show how the 
-    EnviroScreen score is calculated for the selected location."),
+    p("The EnviroScreen score combines five components: Environmental exposures, Environmental effects, Climate vulnerability, Sensitive populations, and Demographics. When you click a location on the map, the orange bars in this chart show the score for that location. The orange bars show how the location compares to the rest of Colorado for each component score. Together, the charts show how the EnviroScreen score is calculated for the selected location."),
     
   ),
   
   # show reactive table -----------------------------------------------------
   # table showing the results
-  h2("Enviroscreen Score Data"),
-  p("Use the tabs on top of the table to filter through different elements of the 
-    Colorado Enviroscreen score. You can select specific rows on the table, then hit the
-    `Highlight Selection on Map` button to view where in the Colorado those areas are found."),
-  # add selection to map button 
+  fluidRow(class = "boarderElement",
+           h2("Enviroscreen Score Data"),
+           p("Use the tabs on top of the table to filter through different elements of the Colorado Enviroscreen score. You can select specific rows on the table, then hit the blue ‘Highlight Selection on Map` button in the upper right to view the location on the map."),
+  ),
+   # add selection to map button 
   fluidRow(column(
     2, offset = 10,
     tags$div(title="Click here to add selections to map display",
@@ -458,7 +458,14 @@ ui <- fluidPage(
   ),
   
   h3("Additional Resources"),
-  em("Coming Soon!"),
+  p(
+    "For more information about how to use environmental justice mapping tools, 
+    please review the Climate Equity Data Viewer guide (available in", 
+    tags$a(href = "https://drive.google.com/file/d/1iytdPG5iK2VBNpIy8k6oT6lU6-QKMLOa/view?usp=sharing", "English", target = "_blank"),
+    "and ",
+    tags$a(href = "https://drive.google.com/file/d/17rQ90fNt3DF-0PbySpGjo2tiy9AmDiCc/view?usp=sharing", "Spanish", target = "_blank"),
+    ")."
+  ),
   
   br( ),
   br( ),
