@@ -34,7 +34,7 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di) {
     smoothFactor = 0.5,
     opacity = 1.0,
     fillOpacity = 0.5,
-    fillColor = ~ palMap(`Colorado Enviroscreen Score_pcntl`),
+    fillColor = ~ palMap(`Colorado EnviroScreen Score Percentile`),
     # https://stackoverflow.com/questions/48953149/dynamic-color-fill-for-polygon-using-leaflet-in-shiny-not-working
     highlightOptions = highlightOptions(
       color = "white",
@@ -79,6 +79,7 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di) {
             )%>%
     # add control groups ------------------------------------------------------
   addLayersControl(
+    baseGroups = c("Light","Dark", "OpenStreetMap"),
     overlayGroups = c(
       "Indicator Score",
       "Coal Community",
@@ -86,10 +87,8 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di) {
       "Oil and Gas Community",
       "Disproportionately Impacted Community"
     ),
-    baseGroups = c("Light","Dark", "OpenStreetMap"),
-    options = layersControlOptions(collapsed = FALSE),
-    position = "topleft"
-  )%>%
+    position = "topleft", 
+    options = layersControlOptions(collapsed = TRUE))%>%
     htmlwidgets::onRender("
         function() {
             $('.leaflet-control-layers-overlays').prepend('<label style=\"text-align:center\">Map Layers</label>');

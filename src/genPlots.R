@@ -1,4 +1,11 @@
 genPlots <- function(dataframe, parameter, geoid = NULL){
+  
+  fontHeader <- list(
+    family = "museo-sans",
+    color = "#001970")
+  fontBody <- list(
+    family = "Trebuchet MS")
+  
   # filter to input parameter 
   df1 <- dataframe %>% 
     dplyr::select("value" = parameter, GEOID) %>%
@@ -16,12 +23,19 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
   if(parameter %in% c("Demographics")){
     xlabel <- "Vulnerability"
   }
-  if(parameter %in% c("Colorado Enviroscreen Score" ,"Environmental exposures","Environmental effects","Climate Vulnerability")){
+  if(parameter %in% c("Colorado EnviroScreen Score", "Environmental exposures","Environmental effects","Climate vulnerability")){
     xlabel <- "Burden"
   }
+  if(parameter == "Colorado EnviroScreen Score"){
+    bg_color <- "#e5ecf6"
+  }else{
+    bg_color <- "#FFFFFF"
+  }
+  
   
   minBin <- min(t1$breaks)
   maxBin <- max(t1$breaks)
+  
   
   # generate plot regardless of geoid selection 
   p1 <- plot_ly(df1,x=~value, nbinsx = length(unique(df1$bins)))%>%
@@ -29,14 +43,17 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
       marker = list(color = "#009add",
                     line = list(width = 2,
                                 color = 'rgb(0, 0, 0)')))%>%
-    layout(xaxis = list(title = xlabel,
-               ticktext = list("Least", "Most"), 
-               tickvals = list(minBin,maxBin),
-               tickmode = "array",
-               tickangle = 45
-             ), 
-           yaxis = list(title = "Number of Areas"))%>%
-    hide_legend()
+    layout(title = list(text=parameter,font = fontHeader),
+           xaxis = list(title = xlabel,
+                        ticktext = list("Least", "Most"), 
+                        tickvals = list(minBin,maxBin),
+                        tickmode = "array",
+                        tickangle = 45),
+           yaxis = list(title = "Number of Areas"),
+           plot_bgcolor = bg_color,
+           font = fontBody)%>%
+    hide_legend()%>%
+    style(hoverinfo = 'none')
   
   # if geoid is in feature, reassign p1 and produce altered plot 
   ## determine if the map has been clicked 
@@ -59,14 +76,17 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
           marker = list(color = colors$color,
                         line = list(width = 2,
                                     color = 'rgb(0, 0, 0)')))%>%
-        layout(xaxis = list(title = xlabel,
+        layout(title = list(text= parameter,font = fontHeader),
+               xaxis = list(title = xlabel,
                            ticktext = list("Least", "Most"), 
                            tickvals = list(minBin,maxBin),
                            tickmode = "array",
-                           tickangle = 45
-        ),
-        yaxis = list(title = "Number of Areas"))%>%
-        hide_legend() 
+                           tickangle = 45),
+        yaxis = list(title = "Number of Areas"),
+        plot_bgcolor = bg_color, 
+        font = fontBody)%>%
+        hide_legend()%>%
+        style(hoverinfo = 'none') 
     }
   }
   return(p1) 

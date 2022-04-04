@@ -26,11 +26,9 @@ lapply(list.files(path = "src",recursive = TRUE, full.names = TRUE), source)
 
 # enviroscreen data
 envoData <- readRDS("data/scores/allScores.rda")%>%
-  dplyr::mutate(visParam = `Colorado Enviroscreen Score_pcntl`)
+  dplyr::mutate(visParam = `Colorado EnviroScreen Score Percentile`)%>%
+  dplyr::select("County Name", "GEOID", everything())
 
-# test1 <- envoData %>%
-#   dplyr::filter(area == "Census Tract")%>%
-#   dplyr::select("GEOID", "County Name")
 
 # Additional Data 
 oil <- readRDS("data/scores/oilgasVis.rda") 
@@ -61,7 +59,7 @@ palMap <- leaflet::colorNumeric(palette = colorRamp,
 indicators <- sf::st_drop_geometry(envoData) %>%
   dplyr::select(-c(`County Name`, area, GEOID)) %>%
   dplyr::select(!ends_with("_Pctl")) %>%
-  dplyr::select(!ends_with("_pcntl")) %>%
+  dplyr::select(!ends_with(" Percentile")) %>%
   names()
 
 #hist data
@@ -70,12 +68,12 @@ histData <- envoData %>%
   dplyr::filter(area == "County")%>%
   dplyr::select(
     "GEOID"                                                   
-    ,"Colorado Enviroscreen Score"                            
-    ,"Pollution and Climate Burden"                           
+    ,"Colorado EnviroScreen Score"                            
+    ,"Pollution & Climate Burden"                           
     ,"Socioeconomics & Demographics"                                      
     ,"Environmental exposures"                                
     ,"Environmental effects"                                   
-    ,"Climate Vulnerability"                                  
+    ,"Climate vulnerability"                                  
     ,"Sensitive population"                                   
     ,"Demographics"
   )
@@ -83,65 +81,6 @@ histData <- envoData %>%
 # set empty parameter for histogram funciton 
 ## set to non GEOID number for the histogram generate on loading. 
 geoidMap <- "100"
-
-### annotations for histograms 
-annotations = list( 
-  list(x = 0.05,  
-    y = 1.0,  
-    text = "<b> Colorado Enviroscreen Score </b>",  
-    font=list(size=16),
-    xref = "paper",  
-    yref = "paper",  
-    xanchor = "center",  
-    yanchor = "bottom",  
-    showarrow = FALSE),
-  list(x = 0.22,  
-    y = 1.0,  
-    text = "<b> Environmental exposures </b>",  
-    font=list(size=16),
-    xref = "paper",  
-    yref = "paper",  
-    xanchor = "center",  
-    yanchor = "bottom",  
-    showarrow = FALSE),
-  list(x = 0.42,  
-    y = 1.0,  
-    text = "<b> Environmental effects</b>",  
-    font=list(size=16),
-    xref = "paper",  
-    yref = "paper",  
-    xanchor = "center",  
-    yanchor = "bottom",  
-    showarrow = FALSE ),
-  list(x = 0.58,  
-    y = 1.0,  
-    text = "<b> Climate Vulnerability </b>",  
-    font=list(size=16),
-    xref = "paper",  
-    yref = "paper",  
-    xanchor = "center",  
-    yanchor = "bottom",  
-    showarrow = FALSE ),
-  list(x = 0.74,  
-    y = 1.0,  
-    text = "<b> Sensitive population </b>",  
-    font=list(size=16),
-    xref = "paper",  
-    yref = "paper",  
-    xanchor = "center",  
-    yanchor = "bottom",  
-    showarrow = FALSE ),
-  list(x = 0.9,  
-    y = 1.0,  
-    text = "<b> Demographics </b>", 
-    font=list(size=16),
-    xref = "paper",  
-    yref = "paper",  
-    xanchor = "center",  
-    yanchor = "bottom",  
-    showarrow = FALSE 
-  )
-)
 
 
 
@@ -161,8 +100,7 @@ ui <- fluidPage(
     bslib::bs_add_rules(sass::sass_file("www/style.scss")),
 
   # Title ------------------------------------------------------------------
-  shiny::titlePanel( title=div(style="text-align:left;","Colorado EnviroScreen", br(),"Beta Test Version February 2022", img(src="MountainsToPlains.png")
-                               ,windowTitle = "Colorado Enviroscreen - Beta ")),
+  shiny::titlePanel( title="Colorado EnviroScreen - Beta Test Version February 2022",windowTitle = "Colorado Enviroscreen - Beta "),
   
   fluidRow(
     p(HTML("</br><a href='#map'>Jump to Map</a>")),
@@ -198,7 +136,7 @@ ui <- fluidPage(
   #   	background: #ffcd00
   #       }")),
   fluidRow(class = "boarderElement", 
-    h2("Understanding the Enviroscreen Tool")  
+    h2("Understanding the EnviroScreen Tool")  
   ),
   br(),
   tabsetPanel(
@@ -218,7 +156,7 @@ ui <- fluidPage(
                tags$ul(
                  tags$li("Define all areas that might be affected by environmental injustice or specific environmental burdens."),
                  tags$li("Tell us about individuals who have health problems that make them more likely to experience negative effects from environmental exposures."),
-                 tags$li("Take all environmental exposures into account."),
+                 tags$li("Take all Environmental exposures into account."),
                  tags$li("Tell us about smaller areas within a county, census tract, or census block group that may be more vulnerable to environmental exposures."),
               )
              ),
@@ -312,36 +250,36 @@ ui <- fluidPage(
         inputId = "Indicator",
         label = "Select Layer for Map",
         choices = list(
-          "EnviroScreen Score" = "Colorado Enviroscreen Score",
-          "Group Component Scores" = c("Pollution and Climate Burden", "Socioeconomics & Demographics"),
+          "EnviroScreen Score" = "Colorado EnviroScreen Score",
+          "Group Component Scores" = c("Pollution & Climate Burden", "Socioeconomics & Demographics"),
           "Individual Component Scores" =c("Environmental exposures",
                                            "Environmental effects",
-                                           "Climate Vulnerability",
+                                           "Climate vulnerability",
                                            "Sensitive population",
                                            "Demographics"),
           "Environmental exposures" = c("Ozone"                                                  
                                         ,"Particles"                                 
                                         ,"Lead exposure risk"                                    
                                         ,"Diesel PM"                              
-                                        ,"Traffic proximity and volume"                                        
-                                        ,"Air Toxics Emissions" 
+                                        ,"Traffic proximity & volume"                                        
+                                        ,"Air toxics emissions" 
                                       ),
           "Environmental effects" = c(
-            "Wastewater Discharge Indicator"                                  
+            "Wastewater discharge indicator"                                  
             ,"Proximity to National Priorities List (NPL) sites"                           
-            ,"Proximity to RMP Sites"                
-            ,"Proximity to Hazardous Waste Facilities"
+            ,"Proximity to RMP sites"                
+            ,"Proximity to hazardous waste facilities"
           ),
-          "Climate Vulnerability" = c(
-            "Wildfire Risk"                                          
-            ,"Flood Plains" 
+          "Climate vulnerability" = c(
+            "Wildfire risk"                                          
+            ,"Floodplains" 
           ),
           "Sensitive population" = c(
             "Population under 5"                                  
             ,"Population over 64"                            
             ,"Heart disease in adults"                                          
             ,"Asthma hospitalization rate"                                                 
-            ,"Life Expectancy"                                        
+            ,"Life expectancy"                                        
             ,"Low weight birth rate" 
           ),
           "Demographics" = c(
@@ -352,7 +290,7 @@ ui <- fluidPage(
             ,"Percent disability" 
           )
         ),
-        selected = "Colorado Enviroscreen Score",
+        selected = "Colorado EnviroScreen Score",
         width = "90%"
       )
       )
@@ -360,7 +298,7 @@ ui <- fluidPage(
     # toggle between measured and percentile
     column(
       3,
-      tags$div(title="Click here to show measure value or rank of the variable",
+      tags$div(title="Click here to show measured value or rank of the variable",
       selectInput(
         inputId = "Percentile",
         label = "Measure or Percentile",
@@ -379,7 +317,7 @@ ui <- fluidPage(
     # action button 
     column(
       1,
-      tags$div(title="Click to remove highilights features",
+      tags$div(title="Click here to remove highlighted features",
                actionButton("button_remove", "Remove Highlighted Areas")
       )
     ),
@@ -397,9 +335,9 @@ ui <- fluidPage(
   
   # display map -------------------------------------------------------------
   fluidRow(tags$style(type = "text/css", "#mymap {height: calc(100vh - 280px) !important;}"),style = {"background-color:#4d3a7d;"},
-           column(1),
-           column(10, leafletOutput("mymap")),
-           column(1)
+           #column(1),
+           column(8, leafletOutput("mymap")),
+           column(4, plotlyOutput("histEnviroScreen",height = "100%"))
   ),
 
   # describe indicators -----------------------------------------------------
@@ -409,19 +347,24 @@ ui <- fluidPage(
   # plot of the datasets
   br(),
   fluidRow(class = "boarderElement",
-    plotlyOutput("plot2",width = "100%"),
-    # Describe plots  --------------------------------------------------------
-    # paragraph explaining the plot
-    # h2("Understanding the Charts"),
-    p("The EnviroScreen score combines five components: Environmental exposures, Environmental effects, Climate vulnerability, Sensitive populations, and Demographics. When you click a location on the map, the orange bars in this chart show the score for that location. The orange bars show how the location compares to the rest of Colorado for each component score. Together, the charts show how the EnviroScreen score is calculated for the selected location."),
-    
+           column(1),
+           column(2,plotlyOutput("histExposure")),
+           column(2,plotlyOutput("histEffect")),
+           column(2,plotlyOutput("histClimate")),
+           column(2,plotlyOutput("histSocial")),
+           column(2,plotlyOutput("histDemo")),
+           column(1),
+    p("The EnviroScreen score combines five components: Environmental exposures, Environmental effects, Climate vulnerability, Sensitive population, and Demographics. When you click a location on the map, the orange bars in this chart show the score for that location. The orange bars show how the location compares to the rest of Colorado for each component score. Together, the charts show how the EnviroScreen score is calculated for the selected location.")
   ),
+  br(),
   
   # show reactive table -----------------------------------------------------
   # table showing the results
   fluidRow(class = "boarderElement",
-           h2("Enviroscreen Score Data"),
-           p("Use the tabs on top of the table to filter through different elements of the Colorado Enviroscreen score. You can select specific rows on the table, then hit the blue ‘Highlight Selection on Map` button in the upper right to view the location on the map."),
+           h2("EnviroScreen Score Data"),
+           p("Use the tabs above  the table to filter through different elements of the
+    Colorado EnviroScreen Score. You can select specific rows in the table, then hit the
+    Blue `Highlight Selection on Map` button in the upper right to view the location on the map."),
   ),
    # add selection to map button 
   fluidRow(column(
@@ -435,25 +378,12 @@ ui <- fluidPage(
               tabPanel("Group Component Scores", dataTableOutput("gcomponentScore")),
               tabPanel("Component Score", dataTableOutput("componentScore")),
               tabPanel("Environmental exposures", dataTableOutput("evnEx")),
-              tabPanel("Environmental effects", dataTableOutput("evnEf")),
-              tabPanel("Climate Vulnerability", dataTableOutput("clim")),
+              tabPanel("Environmental Effects", dataTableOutput("evnEf")),
+              tabPanel("Climate vulnerability", dataTableOutput("clim")),
               tabPanel("Sensitive population", dataTableOutput("senPop")),
-              tabPanel("Demographics", dataTableOutput("socEco"))
-    ),
+              tabPanel("Demographics", dataTableOutput("socEco"))),
   # download table option  --------------------------------------------------
   fluidRow(
-    # column(2,selectInput("download", "Choose a dataset:",
-    #               choices = c("All Data" 
-    #                           # ,"Group Component Scores"
-    #                           # ,"Component Score"
-    #                           # ,"Environmental Exposures"
-    #                           # ,"Environmental Effects"
-    #                           # ,"Climate"
-    #                           # ,"Sensitive Population"
-    #                           # ,"Socioeconomic"
-    #                           )
-    #               ),
-    # ),
     column(2,downloadButton("downloadData", "Download Data for Current Geography"))
   ),
   
@@ -508,20 +438,46 @@ server <- function(input, output,session) {
 
 # histogram plots ---------------------------------------------------------
   # if input changes reset map value 
-  plotGroup <- c( "Colorado Enviroscreen Score", "Environmental exposures","Environmental effects",
-                  "Climate Vulnerability","Sensitive population","Demographics")
-  # output for ployly
-  output$plot2 <- renderPlotly({
-    plots1 <- list()
-    for(i in seq_along(plotGroup)){
-      plots1[[i]] <- genPlots(dataframe = df1(),parameter = plotGroup[i], geoid = input$mymap_shape_click)
-    }
-    
-    subplot(plots1, nrows = 1, shareY = TRUE, titleX = TRUE)%>%
-      layout(annotations = annotations)
-    
-    
+  plotGroup <- c( "Colorado EnviroScreen Score", "Environmental exposures","Environmental effects",
+                  "Climate vulnerability","Sensitive population","Demographics")
+  
+  ### need individual output objects for each plot 
+  output$histEnviroScreen <- renderPlotly({
+    genPlots(dataframe = df1(),parameter = "Colorado EnviroScreen Score", geoid = input$mymap_shape_click)
   })
+  
+  
+  output$histExposure<- renderPlotly({
+    genPlots(dataframe = df1(),parameter = "Environmental exposures", geoid = input$mymap_shape_click)
+  })
+  output$histEffect<- renderPlotly({
+    genPlots(dataframe = df1(),parameter = "Environmental effects", geoid = input$mymap_shape_click)
+  })
+  output$histClimate<- renderPlotly({
+    genPlots(dataframe = df1(),parameter = "Climate vulnerability", geoid = input$mymap_shape_click)
+  })
+  output$histSocial<- renderPlotly({
+    genPlots(dataframe = df1(),parameter = "Sensitive population", geoid = input$mymap_shape_click)
+  })
+  output$histDemo<- renderPlotly({
+    genPlots(dataframe = df1(),parameter = "Demographics", geoid = input$mymap_shape_click)
+  })
+    
+  
+  
+  # ### 
+  # # output for ployly
+  # output$plot2 <- renderPlotly({
+  #   plots1 <- list()
+  #   for(i in seq_along(plotGroup)){
+  #     plots1[[i]] <- genPlots(dataframe = df1(),parameter = plotGroup[i], geoid = input$mymap_shape_click)
+  #   }
+  #   
+  #   subplot(plots1, nrows = 1, shareY = TRUE, titleX = TRUE)%>%
+  #     layout(annotations = annotations)
+  #   
+  #   
+  # })
   
   
 # table output ------------------------------------------------------------   
@@ -546,13 +502,18 @@ server <- function(input, output,session) {
       dplyr::select(
     "GEOID"
     ,"County Name"
-    ,"Colorado Enviroscreen Score"                                  
-    ,"Colorado Enviroscreen Score_pcntl"                            
-    ,"Pollution and Climate Burden"                                 
-    ,"Pollution and Climate Burden_pcntl"                           
+    ,"Colorado EnviroScreen Score"                                  
+    ,"Colorado EnviroScreen Score Percentile"                            
+    ,"Pollution & Climate Burden"                                 
+    ,"Pollution & Climate Burden Percentile"                           
     ,"Socioeconomics & Demographics"                                            
-    ,"Socioeconomics & Demographics_pcntl"
-    ))
+    ,"Socioeconomics & Demographics Percentile"
+    ), 
+    rownames = FALSE,
+    options = list(autoWidth = TRUE, scrollX = TRUE,
+              scrollY = "200px", scrollCollapse = TRUE,
+              paging = FALSE, float = "left"),
+     width = "80%", height = "70%")
   
   
   # click observer event ----------------------------------------------------
@@ -600,81 +561,86 @@ server <- function(input, output,session) {
     "County Name"
     ,"Environmental exposures",
     "Environmental effects",
-    "Climate Vulnerability",
+    "Climate vulnerability",
     "Sensitive population",
     "Demographics"
-  ))
+  ), 
+  options = list(autoWidth = TRUE, scrollX = TRUE))
   # enviromental exposures Score
   output$evnEx <- renderDataTable(tableData() %>% dplyr::select(
     "GEOID"
     ,"County Name"
     ,"Ozone"
-    ,"Ozone_pcntl"
+    ,"Ozone Percentile"
     ,"Particles"                                              
-    ,"Particles_pcntl"                                         
+    ,"Particles Percentile"                                         
     ,"Lead exposure risk"                                     
-    ,"Lead exposure risk_pcntl"                                
+    ,"Lead exposure risk Percentile"                                
     ,"Diesel PM"                                              
-    ,"Diesel PM_pcntl"                                         
-    ,"Traffic proximity and volume"                           
-    ,"Traffic proximity and volume_pcntl"                      
-    ,"Air Toxics Emissions"                                   
-    ,"Air Toxics Emissions_pcntl"
-  ))
+    ,"Diesel PM Percentile"                                         
+    ,"Traffic proximity & volume"                           
+    ,"Traffic proximity & volume Percentile"                      
+    ,"Air toxics emissions"                                   
+    ,"Air toxics emissions Percentile"
+  ), 
+  options = list(autoWidth = TRUE, scrollX = TRUE))
   # enviromental effects Score
   output$evnEf <- renderDataTable(tableData() %>% dplyr::select(
     "GEOID"
     ,"County Name"
-    ,"Wastewater Discharge Indicator"                         
-    ,"Wastewater Discharge Indicator_pcntl"                    
+    ,"Wastewater discharge indicator"                         
+    ,"Wastewater discharge indicator Percentile"                    
     ,"Proximity to National Priorities List (NPL) sites"      
-    ,"Proximity to National Priorities List (NPL) sites_pcntl" 
-    ,"Proximity to RMP Sites"                                 
-    ,"Proximity to RMP Sites_pcntl"                            
-    ,"Proximity to Hazardous Waste Facilities"                
-    ,"Proximity to Hazardous Waste Facilities_pcntl"
-  ))
+    ,"Proximity to National Priorities List (NPL) sites Percentile" 
+    ,"Proximity to RMP sites"                                 
+    ,"Proximity to RMP sites Percentile"                            
+    ,"Proximity to hazardous waste facilities"                
+    ,"Proximity to hazardous waste facilities Percentile"
+  ), 
+  options = list(autoWidth = TRUE, scrollX = TRUE))
   # component Score
   output$clim <- renderDataTable(tableData() %>% dplyr::select(
     "GEOID"
     ,"County Name"
-    ,"Wildfire Risk"                                          
-    ,"Wildfire Risk_pcntl"                                     
-    ,"Flood Plains"                                           
-    ,"Flood Plains_pcntl"
-  ))
+    ,"Wildfire risk"                                          
+    ,"Wildfire risk Percentile"                                     
+    ,"Floodplains"                                           
+    ,"Floodplains Percentile"
+  ), 
+  options = list(autoWidth = TRUE, scrollX = TRUE))
   # component Score
   output$senPop <-  renderDataTable(tableData() %>% dplyr::select(
     "GEOID"
     ,"County Name"
     ,"Population under 5"                                     
-    ,"Population under 5_pcntl"                                
+    ,"Population under 5 Percentile"                                
     ,"Population over 64"                                     
-    ,"Population over 64_pcntl"                                
+    ,"Population over 64 Percentile"                                
     ,"Heart disease in adults"                                
-    ,"Heart disease in adults_pcntl"                           
+    ,"Heart disease in adults Percentile"                           
     ,"Asthma hospitalization rate"                            
-    ,"Asthma hospitalization rate_pcntl"                       
-    ,"Life Expectancy"                                        
-    ,"Life Expectancy_pcntl"                                   
+    ,"Asthma hospitalization rate Percentile"                       
+    ,"Life expectancy"                                        
+    ,"Life expectancy Percentile"                                   
     ,"Low weight birth rate"                                  
-    ,"Low weight birth rate_pcntl"
-  ))
+    ,"Low weight birth rate Percentile"
+  ), options = list(autoWidth = TRUE, scrollX = TRUE))
   # component Score
   output$socEco <- renderDataTable(tableData() %>% dplyr::select(
     "GEOID"
     ,"County Name"
     ,"Percent people of color"                                
-    ,"Percent people of color_pcntl"                           
+    ,"Percent people of color Percentile"                           
     ,"Percent less than high school education"                
-    ,"Percent less than high school education_pcntl"           
+    ,"Percent less than high school education Percentile"           
     ,"Percent low income"                                     
-    ,"Percent low income_pcntl"                                
+    ,"Percent low income Percentile"                                
     ,"Percent linguistic isolation"                           
-    ,"Percent linguistic isolation_pcntl"                      
+    ,"Percent linguistic isolation Percentile"                      
     ,"Percent disability"                                     
-    ,"Percent disability_pcntl"
-  ))
+    ,"Percent disability Percentile"
+  ), 
+  options = list(autoWidth = TRUE, scrollX = TRUE))
   # download data -----------------------------------------------------------
   # Downloadable csv of selected dataset ----
   output$downloadData <- downloadHandler(
@@ -697,7 +663,7 @@ server <- function(input, output,session) {
     # indicator 
     in1 <- input$Indicator
     indicator1 <- in1
-    indicator2 <- paste0(in1,"_pcntl")
+    indicator2 <- paste0(in1," Percentile")
     
     if(input$Percentile == "Measured Value"){
       indicator <- indicator1 
@@ -718,14 +684,14 @@ server <- function(input, output,session) {
         popup = paste0(
           "<br/><strong>", as.character(in1),"</strong>", # needs to be text
           paste0("<br/><strong>",`County Name`,"</strong>"),
-          paste0(if(in1 %in% c("Colorado Enviroscreen Score",
-                                    "Pollution Burden",
-                                    "Climate Burden",
-                                    "Environmental Exposures",
+          paste0(if(in1 %in% c("Colorado EnviroScreen Score",
+                                    "Pollution & Climate Burden",
+                                    "Socioeconomics & Demographics",
+                                    "Environmental exposures",
                                     "Environmental Effects",
-                                    "Climate",
-                                    "Sensitive Populations",
-                                    "Socioeconomic"
+                                    "Climate vulnerability",
+                                    "Sensitive population",
+                                    "Demographics"
           )){
             paste0("<br/><b>Percentile:</b> ", round(!!as.symbol(indicator2), digits =  0))
           }else{

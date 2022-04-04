@@ -3,7 +3,7 @@
 defineLegend<- function(indicator){
     #establish classes 
     cat1 <- c("Sensitive population","Population under 5","Population over 64"
-    ,"Heart disease in adults","Asthma hospitalization rate","Life Expectancy"
+    ,"Heart disease in adults","Asthma hospitalization rate","Life expectancy"
     ,"Low weight birth rate")
     
     cat2 <- c("Demographics","Percent people of color","Percent less than high school education"
