@@ -23,17 +23,18 @@ library(data.table)
 # source helpers ----------------------------------------------------------
 lapply(list.files(path = "src",recursive = TRUE, full.names = TRUE), source)
 
+version <- 2
 
 # enviroscreen data
-envoData <- readRDS("data/scores/allScores.rda")%>%
+envoData <- readRDS(paste0("data/scores/allScores_",version,".rds"))%>%
   dplyr::mutate(visParam = `Colorado EnviroScreen Score Percentile`)%>%
   dplyr::select("County Name", "GEOID", everything())
 
 
 # Additional Data 
-oil <- readRDS("data/scores/oilgasVis.rda") 
-coal <- readRDS("data/scores/coalVis.rda")
-rural <- readRDS("data/scores/ruralVis.rda")
+oil <- readRDS("data/scores/oilgasVis.rds") 
+coal <- readRDS("data/scores/coalVis.rds")
+rural <- readRDS("data/scores/ruralVis.rds")
 descriptors <- read_csv("data/descriptions/indicatorDesc.csv")
 
 # di community 
@@ -100,7 +101,21 @@ ui <- fluidPage(
     bslib::bs_add_rules(sass::sass_file("www/style.scss")),
 
   # Title ------------------------------------------------------------------
-  shiny::titlePanel( title="Colorado EnviroScreen - Beta Test Version February 2022",windowTitle = "Colorado Enviroscreen - Beta "),
+  fluidRow(
+    class = "titleElement",
+    column(4, 
+           tags$a(
+             href = "https://cdphe.colorado.gov/enviroscreen",
+             tags$img(
+               src="EnviroScreen Logos/co_cdphe_pr_es_white_v.png",
+               title = "Colorado Department of Public Health and Environment",
+               width="90%",
+               height="90%" 
+             )
+           )
+          ),
+    column(8, h1("Colorado EnviroScreen"), h4("Beta Test Version February 2022"))
+  ),
   
   fluidRow(
     p(HTML("</br><a href='#map'>Jump to Map</a>")),
@@ -135,8 +150,8 @@ ui <- fluidPage(
   #       .a.nav-link.active{
   #   	background: #ffcd00
   #       }")),
-  fluidRow(class = "boarderElement", 
-    h2("Understanding the EnviroScreen Tool")  
+  fluidRow(class = "sectionTitle", 
+           h2("Understanding the EnviroScreen Tool")
   ),
   br(),
   tabsetPanel(
@@ -262,17 +277,25 @@ ui <- fluidPage(
                                         ,"Lead exposure risk"                                    
                                         ,"Diesel PM"                              
                                         ,"Traffic proximity & volume"                                        
-                                        ,"Air toxics emissions" 
+                                        ,"Air toxics emissions"
+                                        ,"Other Air Pollutants"
+                                        ,"Drinking Water Violations"
+                                        ,"Noise"
                                       ),
           "Environmental effects" = c(
             "Wastewater discharge indicator"                                  
             ,"Proximity to National Priorities List (NPL) sites"                           
             ,"Proximity to RMP sites"                
             ,"Proximity to hazardous waste facilities"
+            ,"Proximiy to Oil and Gas"
+            ,"Proximiy to Mining and Smelting"
+            ,"Impaired Surface Water"
           ),
           "Climate vulnerability" = c(
             "Wildfire risk"                                          
             ,"Floodplains" 
+            ,"Drought"
+            ,"Extreme Heat Days"
           ),
           "Sensitive population" = c(
             "Population under 5"                                  
@@ -280,14 +303,18 @@ ui <- fluidPage(
             ,"Heart disease in adults"                                          
             ,"Asthma hospitalization rate"                                                 
             ,"Life expectancy"                                        
-            ,"Low weight birth rate" 
+            ,"Low weight birth rate"
+            ,"Cancer Incidence"
+            ,"Diabetes Incidence"
+            ,"Mental Health Incidence"
           ),
           "Demographics" = c(
             "Percent people of color"                                        
             ,"Percent less than high school education"                                 
             ,"Percent low income"                                             
             ,"Percent linguistic isolation"                                   
-            ,"Percent disability" 
+            ,"Percent disability"
+            ,"Housing Cost Burdened"
           )
         ),
         selected = "Colorado EnviroScreen Score",
@@ -321,23 +348,24 @@ ui <- fluidPage(
                actionButton("button_remove", "Remove Highlighted Areas")
       )
     ),
-    br(),
-    tags$blockquote(textOutput("indicatorDesc")),
-    p(
-      tags$strong("Coal Community"),": Areas designated Coal Community are census block groups that have a coal-burning power plant within the county. All census tracts and block groups within these counties are considered coal communities.",
-      br(),
-      tags$strong("Oil & Gas Community"),": Oil and Gas Communities are  census block groups that have active oil and gas operations within the county. All census tracts and block groups within these counties are considered oil and gas communities.",
-      br(),
-      tags$strong("Rural Community"),": The U.S. Census Bureau's urban areas are densely populated and include residential, commercial, and other properties. Counties that include these urban areas are considered urban. Rural Communities encompass all counties not included within urban counties.",
-    )
+    # This is being moved to a tab above. 
+    # p(
+    #   tags$strong("Coal Community"),": Areas designated Coal Community are census block groups that have a coal-burning power plant within the county. All census tracts and block groups within these counties are considered coal communities.",
+    #   br(),
+    #   tags$strong("Oil & Gas Community"),": Oil and Gas Communities are  census block groups that have active oil and gas operations within the county. All census tracts and block groups within these counties are considered oil and gas communities.",
+    #   br(),
+    #   tags$strong("Rural Community"),": The U.S. Census Bureau's urban areas are densely populated and include residential, commercial, and other properties. Counties that include these urban areas are considered urban. Rural Communities encompass all counties not included within urban counties.",
+    # )
   ),
   
   
   # display map -------------------------------------------------------------
-  fluidRow(tags$style(type = "text/css", "#mymap {height: calc(100vh - 280px) !important;}"),style = {"background-color:#4d3a7d;"},
-           #column(1),
-           column(8, leafletOutput("mymap")),
-           column(4, plotlyOutput("histEnviroScreen",height = "100%"))
+  fluidRow(tags$style(type = "text/css", "#mymap {height: calc(100vh - 280px) !important;}"), #style = {"background-color:#4d3a7d;"},
+           column(1),
+           column(6, leafletOutput("mymap")),
+           column(4, plotlyOutput("histEnviroScreen",height = "100%", width = "100%")),
+           column(1),
+           
   ),
 
   # describe indicators -----------------------------------------------------
@@ -360,7 +388,7 @@ ui <- fluidPage(
   
   # show reactive table -----------------------------------------------------
   # table showing the results
-  fluidRow(class = "boarderElement",
+  fluidRow(class = "sectionTitle",
            h2("EnviroScreen Score Data"),
            p("Use the tabs above  the table to filter through different elements of the
     Colorado EnviroScreen Score. You can select specific rows in the table, then hit the
@@ -373,6 +401,8 @@ ui <- fluidPage(
              actionButton("button_table", "Highlight Selection on Map")
     )
   )),
+  br(),
+  tags$blockquote(textOutput("indicatorDesc")),
   # Output: Tabset w/ plot, summary, and table ----
   tabsetPanel(type = "tabs",
               tabPanel("Group Component Scores", dataTableOutput("gcomponentScore")),
@@ -386,21 +416,37 @@ ui <- fluidPage(
   fluidRow(
     column(2,downloadButton("downloadData", "Download Data for Current Geography"))
   ),
+  br(),
   
-  h3("Additional Resources"),
-  p(
-    "For more information about how to use environmental justice mapping tools, 
+  fluidRow(    class = "titleElement", 
+               column(8,   
+                      h3("Additional Resources"),
+                      p(class = "href2",
+                        "For more information about how to use environmental justice mapping tools, 
     please review the Climate Equity Data Viewer guide (available in", 
-    tags$a(href = "https://drive.google.com/file/d/1iytdPG5iK2VBNpIy8k6oT6lU6-QKMLOa/view?usp=sharing", "English", target = "_blank"),
+    tags$a(href = "https://drive.google.com/file/d/1iytdPG5iK2VBNpIy8k6oT6lU6-QKMLOa/view?usp=sharing",
+           tags$span(style="color:white","English"), target = "_blank"),
     "and ",
-    tags$a(href = "https://drive.google.com/file/d/17rQ90fNt3DF-0PbySpGjo2tiy9AmDiCc/view?usp=sharing", "Spanish", target = "_blank"),
+    tags$a(href = "https://drive.google.com/file/d/17rQ90fNt3DF-0PbySpGjo2tiy9AmDiCc/view?usp=sharing",
+           tags$span(style="color:white","Spanish"), target = "_blank"),
     ")."
+                      ), ),
+    column(4,tags$a(
+      href = "https://cdphe.colorado.gov/enviroscreen",
+      tags$img(
+        src="EnviroScreen Logos/co_cdphe_pr_es_white_v.png",
+        title = "Colorado Department of Public Health and Environment",
+        width="90%",
+        height="90%" 
+        )
+      )
+    )
   ),
   
   br( ),
   br( ),
   br( ),
-  br( ),
+  br( )
 )
 
 # Define server logic required to draw a histogram
@@ -426,7 +472,7 @@ server <- function(input, output,session) {
               oil=oil, rural = rural, coal = coal)
     })
 
-# # indicator summary -------------------------------------------------------
+# indicator summary -------------------------------------------------------
   # output for indicator summary'
   desc1 <- descriptors
   output$indicatorDesc <- renderText({
@@ -445,8 +491,6 @@ server <- function(input, output,session) {
   output$histEnviroScreen <- renderPlotly({
     genPlots(dataframe = df1(),parameter = "Colorado EnviroScreen Score", geoid = input$mymap_shape_click)
   })
-  
-  
   output$histExposure<- renderPlotly({
     genPlots(dataframe = df1(),parameter = "Environmental exposures", geoid = input$mymap_shape_click)
   })
@@ -463,23 +507,6 @@ server <- function(input, output,session) {
     genPlots(dataframe = df1(),parameter = "Demographics", geoid = input$mymap_shape_click)
   })
     
-  
-  
-  # ### 
-  # # output for ployly
-  # output$plot2 <- renderPlotly({
-  #   plots1 <- list()
-  #   for(i in seq_along(plotGroup)){
-  #     plots1[[i]] <- genPlots(dataframe = df1(),parameter = plotGroup[i], geoid = input$mymap_shape_click)
-  #   }
-  #   
-  #   subplot(plots1, nrows = 1, shareY = TRUE, titleX = TRUE)%>%
-  #     layout(annotations = annotations)
-  #   
-  #   
-  # })
-  
-  
 # table output ------------------------------------------------------------   
   # output for datatable
   
@@ -488,14 +515,12 @@ server <- function(input, output,session) {
     if(is.null(geoid1$id)){
       df1() %>% sf::st_drop_geometry()
     }else{
+      ### single features table selection 
+      # df1()%>% dplyr::filter(GEOID == geoid1$id)
+      ### replacing with single table element, once table reset is developed 
       genTable(tableData = df1(), geoid = input$mymap_shape_click)
     }
     })  
-  
-  
-  ### coloring tables is something to come back too 
-  # https://stackoverflow.com/questions/24736956/r-highlighting-shiny-data-table
-  # https://rstudio.github.io/DT/010-style.html
   
   # group component scores 
   output$gcomponentScore <- renderDataTable(tableData()%>%
@@ -521,8 +546,9 @@ server <- function(input, output,session) {
   ### this allows only selection from specific table to be added to map 
   observeEvent(input$gcomponentScore_rows_selected, {
     s1 <- input$gcomponentScore_rows_selected  # typo was on this line
+    print(s1)
     print(RV$Clicks )
-    RV$Clicks <- tableData() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
+    RV$Clicks <- tableData() %>% select("GEOID") %>% dplyr::slice(s1) %>% pull()
   })
   observeEvent(input$componentScore_rows_selected, {
     s1 <- input$componentScore_rows_selected 
@@ -536,7 +562,7 @@ server <- function(input, output,session) {
   })
   observeEvent(input$evnEf_rows_selected, {
     s1 <- input$evnEf_rows_selected 
-    RV$Clicks <- tableData() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
+    RV$Clicks <- tableData() %>% select("GEOID") %>% dplyr::slice(s1) %>% pull()
     print(RV$Clicks )
   })
   observeEvent(input$clim_rows_selected, {
@@ -546,7 +572,7 @@ server <- function(input, output,session) {
   })
   observeEvent(input$senPop_rows_selected, {
     s1 <- input$senPop_rows_selected 
-    RV$Clicks <- tableData() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
+    RV$Clicks <- tableData() %>% select("GEOID") %>% dplyr::slice(s1) %>% pull()
     print(RV$Clicks )
   })
   observeEvent(input$socEco_rows_selected, {
@@ -559,11 +585,11 @@ server <- function(input, output,session) {
   output$componentScore <- renderDataTable(tableData() %>% dplyr::select(
     "GEOID",
     "County Name"
-    ,"Environmental exposures",
-    "Environmental effects",
-    "Climate vulnerability",
-    "Sensitive population",
-    "Demographics"
+    ,"Environmental exposures"
+    ,"Environmental effects"
+    ,"Climate vulnerability"
+    ,"Sensitive population"
+    ,"Demographics"
   ), 
   options = list(autoWidth = TRUE, scrollX = TRUE))
   # enviromental exposures Score
@@ -582,6 +608,12 @@ server <- function(input, output,session) {
     ,"Traffic proximity & volume Percentile"                      
     ,"Air toxics emissions"                                   
     ,"Air toxics emissions Percentile"
+    ,"Other Air Pollutants"
+    ,"Other Air Pollutants Percentile"
+    ,"Drinking Water Violations"
+    ,"Drinking Water Violations Percentile"
+    ,"Noise" 
+    ,"Noise Percentile"
   ), 
   options = list(autoWidth = TRUE, scrollX = TRUE))
   # enviromental effects Score
@@ -596,6 +628,12 @@ server <- function(input, output,session) {
     ,"Proximity to RMP sites Percentile"                            
     ,"Proximity to hazardous waste facilities"                
     ,"Proximity to hazardous waste facilities Percentile"
+    ,"Proximiy to Oil and Gas" 
+    ,"Proximiy to Oil and Gas Percentile" 
+    ,"Proximiy to Mining and Smelting"
+    ,"Proximiy to Mining and Smelting Percentile" 
+    ,"Impaired Surface Water" 
+    ,"Impaired Surface Water Percentile" 
   ), 
   options = list(autoWidth = TRUE, scrollX = TRUE))
   # component Score
@@ -606,6 +644,10 @@ server <- function(input, output,session) {
     ,"Wildfire risk Percentile"                                     
     ,"Floodplains"                                           
     ,"Floodplains Percentile"
+    ,"Drought"
+    ,"Drought Percentile"
+    ,"Extreme Heat Days"
+    ,"Extreme Heat Days Percentile"
   ), 
   options = list(autoWidth = TRUE, scrollX = TRUE))
   # component Score
@@ -624,6 +666,12 @@ server <- function(input, output,session) {
     ,"Life expectancy Percentile"                                   
     ,"Low weight birth rate"                                  
     ,"Low weight birth rate Percentile"
+    ,"Cancer Incidence"
+    ,"Cancer Incidence Percentile"
+    ,"Diabetes Incidence"
+    ,"Diabetes Incidence Percentile"
+    ,"Mental Health Incidence"
+    ,"Mental Health Incidence Percentile"
   ), options = list(autoWidth = TRUE, scrollX = TRUE))
   # component Score
   output$socEco <- renderDataTable(tableData() %>% dplyr::select(
@@ -639,6 +687,8 @@ server <- function(input, output,session) {
     ,"Percent linguistic isolation Percentile"                      
     ,"Percent disability"                                     
     ,"Percent disability Percentile"
+    ,"Housing Cost Burdened" 
+    ,"Housing Cost Burdened Percentile"
   ), 
   options = list(autoWidth = TRUE, scrollX = TRUE))
   # download data -----------------------------------------------------------
@@ -684,20 +734,8 @@ server <- function(input, output,session) {
         popup = paste0(
           "<br/><strong>", as.character(in1),"</strong>", # needs to be text
           paste0("<br/><strong>",`County Name`,"</strong>"),
-          paste0(if(in1 %in% c("Colorado EnviroScreen Score",
-                                    "Pollution & Climate Burden",
-                                    "Socioeconomics & Demographics",
-                                    "Environmental exposures",
-                                    "Environmental Effects",
-                                    "Climate vulnerability",
-                                    "Sensitive population",
-                                    "Demographics"
-          )){
-            paste0("<br/><b>Percentile:</b> ", round(!!as.symbol(indicator2), digits =  0))
-          }else{
-            paste0("<br/><b>Measured:</b> ", round(!!as.symbol(indicator1), digits = 2),
-                   "<br/><b>Percentile:</b> ", round(!!as.symbol(indicator2), digits =  0))
-          }),
+          paste0("<br/><b>Measured:</b> ", round(!!as.symbol(indicator1), digits = 2),
+                   "<br/><b>Score:</b> ", round(!!as.symbol(indicator2), digits =  0)),
           paste0("<br/><b>Coal Community:</b> ", coal),
           paste0("<br/><b>Oil and Gas Community:</b> ", oilGas),
           paste0("<br/><b>Rural Community:</b> ", rural)
@@ -746,7 +784,6 @@ server <- function(input, output,session) {
   })
   # add selected features to map 
   observeEvent(input$button_table, {
-    print(RV$Clicks)
     mapFeatures <- envoData %>% select("GEOID") %>% dplyr::filter(GEOID %in% RV$Clicks)
       # add features to map 
       leafletProxy("mymap") %>%
@@ -771,7 +808,6 @@ server <- function(input, output,session) {
   # click observer event ----------------------------------------------------
   observeEvent(input$mymap_shape_click, {
     geoidMap <- input$mymap_shape_click$id  # typo was on this line
-    print(geoidMap)
   })
 }
 

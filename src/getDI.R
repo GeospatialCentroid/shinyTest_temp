@@ -22,7 +22,7 @@
 # 
 getDI <- function(){
   
-  diCommunity <- readRDS("data/scores/diCommunities.rda")%>%
+  diCommunity <- readRDS("data/scores/diCommunities.rds")%>%
     mutate(
       Mn_FLAG = case_when(
         Min_FLAG == 1 ~ "Yes",

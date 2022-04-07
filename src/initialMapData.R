@@ -14,7 +14,7 @@ initialMapData <- function(data1){
     popup = paste0(
           "<br/><strong>Colorado Enviroscreen Score</strong>", # needs to be text
           paste0("<br/><strong>",`County Name`,"</strong>"),
-          paste0("<br/><b>Percentile:</b> ", as.character(round(`Colorado EnviroScreen Score Percentile`), digits =  0)),
+          paste0("<br/><b>Score:</b> ", as.character(round(`Colorado EnviroScreen Score Percentile`), digits =  0)),
           paste0("<br/><b>Coal Community:</b> ", coal),
           paste0("<br/><b>Oil and Gas Community:</b> ", oilGas),
           paste0("<br/><b>Rural Community:</b> ", rural)

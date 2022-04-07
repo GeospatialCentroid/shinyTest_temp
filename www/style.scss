@@ -43,11 +43,15 @@ shiny-text-output shiny-bound-output{
 
 a {
     color: #0000FF;
+    text-decoration: underline;
 }
 
 a.nav-link{
   color: #245D38 !important;
+  
 }
+
+
 .nav-tabs .nav-link.active, .nav-tabs>li>a.active,{
     background: #ffcd00;
 }
@@ -58,4 +62,17 @@ a.nav-link{
     border-top-left-radius: 0.25rem;
     border-top-right-radius: 0.25rem;
 }
+
+div.row.titleElement{
+  background:#001970;
+  color: #FFFFFF;
+}
+
+div.row.sectionTitle{
+  background:#35647e;
+  color: #FFFFFF;
+  margin: 10px;
+}
+
+
 
