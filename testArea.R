@@ -1,9 +1,4 @@
-library(shiny)
-library(leaflet)
 
-data(quakes)
-quakes <- quakes[1:10,]
-oil <- readRDS("data/scores/oil.rda")
 
 
 leafIcons_A <- icons(
@@ -95,3 +90,4 @@ server <- function(input, output, session){
 }
 
 shinyApp(ui, server)
+
