@@ -242,8 +242,27 @@ ui <- fluidPage(
   # content for the reactive elements of the map
   br(), 
   # h2("Colorado Enviroscreen Displayed"),
-  fluidRow(class = "boarderElement", id = "map", 
-    # select geography
+  fluidRow(class = "boarderElement",
+           id = "map",
+           # action button : update map elements
+           column(
+             1,
+             tags$div(title = "Click here to update map display",
+                      actionButton("button", "Update Map")),
+             tags$style(type='text/css', "#button { margin-top: 30px; background: #c3002f}")
+           ),
+           # action button
+           column(
+             1,
+             tags$div(
+               title = "Click here to remove highlighted features",
+               actionButton("button_remove", "Remove Highlighted Areas")
+             ),
+             tags$style(type='text/css', "#button_remove { margin-top: 15px; 
+                        margin-bottom: 15px; background: #c3002f}")
+             
+           ),
+           # select geography
     column(
       2,
       offset = 1, 
@@ -272,49 +291,49 @@ ui <- fluidPage(
                                            "Climate vulnerability",
                                            "Sensitive population",
                                            "Demographics"),
-          "Environmental exposures" = c("Ozone"                                                  
-                                        ,"Particles"                                 
-                                        ,"Lead exposure risk"                                    
-                                        ,"Diesel PM"                              
-                                        ,"Traffic proximity & volume"                                        
-                                        ,"Air toxics emissions"
-                                        ,"Other Air Pollutants"
-                                        ,"Drinking Water Violations"
-                                        ,"Noise"
+          "Environmental exposures" = c("Air toxics emissions",
+                                        "Diesel PM", 
+                                        "Drinking Water Violations",
+                                        "Lead exposure risk",
+                                        "Noise",
+                                        "Other Air Pollutants",
+                                        "Ozone",
+                                        "Particles" ,                                
+                                       "Traffic proximity & volume"                                        
                                       ),
           "Environmental effects" = c(
-            "Wastewater discharge indicator"                                  
-            ,"Proximity to National Priorities List (NPL) sites"                           
-            ,"Proximity to RMP sites"                
-            ,"Proximity to hazardous waste facilities"
-            ,"Proximiy to Oil and Gas"
-            ,"Proximiy to Mining and Smelting"
-            ,"Impaired Surface Water"
+            "Impaired Surface Water",
+            "Proximity to hazardous waste facilities",
+            "Proximiy to Mining and Smelting",
+            "Proximity to National Priorities List (NPL) sites",
+            "Proximiy to Oil and Gas",
+            "Proximity to RMP sites",              
+            "Wastewater discharge indicator" 
           ),
           "Climate vulnerability" = c(
+            "Drought",
+            "Extreme Heat Days",
+            "Floodplains",
             "Wildfire risk"                                          
-            ,"Floodplains" 
-            ,"Drought"
-            ,"Extreme Heat Days"
           ),
           "Sensitive population" = c(
+            "Asthma hospitalization rate",
+            "Cancer Incidence",
+            "Diabetes Incidence",
+            "Heart disease in adults",
+            "Life expectancy",                                       
+            "Low weight birth rate",
+            "Mental Health Incidence",
+            "Population over 64",
             "Population under 5"                                  
-            ,"Population over 64"                            
-            ,"Heart disease in adults"                                          
-            ,"Asthma hospitalization rate"                                                 
-            ,"Life expectancy"                                        
-            ,"Low weight birth rate"
-            ,"Cancer Incidence"
-            ,"Diabetes Incidence"
-            ,"Mental Health Incidence"
           ),
           "Demographics" = c(
-            "Percent people of color"                                        
-            ,"Percent less than high school education"                                 
-            ,"Percent low income"                                             
-            ,"Percent linguistic isolation"                                   
-            ,"Percent disability"
-            ,"Housing Cost Burdened"
+            "Housing Cost Burdened",
+            "Percent disability",
+            "Percent less than high school education",                                
+            "Percent linguistic isolation",
+            "Percent low income", 
+            "Percent people of color"
           )
         ),
         selected = "Colorado EnviroScreen Score",
@@ -333,21 +352,8 @@ ui <- fluidPage(
         selected = "Percentile Rank"
       )
       ),
-    ),
-    # action button : update map elements
-    column(
-      1,
-      tags$div(title="Click here to update map display",
-               actionButton("button", "Update Map")
-      )
-    ),
-    # action button 
-    column(
-      1,
-      tags$div(title="Click here to remove highlighted features",
-               actionButton("button_remove", "Remove Highlighted Areas")
-      )
-    ),
+    )
+    
     # This is being moved to a tab above. 
     # p(
     #   tags$strong("Coal Community"),": Areas designated Coal Community are census block groups that have a coal-burning power plant within the county. All census tracts and block groups within these counties are considered coal communities.",
@@ -395,14 +401,18 @@ ui <- fluidPage(
     Blue `Highlight Selection on Map` button in the upper right to view the location on the map."),
   ),
    # add selection to map button 
-  fluidRow(column(
-    2, offset = 10,
-    tags$div(title="Click here to add selections to map display",
-             actionButton("button_table", "Highlight Selection on Map")
-    )
-  )),
   br(),
   tags$blockquote(textOutput("indicatorDesc")),
+  fluidRow(column(
+    2, 
+    #offset = 10,
+    tags$div(title="Click here to add selections to map display",
+             actionButton("button_table", "Highlight Selection on Map")
+    ),
+    tags$style(type='text/css', "#button_table { background: #c3002f}")
+  )),
+  br(),
+  
   # Output: Tabset w/ plot, summary, and table ----
   tabsetPanel(type = "tabs",
               tabPanel("Group Component Scores", dataTableOutput("gcomponentScore")),
