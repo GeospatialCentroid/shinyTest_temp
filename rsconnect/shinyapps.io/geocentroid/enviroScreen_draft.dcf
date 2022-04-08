@@ -9,6 +9,3 @@ bundleId: 5579428
 url: https://geocentroid.shinyapps.io/enviroScreen_draft/
 when: 1644888171.35571
 lastSyncTime: 1644888171.35571
-asMultiple: FALSE
-asStatic: FALSE
-ignoredFiles: testArea.R

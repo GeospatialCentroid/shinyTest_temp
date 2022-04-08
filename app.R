@@ -19,7 +19,6 @@ library(bslib)
 library(readr)
 library(data.table)
 
-
 # source helpers ----------------------------------------------------------
 lapply(list.files(path = "src",recursive = TRUE, full.names = TRUE), source)
 
@@ -45,16 +44,16 @@ diPal <- colorFactor(palette = c(
                                                        "Housing Burden", "More then one category"), di$color
 )
 
-
 colorRamp <- c(  "#f2f0f7"  ,"#cbc9e2"  ,"#9e9ac8"  ,"#756bb1"  ,"#54278f")
 
 # create initial dataset for map  -----------------------------------------
 mapData <- initialMapData(envoData)
 # palette for the map
 palMap <- leaflet::colorNumeric(palette = colorRamp,
-    domain = mapData$visParam,
+                                domain = mapData$visParam,
     reverse = TRUE
   )
+
 
 # unique Indicators
 indicators <- sf::st_drop_geometry(envoData) %>%
@@ -101,6 +100,8 @@ ui <- fluidPage(
     bslib::bs_add_rules(sass::sass_file("www/style.scss")),
 
   # Title ------------------------------------------------------------------
+  shiny::titlePanel(h1("Colorado Enviroscreen")),
+  
   fluidRow(
     class = "titleElement",
     column(4, 
@@ -238,6 +239,7 @@ ui <- fluidPage(
 
 
 
+
   # Select Reactive Elements ------------------------------------------------
   # content for the reactive elements of the map
   br(), 
@@ -372,6 +374,7 @@ ui <- fluidPage(
            column(4, plotlyOutput("histEnviroScreen",height = "100%", width = "100%")),
            column(1),
            
+
   ),
 
   # describe indicators -----------------------------------------------------
@@ -399,6 +402,7 @@ ui <- fluidPage(
            p("Use the tabs above  the table to filter through different elements of the
     Colorado EnviroScreen Score. You can select specific rows in the table, then hit the
     Blue `Highlight Selection on Map` button in the upper right to view the location on the map."),
+
   ),
    # add selection to map button 
   br(),

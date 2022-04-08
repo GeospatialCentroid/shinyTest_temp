@@ -2,7 +2,6 @@ p {
   padding-left:50px;
   padding-right:50px;
   text-align:left;
-}
 
 
 h1, h2, h3, h4, h5, h6
@@ -27,6 +26,7 @@ div.row.boarderElement{
   padding-right:50px;
 }
 
+
 shiny-text-output shiny-bound-output{
   padding: 10px 20px;
 }
@@ -40,7 +40,6 @@ shiny-text-output shiny-bound-output{
   background-color: coral;
   text-size-adjust: 1.5;
 }
-
 a {
     color: #0000FF;
     text-decoration: underline;
@@ -91,3 +90,4 @@ label.control-label {
   color: #000000 !important;
   background-color: #95a5a6 !important;
 }
+

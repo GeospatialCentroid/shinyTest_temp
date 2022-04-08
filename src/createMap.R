@@ -67,6 +67,7 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di) {
     opacity = 1,
     layerId = "firstLegend",
     group = "Indicator Score"
+
     # labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))
   ) %>%
   addLegend("topright",
