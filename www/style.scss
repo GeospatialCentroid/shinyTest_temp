@@ -74,5 +74,20 @@ div.row.sectionTitle{
   margin: 10px;
 }
 
+/* Make map search button yellow*/
+a.search-button{
+   background-color: #ffcd00 !important;
+}
 
-
+/* Make selection labels bold*/
+label.control-label {
+        font-size: 15px;
+        font-weight: bold;
+}
+      
+  
+/* Highlight group selection headers in indicator drop down */
+.selectize-dropdown .optgroup-header{
+  color: #000000 !important;
+  background-color: #95a5a6 !important;
+}
