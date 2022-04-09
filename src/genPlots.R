@@ -1,10 +1,18 @@
 genPlots <- function(dataframe, parameter, geoid = NULL){
-  
+  # font for title  
   fontHeader <- list(
     family = "museo-sans",
-    color = "#001970")
+    color = "#000000",
+    size = 18
+    )
+  # font for labels
   fontBody <- list(
     family = "Trebuchet MS")
+  # plot Margins 
+  mrg <- list(l = 20, r = 20,
+              b = 20, t = 30,
+              pad = 10)
+  
   
   # filter to input parameter 
   df1 <- dataframe %>% 
@@ -43,7 +51,7 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
       marker = list(color = "#009add",
                     line = list(width = 2,
                                 color = 'rgb(0, 0, 0)')))%>%
-    layout(title = list(text=parameter,font = fontHeader),
+    layout(title = list(text=parameter, titlefont  = fontHeader),
            xaxis = list(title = xlabel,
                         ticktext = list("Least", "Most"), 
                         tickvals = list(minBin,maxBin),
@@ -51,7 +59,8 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
                         tickangle = 45),
            yaxis = list(title = "Number of Areas"),
            plot_bgcolor = bg_color,
-           font = fontBody)%>%
+           font = fontBody,
+           margin = mrg)%>%
     hide_legend()%>%
     style(hoverinfo = 'none')
   
@@ -76,15 +85,17 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
           marker = list(color = colors$color,
                         line = list(width = 2,
                                     color = 'rgb(0, 0, 0)')))%>%
-        layout(title = list(text= parameter,font = fontHeader),
+        layout(title = list(text= parameter,titlefont  = fontHeader),
                xaxis = list(title = xlabel,
                            ticktext = list("Least", "Most"), 
                            tickvals = list(minBin,maxBin),
                            tickmode = "array",
                            tickangle = 45),
+               
         yaxis = list(title = "Number of Areas"),
         plot_bgcolor = bg_color, 
-        font = fontBody)%>%
+        font = fontBody,
+        margin = mrg)%>%
         hide_legend()%>%
         style(hoverinfo = 'none') 
     }

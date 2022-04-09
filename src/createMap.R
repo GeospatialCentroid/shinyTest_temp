@@ -9,9 +9,12 @@
 #' @export
 #'
 #'
-createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di) {
+createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice40) {
 
-  map <- leaflet() %>%
+  map <- leaflet(options = leafletOptions(minZoom = 6)) %>%
+    setView( lng = -105.76356278240084
+             , lat = 39.13085942963124
+             , zoom = 7 )%>%
     # add z levels ------------------------------------------------------------
   addMapPane("index", zIndex = 408) %>%
     addMapPane("binary", zIndex = 409) %>%
@@ -29,8 +32,8 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di) {
     # add spatial Data --------------------------------------------------------
   addPolygons(
     data = mapData,
-    color = "#454547",
-    weight = 1,
+    color = "#F9C1AE", #"#454547",
+    weight = 0.2,
     smoothFactor = 0.5,
     opacity = 1.0,
     fillOpacity = 0.5,
@@ -57,6 +60,15 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di) {
       fillOpacity = 0.8,
       popup = di$popup,
       group = "Disproportionately Impacted Community"
+    )%>%
+    addPolygons(
+      data = justice40,
+      popup = justice40$popup,
+      fillColor  = "#bdbdbd",
+      fillOpacity = 0.8,
+      color = "#636363",
+      weight = 1,
+      group = "Justice40"
     )%>%
     # add legend --------------------------------------------------------------
   addLegend(
@@ -86,7 +98,8 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di) {
       "Coal Community",
       "Rural Community",
       "Oil and Gas Community",
-      "Disproportionately Impacted Community"
+      "Disproportionately Impacted Community",
+      "Justice40"
     ),
     position = "topleft", 
     options = layersControlOptions(collapsed = TRUE))%>%
@@ -102,7 +115,8 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di) {
         "Coal Community",
         "Rural Community",
         "Oil and Gas Community",
-        "Disproportionately Impacted Community"))
+        "Disproportionately Impacted Community",
+        "Justice40"))
 
   return(map)
 }

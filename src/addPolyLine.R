@@ -15,8 +15,8 @@ addPolyLine <- function(map, sf1, group){
   output <- addPolylines(map,
     data = sf1,
     stroke = TRUE,
-    color = "#54A800",
-    weight = 1,
+    color = "#F9C1AE", # "#54A800",
+    weight = 0.2,
     layerId = group,
     options = pathOptions(pane = "binary"),
     group = group)

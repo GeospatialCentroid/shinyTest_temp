@@ -22,7 +22,7 @@ library(data.table)
 # source helpers ----------------------------------------------------------
 lapply(list.files(path = "src",recursive = TRUE, full.names = TRUE), source)
 
-version <- 2
+version <- 3
 
 # enviroscreen data
 envoData <- readRDS(paste0("data/scores/allScores_",version,".rds"))%>%
@@ -35,6 +35,8 @@ oil <- readRDS("data/scores/oilgasVis.rds")
 coal <- readRDS("data/scores/coalVis.rds")
 rural <- readRDS("data/scores/ruralVis.rds")
 descriptors <- read_csv("data/descriptions/indicatorDesc.csv")
+justice40 <- st_read("data/scores/coloradoData.geojson") %>%
+  dplyr::mutate(popup = paste0("A total of ", Total.threshold.criteria.exceeded," clauses defined this area as disadvantaged."))
 
 # di community 
 di <- getDI()
@@ -100,8 +102,6 @@ ui <- fluidPage(
     bslib::bs_add_rules(sass::sass_file("www/style.scss")),
 
   # Title ------------------------------------------------------------------
-  shiny::titlePanel(h1("Colorado Enviroscreen")),
-  
   fluidRow(
     class = "titleElement",
     column(4, 
@@ -147,16 +147,13 @@ ui <- fluidPage(
 
 
   # description of use ------------------------------------------------------
-  # tags$style(HTML("
-  #       .a.nav-link.active{
-  #   	background: #ffcd00
-  #       }")),
+
   fluidRow(class = "sectionTitle", 
            h2("Understanding the EnviroScreen Tool")
   ),
-  br(),
   tabsetPanel(
-    tabPanel("EnviroScreen Score",
+    tabPanel( class = "supportingText", 
+      "EnviroScreen Score",
              br(),
              tags$strong("EnviroScreen Score"),
              p(
@@ -228,13 +225,22 @@ ui <- fluidPage(
         )
       ), 
     ),
-    tabPanel("Additional Content",
+    tabPanel("Descriptions",
              br(),
-             p(
-               tags$em("Coming Soon!") 
+             tags$em("EnviroScreen Score"),
+             p("The EnviroScreen sScore combines population characteristics and with environmental burdens. The score goes from 0 to 100, with the highest score representing the highest burden."
+               ,"The EnviroScreen score is a percentile, which is like a ranking. The number represents how many of the state’s counties, census tracts, or census block groups have a lower score than the geography in question."
+               ,"Suppose a census block group has an EnviroScreen score of 50. Thisat means its EnviroScreen score is higher than 50% of all census block groups in Coloradothe state. A score of 90 means its the EnviroScreen score is higher than 90% of all census block groups in Colorado the state."
              ),
              br(),
-            )
+    ),
+    tabPanel("FAQ",
+             br(),
+             tags$em("Frequently Asked Questions"),
+             p("state."
+             ),
+             br(),
+    ),
     ),
 
 
@@ -243,48 +249,31 @@ ui <- fluidPage(
   # Select Reactive Elements ------------------------------------------------
   # content for the reactive elements of the map
   br(), 
-  # h2("Colorado Enviroscreen Displayed"),
-  fluidRow(class = "boarderElement",
-           id = "map",
-           # action button : update map elements
-           column(
-             1,
-             tags$div(title = "Click here to update map display",
-                      actionButton("button", "Update Map")),
-             tags$style(type='text/css', "#button { margin-top: 30px; background: #c3002f}")
-           ),
-           # action button
-           column(
-             1,
-             tags$div(
-               title = "Click here to remove highlighted features",
-               actionButton("button_remove", "Remove Highlighted Areas")
-             ),
-             tags$style(type='text/css', "#button_remove { margin-top: 15px; 
-                        margin-bottom: 15px; background: #c3002f}")
-             
-           ),
-           # select geography
-    column(
-      2,
-      offset = 1, 
+  fluidRow(class = "sectionTitle",id = "map",
+    # action button : update map elements
+    column(2,
+          tags$div(title = "Click here to update map display",
+           actionButton(inputId = "updateMap", "Update Map"),
+       ),
+    ),
+    # select geography  
+    column(2,
       tags$div(title="Click here to select area to display on the map",
                selectInput(
                  inputId = "Geom",
-                 label = "Select Geographic Scale",
+                 label = "Geo Scale",
                  choices = c("County", "Census Tract", "Census Block Group"),
                  selected = "County",
-                 width = "90%"
+                   width = "90%"
                )
       )
     ),
     # select indicator
-    column(
-      3,
+    column(4,
       tags$div(title="Click here to select variable for map",
       selectInput(
         inputId = "Indicator",
-        label = "Select Layer for Map",
+        label = "Layer",
         choices = list(
           "EnviroScreen Score" = "Colorado EnviroScreen Score",
           "Group Component Scores" = c("Pollution & Climate Burden", "Socioeconomics & Demographics"),
@@ -341,34 +330,29 @@ ui <- fluidPage(
         selected = "Colorado EnviroScreen Score",
         width = "90%"
       )
-      )
+    )
     ),
     # toggle between measured and percentile
-    column(
-      3,
+    column(2,
       tags$div(title="Click here to show measured value or rank of the variable",
       selectInput(
         inputId = "Percentile",
-        label = "Measure or Percentile",
+        label = "Measure or %",
         choices = c("Measured Value", "Percentile Rank"),
         selected = "Percentile Rank"
+        )
       )
-      ),
+    ),
+    column(
+      2,
+      tags$div(title="Click here to remove highlighted features",
+               actionButton("button_remove", "Remove Highlighted Areas")
+      )
     )
-    
-    # This is being moved to a tab above. 
-    # p(
-    #   tags$strong("Coal Community"),": Areas designated Coal Community are census block groups that have a coal-burning power plant within the county. All census tracts and block groups within these counties are considered coal communities.",
-    #   br(),
-    #   tags$strong("Oil & Gas Community"),": Oil and Gas Communities are  census block groups that have active oil and gas operations within the county. All census tracts and block groups within these counties are considered oil and gas communities.",
-    #   br(),
-    #   tags$strong("Rural Community"),": The U.S. Census Bureau's urban areas are densely populated and include residential, commercial, and other properties. Counties that include these urban areas are considered urban. Rural Communities encompass all counties not included within urban counties.",
-    # )
   ),
   
-  
   # display map -------------------------------------------------------------
-  fluidRow(tags$style(type = "text/css", "#mymap {height: calc(100vh - 280px) !important;}"), #style = {"background-color:#4d3a7d;"},
+  fluidRow(tags$style(type = "text/css", "#mymap {height: calc(100vh - 400px) !important;}"), #style = {"background-color:#4d3a7d;"},
            column(1),
            column(6, leafletOutput("mymap")),
            column(4, plotlyOutput("histEnviroScreen",height = "100%", width = "100%")),
@@ -383,13 +367,13 @@ ui <- fluidPage(
   # show plots --------------------------------------------------------------
   # plot of the datasets
   br(),
-  fluidRow(class = "boarderElement",
+  fluidRow(class = "plotArea",
            column(1),
-           column(2,plotlyOutput("histExposure")),
-           column(2,plotlyOutput("histEffect")),
-           column(2,plotlyOutput("histClimate")),
-           column(2,plotlyOutput("histSocial")),
-           column(2,plotlyOutput("histDemo")),
+           column(2, br(), plotlyOutput("histExposure")),
+           column(2, br(), plotlyOutput("histEffect")),
+           column(2, br(), plotlyOutput("histClimate")),
+           column(2, br(), plotlyOutput("histSocial")),
+           column(2, br(), plotlyOutput("histDemo")),
            column(1),
     p("The EnviroScreen score combines five components: Environmental exposures, Environmental effects, Climate vulnerability, Sensitive population, and Demographics. When you click a location on the map, the orange bars in this chart show the score for that location. The orange bars show how the location compares to the rest of Colorado for each component score. Together, the charts show how the EnviroScreen score is calculated for the selected location.")
   ),
@@ -407,14 +391,7 @@ ui <- fluidPage(
    # add selection to map button 
   br(),
   tags$blockquote(textOutput("indicatorDesc")),
-  fluidRow(column(
-    2, 
-    #offset = 10,
-    tags$div(title="Click here to add selections to map display",
-             actionButton("button_table", "Highlight Selection on Map")
-    ),
-    tags$style(type='text/css', "#button_table { background: #c3002f}")
-  )),
+
   br(),
   
   # Output: Tabset w/ plot, summary, and table ----
@@ -428,7 +405,17 @@ ui <- fluidPage(
               tabPanel("Demographics", dataTableOutput("socEco"))),
   # download table option  --------------------------------------------------
   fluidRow(
-    column(2,downloadButton("downloadData", "Download Data for Current Geography"))
+    column(4,
+           offset = 3, 
+           tags$div(title="Click here to download content",
+           downloadButton("downloadData", "Download Data for Current Geography")
+           ),
+    ),
+    column(4, 
+      tags$div(title="Click here to add selections to map display",
+                 actionButton("button_table", "Highlight Selection on Map")
+      ),
+    )
   ),
   br(),
   
@@ -456,11 +443,6 @@ ui <- fluidPage(
       )
     )
   ),
-  
-  br( ),
-  br( ),
-  br( ),
-  br( )
 )
 
 # Define server logic required to draw a histogram
@@ -483,7 +465,7 @@ server <- function(input, output,session) {
      # render leaflet object 
      createMap(mapData = mapData, di = di, diPal = diPal,
               pal = colorRamp, palMap = palMap,
-              oil=oil, rural = rural, coal = coal)
+              oil=oil, rural = rural, coal = coal, justice40 = justice40)
     })
 
 # indicator summary -------------------------------------------------------
@@ -719,7 +701,7 @@ server <- function(input, output,session) {
 
   
 # proxy map elements  -----------------------------------------------------
-  observeEvent(input$button, {
+  observeEvent(input$updateMap, {
     ### helpful source https://stackoverflow.com/questions/37433569/changing-leaflet-map-according-to-input-without-redrawing
     # geography 
     geo <- input$Geom 
@@ -767,8 +749,8 @@ server <- function(input, output,session) {
       clearGroup(group = "Indicator Score") %>%
       addPolygons(
         data = ed2,
-        color = "#454547",
-        weight = 1,
+        color = "#F9C1AE", #"#454547",
+        weight = 0.2,
         smoothFactor = 0.5,
         opacity = 1.0,
         layerId = ed2$GEOID,
@@ -813,7 +795,7 @@ server <- function(input, output,session) {
     })
   
   # remove selected features from map 
-  observeEvent(input$button_remove, {
+  observeEvent(input$removeHighlight, {
     # add features to map 
     leafletProxy("mymap") %>%
       clearGroup(group = "Table Highlight") 

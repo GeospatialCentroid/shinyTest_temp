@@ -2,6 +2,7 @@ p {
   padding-left:50px;
   padding-right:50px;
   text-align:left;
+}
 
 
 h1, h2, h3, h4, h5, h6
@@ -27,6 +28,7 @@ div.row.boarderElement{
 }
 
 
+
 shiny-text-output shiny-bound-output{
   padding: 10px 20px;
 }
@@ -35,32 +37,40 @@ shiny-text-output shiny-bound-output{
   text-align: center;
 }
 
-.optgroup-header{ 
+
+.optgroup-header{
   font-weight: 600;
   background-color: coral;
   text-size-adjust: 1.5;
 }
-a {
-    color: #0000FF;
-    text-decoration: underline;
+/* text color for hyperlink blue */
+a{color: #0000FF;
+  text-decoration: underline;
 }
 
+/* stlying for all tabset panels */
 a.nav-link{
-  color: #245D38 !important;
-  
+  color: #FFFFFF !important;
+  background-color: #245d38;
+  font-size: 18px;
 }
 
-
+/* stlying for selected tab */
 .nav-tabs .nav-link.active, .nav-tabs>li>a.active,{
     background: #ffcd00;
+    color: #000000 !important;
 }
 
-.nav-tabs .nav-link, .nav-tabs>li>a, .nav-tabs .nav-pills>li>a, .nav-tabs ul.nav.navbar-nav>li>a {
-    margin-bottom: -1px;
-    border: 1px solid;
-    border-top-left-radius: 0.25rem;
-    border-top-right-radius: 0.25rem;
+/* Positing for all tabs */
+.nav-tabs{
+  display: flex !important;
+  justify-content: center !important;
+  width: 100%;
+  margin-bottom: 10px;
 }
+
+
+
 
 div.row.titleElement{
   background:#001970;
@@ -73,21 +83,41 @@ div.row.sectionTitle{
   margin: 10px;
 }
 
-/* Make map search button yellow*/
-a.search-button{
-   background-color: #ffcd00 !important;
+/* Make map buttons yellow*/
+a.search-button,a.leaflet-control-layers-toggle{
+  background-color: #ffcd00 !important;
 }
 
 /* Make selection labels bold*/
 label.control-label {
-        font-size: 15px;
+        font-size: 28px;
         font-weight: bold;
 }
-      
-  
-/* Highlight group selection headers in indicator drop down */
+
+
+/* Highlight group selection headers in indicator drop down*/
 .selectize-dropdown .optgroup-header{
   color: #000000 !important;
   background-color: #95a5a6 !important;
 }
 
+
+/*style all buttons */
+.btn{
+  background-color: #ef7521!important;
+}
+/*style individula buttons*/
+#updateMap, #button_remove {
+    margin: 30px 30px !important;
+}
+#removeHighlight {
+  margin: 25px 30px !important;
+}
+#downloadData, #button_table{
+  margin: 5px 10px !important;
+}
+
+/* sytle supporting text*/
+div.tab-content{
+  margin: 10px 50px
+}
