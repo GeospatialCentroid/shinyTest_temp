@@ -1,93 +1,55 @@
+library(shiny)
+library(DT)
 
+rowCallback <- c(
+  "function(row, dat, displayNum, index){",
+  "  if(dat[1] < 5){",
+  "    $('td:eq(1)', row).addClass('red');",
+  "  }",
+  "}"
+)
 
-
-leafIcons_A <- icons(
-  iconUrl = "https://leafletjs.com/examples/custom-icons/leaf-green.png",
-  iconWidth = 38, iconHeight = 95,
-  iconAnchorX = 22, iconAnchorY = 94)
-leafIcons_B <- icons(
-  iconUrl = "https://leafletjs.com/examples/custom-icons/leaf-red.png",
-  iconWidth = 38, iconHeight = 95,
-  iconAnchorX = 22, iconAnchorY = 94)
-
-html_legend_A <- "<img src='https://leafletjs.com/examples/custom-icons/leaf-green.png'>green<br/>"
-html_legend_B <- "<img src='https://leafletjs.com/examples/custom-icons/leaf-red.png'>red<br/>"
+css <- "
+.red {
+  background-color: #e34755;
+}
+table.dataTable tr.selected td.red {
+  background-color: #e34755 !important;
+}
+"
 
 ui <- fluidPage(
-  tabsetPanel(
-    tabPanel("Enviroscreen Score",
-             h3("What is the Enviroscreen Score"),
-             fluidRow(
-               column( align = "center",
-                       6,
-                       h2("content")
-               ),
-               column(
-                 6,
-                 h2("supporting text"),
-               )
-             )),
-    tabPanel("Enviroscreen Score",
-             h3("What is the Enviroscreen Score"),
-             fluidRow(
-               column( align = "center",
-                       6,
-                       h2("content")
-               ),
-               column(
-                 6,
-                 h2("supporting text"),
-               )
-             )),
-    tabPanel("Enviroscreen Score",
-             h3("What is the Enviroscreen Score"),
-             fluidRow(
-               column( align = "center",
-                       6,
-                       h2("content")
-               ),
-               column(
-                 6,
-                 h2("supporting text"),
-               )
-             ))
+  
+  tags$head(
+    tags$style(HTML(css))
   ),
-  leafletOutput("map")
+  
+  title = 'Select Table Rows',
+  
+  fluidRow(
+    column(6, DTOutput('x1')),
+    column(6, plotOutput('x2', height = 500))
+  )
 )
-server <- function(input, output, session){
-  output$map <- renderLeaflet({
-    dataA <- quakes[quakes$mag < 4.6,]
-    dataB <- quakes[quakes$mag > 4.6,]
-    
-    map <- leaflet() %>% addTiles() %>%
-      addMarkers(dataA$long, dataA$lat, icon = leafIcons_A, group = "Group A") %>%
-      addMarkers(dataB$long, dataB$lat, icon = leafIcons_B, group = "Group B") %>%
-      addLayersControl(position = "topleft", overlayGroups = c("Group A","Group B")) %>%
-      hideGroup("Group B")%>%
-      addPolylines(
-        data = oil,
-        stroke = TRUE,
-        color = "#54A800",
-        weight = 1,
-        layerId = "Oil and Gas",
-        group = "Oil Community"
-      ) %>%
-      addLayersControl(position = "topleft", overlayGroups = c("Group A","Group B", "Oil Community")) %>%
-      hideGroup("Group B")
-    map
+
+server <- function(input, output) {
+  
+  output$x1 <- renderDT({
+    datatable(cars,
+              options = list(
+                columnDefs = list(list(targets = 3,visible = FALSE)),
+                rowCallback = JS(rowCallback)
+              )
+    )
   })
-  observe({
-    map <- leafletProxy("map") %>% clearControls()
-    if (any(input$map_groups %in% "Group A")) {
-      map <- map %>%
-        addControl(html = html_legend_A, position = "bottomleft") %>%
-        addLegend(title="Group A", position="bottomright", opacity=1, colors="green",labels = "Group A")}
-    if (any(input$map_groups %in% "Group B")) {
-      map <- map %>%
-        addControl(html = html_legend_B, position = "bottomleft") %>%
-        addLegend(title="Group B", position="bottomright", opacity=1,colors="red",labels = "Group B")}
+  
+  # highlight selected rows in the scatterplot
+  output$x2 <- renderPlot({
+    s <- input$x1_rows_selected
+    par(mar = c(4, 4, 1, .1))
+    plot(cars[ ,-3])
+    if (length(s)) points(cars[s, , drop = FALSE], pch = 19, cex = 2)
   })
 }
 
 shinyApp(ui, server)
-

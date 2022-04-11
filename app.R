@@ -18,6 +18,7 @@ library(DT)
 library(bslib)
 library(readr)
 library(data.table)
+library(leaflegend)
 
 # source helpers ----------------------------------------------------------
 lapply(list.files(path = "src",recursive = TRUE, full.names = TRUE), source)
@@ -27,7 +28,8 @@ version <- 3
 # enviroscreen data
 envoData <- readRDS(paste0("data/scores/allScores_",version,".rds"))%>%
   dplyr::mutate(visParam = `Colorado EnviroScreen Score Percentile`)%>%
-  dplyr::select("County Name", "GEOID", everything())
+  dplyr::select("County Name", "GEOID", everything())%>% 
+  dplyr::select(-"GEOID3")
 
 
 # Additional Data 
@@ -35,7 +37,7 @@ oil <- readRDS("data/scores/oilgasVis.rds")
 coal <- readRDS("data/scores/coalVis.rds")
 rural <- readRDS("data/scores/ruralVis.rds")
 descriptors <- read_csv("data/descriptions/indicatorDesc.csv")
-justice40 <- st_read("data/scores/coloradoData.geojson") %>%
+justice40 <- readRDS("data/scores/justice40.rds") %>%
   dplyr::mutate(popup = paste0("A total of ", Total.threshold.criteria.exceeded," clauses defined this area as disadvantaged."))
 
 # di community 
@@ -53,6 +55,7 @@ mapData <- initialMapData(envoData)
 # palette for the map
 palMap <- leaflet::colorNumeric(palette = colorRamp,
                                 domain = mapData$visParam,
+                                na.color = "#808080",
     reverse = TRUE
   )
 
@@ -83,7 +86,6 @@ histData <- envoData %>%
 # set empty parameter for histogram funciton 
 ## set to non GEOID number for the histogram generate on loading. 
 geoidMap <- "100"
-
 
 
 
@@ -346,16 +348,17 @@ ui <- fluidPage(
     column(
       2,
       tags$div(title="Click here to remove highlighted features",
-               actionButton("button_remove", "Remove Highlighted Areas")
+               actionButton("removeHighlight", "Remove Highlighted Areas")
       )
     )
   ),
   
   # display map -------------------------------------------------------------
-  fluidRow(tags$style(type = "text/css", "#mymap {height: calc(100vh - 400px) !important;}"), #style = {"background-color:#4d3a7d;"},
+  fluidRow(tags$style(type = "text/css", "#mymap {height: calc(100vh - 250px) !important;}"), #style = {"background-color:#4d3a7d;"},
            column(1),
-           column(6, leafletOutput("mymap")),
-           column(4, plotlyOutput("histEnviroScreen",height = "100%", width = "100%")),
+           column(7, leafletOutput("mymap")),
+           column(3, br(),br(),br(),br(),
+                  plotlyOutput("histEnviroScreen" ,height = "80%", width = "100%")),
            column(1),
            
 
@@ -369,11 +372,11 @@ ui <- fluidPage(
   br(),
   fluidRow(class = "plotArea",
            column(1),
-           column(2, br(), plotlyOutput("histExposure")),
-           column(2, br(), plotlyOutput("histEffect")),
-           column(2, br(), plotlyOutput("histClimate")),
-           column(2, br(), plotlyOutput("histSocial")),
-           column(2, br(), plotlyOutput("histDemo")),
+           column(2, br(), plotlyOutput("histExposure", height=300)),
+           column(2, br(), plotlyOutput("histEffect", height=300)),
+           column(2, br(), plotlyOutput("histClimate", height=300)),
+           column(2, br(), plotlyOutput("histSocial", height=300)),
+           column(2, br(), plotlyOutput("histDemo", height=300)),
            column(1),
     p("The EnviroScreen score combines five components: Environmental exposures, Environmental effects, Climate vulnerability, Sensitive population, and Demographics. When you click a location on the map, the orange bars in this chart show the score for that location. The orange bars show how the location compares to the rest of Colorado for each component score. Together, the charts show how the EnviroScreen score is calculated for the selected location.")
   ),
@@ -396,8 +399,8 @@ ui <- fluidPage(
   
   # Output: Tabset w/ plot, summary, and table ----
   tabsetPanel(type = "tabs",
-              tabPanel("Group Component Scores", dataTableOutput("gcomponentScore")),
-              tabPanel("Component Score", dataTableOutput("componentScore")),
+              tabPanel("Group Component Scores", DT::dataTableOutput("gcomponentScore")),
+              tabPanel("Component Score", DT::dataTableOutput("componentScore")),
               tabPanel("Environmental exposures", dataTableOutput("evnEx")),
               tabPanel("Environmental Effects", dataTableOutput("evnEf")),
               tabPanel("Climate vulnerability", dataTableOutput("clim")),
@@ -506,35 +509,24 @@ server <- function(input, output,session) {
 # table output ------------------------------------------------------------   
   # output for datatable
   
+  # tableData <- reactive({
+  #   geoid1 <- input$mymap_shape_click
+  #   if(is.null(geoid1$id)){
+  #     df1() %>% sf::st_drop_geometry()
+  #   }else{
+  #     ### single features table selection 
+  #     # df1()%>% dplyr::filter(GEOID == geoid1$id)
+  #     ### replacing with single table element, once table reset is developed 
+  #     genTable(tableData = df1(), geoid = input$mymap_shape_click)
+  #   }
+  #   })  
   tableData <- reactive({
     geoid1 <- input$mymap_shape_click
     if(is.null(geoid1$id)){
-      df1() %>% sf::st_drop_geometry()
-    }else{
-      ### single features table selection 
-      # df1()%>% dplyr::filter(GEOID == geoid1$id)
-      ### replacing with single table element, once table reset is developed 
-      genTable(tableData = df1(), geoid = input$mymap_shape_click)
+      geoid1 <- 1
     }
-    })  
-  
-  # group component scores 
-  output$gcomponentScore <- renderDataTable(tableData()%>%
-      dplyr::select(
-    "GEOID"
-    ,"County Name"
-    ,"Colorado EnviroScreen Score"                                  
-    ,"Colorado EnviroScreen Score Percentile"                            
-    ,"Pollution & Climate Burden"                                 
-    ,"Pollution & Climate Burden Percentile"                           
-    ,"Socioeconomics & Demographics"                                            
-    ,"Socioeconomics & Demographics Percentile"
-    ), 
-    rownames = FALSE,
-    options = list(autoWidth = TRUE, scrollX = TRUE,
-              scrollY = "200px", scrollCollapse = TRUE,
-              paging = FALSE, float = "left"),
-     width = "80%", height = "70%")
+    genTable(tableData = df1(), geoid = geoid1)
+  })
   
   
   # click observer event ----------------------------------------------------
@@ -542,151 +534,51 @@ server <- function(input, output,session) {
   ### this allows only selection from specific table to be added to map 
   observeEvent(input$gcomponentScore_rows_selected, {
     s1 <- input$gcomponentScore_rows_selected  # typo was on this line
-    print(s1)
-    print(RV$Clicks )
-    RV$Clicks <- tableData() %>% select("GEOID") %>% dplyr::slice(s1) %>% pull()
+    RV$Clicks <- tableData()[[1]]%>% setDF() %>% select("GEOID") %>% dplyr::slice(s1) %>% pull()
   })
   observeEvent(input$componentScore_rows_selected, {
     s1 <- input$componentScore_rows_selected 
-    RV$Clicks <- tableData() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
-    print(RV$Clicks )
+    RV$Clicks <- tableData()[[2]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
   })
   observeEvent(input$evnEx_rows_selected, {
     s1 <- input$evnEx_rows_selected 
-    RV$Clicks <- tableData() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
-    print(s1)
+    RV$Clicks <- tableData()[[3]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
   })
   observeEvent(input$evnEf_rows_selected, {
     s1 <- input$evnEf_rows_selected 
-    RV$Clicks <- tableData() %>% select("GEOID") %>% dplyr::slice(s1) %>% pull()
-    print(RV$Clicks )
+    RV$Clicks <- tableData()[[4]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
   })
   observeEvent(input$clim_rows_selected, {
     s1 <- input$clim_rows_selected 
-    RV$Clicks <- tableData() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
-    print(RV$Clicks )
+    RV$Clicks <- tableData()[[5]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
   })
   observeEvent(input$senPop_rows_selected, {
     s1 <- input$senPop_rows_selected 
-    RV$Clicks <- tableData() %>% select("GEOID") %>% dplyr::slice(s1) %>% pull()
-    print(RV$Clicks )
+    RV$Clicks <- tableData()[[6]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
   })
   observeEvent(input$socEco_rows_selected, {
     s1 <- input$socEco_rows_selected 
-    RV$Clicks <- tableData() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
-    print(RV$Clicks )
+    RV$Clicks <- tableData()[[7]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
   })
+  
 
+  # Render the table outputs ------------------------------------------------
+
+  # group component scores 
+  output$gcomponentScore <- renderDataTable(tableData()[[1]],options = list(autoWidth = TRUE, scrollX = TRUE))
   # component Score
-  output$componentScore <- renderDataTable(tableData() %>% dplyr::select(
-    "GEOID",
-    "County Name"
-    ,"Environmental exposures"
-    ,"Environmental effects"
-    ,"Climate vulnerability"
-    ,"Sensitive population"
-    ,"Demographics"
-  ), 
-  options = list(autoWidth = TRUE, scrollX = TRUE))
+  output$componentScore <- renderDataTable(tableData()[[2]],options = list(autoWidth = TRUE, scrollX = TRUE))
   # enviromental exposures Score
-  output$evnEx <- renderDataTable(tableData() %>% dplyr::select(
-    "GEOID"
-    ,"County Name"
-    ,"Ozone"
-    ,"Ozone Percentile"
-    ,"Particles"                                              
-    ,"Particles Percentile"                                         
-    ,"Lead exposure risk"                                     
-    ,"Lead exposure risk Percentile"                                
-    ,"Diesel PM"                                              
-    ,"Diesel PM Percentile"                                         
-    ,"Traffic proximity & volume"                           
-    ,"Traffic proximity & volume Percentile"                      
-    ,"Air toxics emissions"                                   
-    ,"Air toxics emissions Percentile"
-    ,"Other Air Pollutants"
-    ,"Other Air Pollutants Percentile"
-    ,"Drinking Water Violations"
-    ,"Drinking Water Violations Percentile"
-    ,"Noise" 
-    ,"Noise Percentile"
-  ), 
-  options = list(autoWidth = TRUE, scrollX = TRUE))
+  output$evnEx <- renderDataTable(tableData()[[3]],options = list(autoWidth = TRUE, scrollX = TRUE))
   # enviromental effects Score
-  output$evnEf <- renderDataTable(tableData() %>% dplyr::select(
-    "GEOID"
-    ,"County Name"
-    ,"Wastewater discharge indicator"                         
-    ,"Wastewater discharge indicator Percentile"                    
-    ,"Proximity to National Priorities List (NPL) sites"      
-    ,"Proximity to National Priorities List (NPL) sites Percentile" 
-    ,"Proximity to RMP sites"                                 
-    ,"Proximity to RMP sites Percentile"                            
-    ,"Proximity to hazardous waste facilities"                
-    ,"Proximity to hazardous waste facilities Percentile"
-    ,"Proximiy to Oil and Gas" 
-    ,"Proximiy to Oil and Gas Percentile" 
-    ,"Proximiy to Mining and Smelting"
-    ,"Proximiy to Mining and Smelting Percentile" 
-    ,"Impaired Surface Water" 
-    ,"Impaired Surface Water Percentile" 
-  ), 
-  options = list(autoWidth = TRUE, scrollX = TRUE))
+  output$evnEf <- renderDataTable(tableData()[[4]],options = list(autoWidth = TRUE, scrollX = TRUE))
   # component Score
-  output$clim <- renderDataTable(tableData() %>% dplyr::select(
-    "GEOID"
-    ,"County Name"
-    ,"Wildfire risk"                                          
-    ,"Wildfire risk Percentile"                                     
-    ,"Floodplains"                                           
-    ,"Floodplains Percentile"
-    ,"Drought"
-    ,"Drought Percentile"
-    ,"Extreme Heat Days"
-    ,"Extreme Heat Days Percentile"
-  ), 
-  options = list(autoWidth = TRUE, scrollX = TRUE))
+  output$clim <- renderDataTable(tableData()[[5]],options = list(autoWidth = TRUE, scrollX = TRUE))
   # component Score
-  output$senPop <-  renderDataTable(tableData() %>% dplyr::select(
-    "GEOID"
-    ,"County Name"
-    ,"Population under 5"                                     
-    ,"Population under 5 Percentile"                                
-    ,"Population over 64"                                     
-    ,"Population over 64 Percentile"                                
-    ,"Heart disease in adults"                                
-    ,"Heart disease in adults Percentile"                           
-    ,"Asthma hospitalization rate"                            
-    ,"Asthma hospitalization rate Percentile"                       
-    ,"Life expectancy"                                        
-    ,"Life expectancy Percentile"                                   
-    ,"Low weight birth rate"                                  
-    ,"Low weight birth rate Percentile"
-    ,"Cancer Incidence"
-    ,"Cancer Incidence Percentile"
-    ,"Diabetes Incidence"
-    ,"Diabetes Incidence Percentile"
-    ,"Mental Health Incidence"
-    ,"Mental Health Incidence Percentile"
-  ), options = list(autoWidth = TRUE, scrollX = TRUE))
+  output$senPop <-  renderDataTable(tableData()[[6]],options = list(autoWidth = TRUE, scrollX = TRUE))
   # component Score
-  output$socEco <- renderDataTable(tableData() %>% dplyr::select(
-    "GEOID"
-    ,"County Name"
-    ,"Percent people of color"                                
-    ,"Percent people of color Percentile"                           
-    ,"Percent less than high school education"                
-    ,"Percent less than high school education Percentile"           
-    ,"Percent low income"                                     
-    ,"Percent low income Percentile"                                
-    ,"Percent linguistic isolation"                           
-    ,"Percent linguistic isolation Percentile"                      
-    ,"Percent disability"                                     
-    ,"Percent disability Percentile"
-    ,"Housing Cost Burdened" 
-    ,"Housing Cost Burdened Percentile"
-  ), 
-  options = list(autoWidth = TRUE, scrollX = TRUE))
+  output$socEco <- renderDataTable(tableData()[[7]],options = list(autoWidth = TRUE, scrollX = TRUE))
+  
   # download data -----------------------------------------------------------
   # Downloadable csv of selected dataset ----
   output$downloadData <- downloadHandler(
@@ -694,7 +586,7 @@ server <- function(input, output,session) {
       paste(input$Geom, "_data.csv", sep = "")
     },
     content = function(file) {
-      write.csv(df1() %>% sf::st_drop_geometry(), file, row.names = FALSE)
+      write.csv(df1() %>% sf::st_drop_geometry() %>% select(-"visParam"), file, row.names = FALSE)
     }
   )
   
@@ -722,7 +614,9 @@ server <- function(input, output,session) {
     ed2 <- envoData[envoData$area == geo, ]
     ed2 <- ed2 %>%
       mutate(visParam = !!as.symbol(indicator))%>%# https://stackoverflow.com/questions/62862705/r-shiny-mutate-replace-how-to-mutate-specific-column-selected-from-selectinput
-      dplyr::select(GEOID, `County Name`, indicator1, indicator2,coal,oilGas,rural,visParam)
+      dplyr::select(GEOID, `County Name`, indicator1, indicator2,`Coal Community`,`Oil and Gas Community`,`Rural Community`,visParam)%>%
+      dplyr::mutate("stateAverageValue" = mean(indicator1),
+                    "stateAverageScore" = mean(indicator2))
     
       
     ed2 <- ed2 %>%
@@ -732,9 +626,9 @@ server <- function(input, output,session) {
           paste0("<br/><strong>",`County Name`,"</strong>"),
           paste0("<br/><b>Measured:</b> ", round(!!as.symbol(indicator1), digits = 2),
                    "<br/><b>Score:</b> ", round(!!as.symbol(indicator2), digits =  0)),
-          paste0("<br/><b>Coal Community:</b> ", coal),
-          paste0("<br/><b>Oil and Gas Community:</b> ", oilGas),
-          paste0("<br/><b>Rural Community:</b> ", rural)
+          paste0("<br/><b>Coal Community:</b> ", `Coal Community`),
+          paste0("<br/><b>Oil and Gas Community:</b> ", `Oil and Gas Community`),
+          paste0("<br/><b>Rural Community:</b> ", `Rural Community`)
       )
     )
     
@@ -744,7 +638,6 @@ server <- function(input, output,session) {
                                   reverse = TRUE)
     # legend labels 
     labels1 <- defineLegend(in1)
-    print(labels1)
     leafletProxy("mymap") %>%
       clearGroup(group = "Indicator Score") %>%
       addPolygons(

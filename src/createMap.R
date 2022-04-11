@@ -78,7 +78,8 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
     labels = c("Most Burdened", "", "", "", "Least Burdened"),
     opacity = 1,
     layerId = "firstLegend",
-    group = "Indicator Score"
+    group = "Indicator Score",
+    na.label = "No Data"
 
     # labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))
   ) %>%
@@ -90,7 +91,28 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
             opacity = 1,
             group = "Disproportionately Impacted Community"
             )%>%
-    # add control groups ------------------------------------------------------
+  addLegendImage(images = "www/oilGas.png",
+                 labels = "Oil and Gas Community",
+                 width = 25,
+                 height = 25,
+                 position = 'topright',
+                 group = "Oil and Gas Community",
+                 labelStyle = "font-size: 16")%>%
+  addLegendImage(images = "www/rural.png",
+                 labels = "Rural Community",
+                 width = 25,
+                 height = 25,
+                 position = 'topright',
+                 group = "Rural Community",
+                 labelStyle = "font-size: 16")%>%
+  addLegendImage(images = "www/coal.png",
+                 labels = "Coal Community",
+                 width = 25,
+                 height = 25,
+                 position = 'topright',
+                 group = "Coal Community",
+                 labelStyle = "font-size: 16")%>%
+  # add control groups ------------------------------------------------------
   addLayersControl(
     baseGroups = c("Light","Dark", "OpenStreetMap"),
     overlayGroups = c(

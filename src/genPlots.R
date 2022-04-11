@@ -1,10 +1,23 @@
 genPlots <- function(dataframe, parameter, geoid = NULL){
-  # font for title  
-  fontHeader <- list(
-    family = "museo-sans",
-    color = "#000000",
-    size = 18
+  # setting text for font elements 
+  if(parameter == "Colorado EnviroScreen Score"){
+    # font for title  
+    fontHeader <- list(
+      family = "museo-sans",
+      color = "#000000",
+      size = 18
     )
+    bg_color <- "#FFFFFF" # removing the blue background for this 
+  }else{
+    # font for title  
+    fontHeader <- list(
+      family = "museo-sans",
+      color = "#000000",
+      size = 14
+      )
+    bg_color <- "#FFFFFF"
+  }
+  
   # font for labels
   fontBody <- list(
     family = "Trebuchet MS")
@@ -34,12 +47,7 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
   if(parameter %in% c("Colorado EnviroScreen Score", "Environmental exposures","Environmental effects","Climate vulnerability")){
     xlabel <- "Burden"
   }
-  if(parameter == "Colorado EnviroScreen Score"){
-    bg_color <- "#e5ecf6"
-  }else{
-    bg_color <- "#FFFFFF"
-  }
-  
+
   
   minBin <- min(t1$breaks)
   maxBin <- max(t1$breaks)
@@ -51,8 +59,8 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
       marker = list(color = "#009add",
                     line = list(width = 2,
                                 color = 'rgb(0, 0, 0)')))%>%
-    layout(title = list(text=parameter, titlefont  = fontHeader),
-           xaxis = list(title = xlabel,
+    layout(title = list(text=parameter,font  = fontHeader)
+           ,xaxis = list(title = xlabel,
                         ticktext = list("Least", "Most"), 
                         tickvals = list(minBin,maxBin),
                         tickmode = "array",
@@ -85,19 +93,18 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
           marker = list(color = colors$color,
                         line = list(width = 2,
                                     color = 'rgb(0, 0, 0)')))%>%
-        layout(title = list(text= parameter,titlefont  = fontHeader),
-               xaxis = list(title = xlabel,
+        layout(title = list(text= parameter,font = fontHeader)
+               ,xaxis = list(title = xlabel,
                            ticktext = list("Least", "Most"), 
                            tickvals = list(minBin,maxBin),
                            tickmode = "array",
                            tickangle = 45),
-               
         yaxis = list(title = "Number of Areas"),
         plot_bgcolor = bg_color, 
         font = fontBody,
         margin = mrg)%>%
         hide_legend()%>%
-        style(hoverinfo = 'none') 
+        style(hoverinfo = 'none')
     }
   }
   return(p1) 
