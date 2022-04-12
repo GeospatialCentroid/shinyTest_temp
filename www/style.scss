@@ -2,6 +2,7 @@ p {
   padding-left:50px;
   padding-right:50px;
   text-align:left;
+  font-size: 16px;
 }
 
 
@@ -19,15 +20,6 @@ ol, ul, dl {
     padding-right:50px;
 }
 
-div.row.boarderElement{
-  border-style: solid;
-  border-color :#4d3a7d;
-  border-bottom-width: thin;
-  padding-left:50px;
-  padding-right:50px;
-}
-
-
 
 shiny-text-output shiny-bound-output{
   padding: 10px 20px;
@@ -43,6 +35,18 @@ shiny-text-output shiny-bound-output{
   background-color: coral;
   text-size-adjust: 1.5;
 }
+
+/*page buttons on table */
+.page-link{
+  background-color: #235c37 !important;
+}
+
+/* active page button on table*/ 
+.page-item.active .page-link{
+  background-color: #739849 !important;
+}
+
+
 /* text color for hyperlink blue */
 a{color: #0000FF;
   text-decoration: underline;
@@ -51,14 +55,14 @@ a{color: #0000FF;
 /* stlying for all tabset panels */
 a.nav-link{
   color: #FFFFFF !important;
-  background-color: #245d38;
+  background-color:  #739849;
   font-size: 18px;
 }
 
 /* stlying for selected tab */
 .nav-tabs .nav-link.active, .nav-tabs>li>a.active,{
-    background: #ffcd00;
-    color: #000000 !important;
+    background: #5f7774;
+    color: #FFFFFF !important;
 }
 
 /* Positing for all tabs */
@@ -71,17 +75,19 @@ a.nav-link{
 
 
 
-
+/*main banner elements*/ 
 div.row.titleElement{
-  background:#001970;
+  background:#6d3a5d;
   color: #FFFFFF;
 }
 
+/*section header elements*/ 
 div.row.sectionTitle{
-  background:#35647e;
+  background:#235c37;
   color: #FFFFFF;
   margin: 10px;
 }
+
 
 div.row.plotArea{
 }
@@ -108,7 +114,7 @@ label.control-label {
 
 /*style all buttons */
 .btn{
-  background-color: #ef7521!important;
+  background-color: #bc6123 !important;
 }
 /*style individula buttons*/
 #updateMap, #button_remove {

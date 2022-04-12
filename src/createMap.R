@@ -64,7 +64,7 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
     addPolygons(
       data = justice40,
       popup = justice40$popup,
-      fillColor  = "#bdbdbd",
+      fillColor  = "#fb9a99",
       fillOpacity = 0.8,
       color = "#636363",
       weight = 1,
@@ -84,7 +84,7 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
     # labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))
   ) %>%
   addLegend("topright",
-            colors = c("#fdd18a", "#ade1e9","#51a198","#c095b4"), 
+            colors = c("#a6cee3", "#33a02c","#b2df8a","#1f78b4"), 
             title = "Disproportionately Impacted Community",
             labels = c("Low Income", "People of Color",
                        "Housing Burden", "More then one category"),

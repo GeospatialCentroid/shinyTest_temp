@@ -56,8 +56,8 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
   # generate plot regardless of geoid selection 
   p1 <- plot_ly(df1,x=~value, nbinsx = length(unique(df1$bins)))%>%
     add_histogram(
-      marker = list(color = "#009add",
-                    line = list(width = 2,
+      marker = list(color = "#6d3a5d",
+                    line = list(width = 0.5,
                                 color = 'rgb(0, 0, 0)')))%>%
     layout(title = list(text=parameter,font  = fontHeader)
            ,xaxis = list(title = xlabel,
@@ -83,15 +83,15 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
         dplyr::count(bins) %>%
         dplyr::mutate(
           color = case_when(
-            bins == binGroup  ~"#ef7521",
-            TRUE ~"#009add"
+            bins == binGroup  ~"#bc6123",
+            TRUE ~"#6d3a5d"
           )
         )
       # generate plot 
       p1 <- plot_ly(df1,x=~value, nbinsx = length(unique(df1$bins)))%>%
         add_histogram(
           marker = list(color = colors$color,
-                        line = list(width = 2,
+                        line = list(width = 0.5,
                                     color = 'rgb(0, 0, 0)')))%>%
         layout(title = list(text= parameter,font = fontHeader)
                ,xaxis = list(title = xlabel,

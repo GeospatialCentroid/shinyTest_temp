@@ -5,10 +5,10 @@ account: geocentroid
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5475280
-bundleId: 5782637
+bundleId: 5791949
 url: https://geocentroid.shinyapps.io/shinyTest/
-when: 1649542582.51283
-lastSyncTime: 1649542582.51283
+when: 1649800633.52743
+lastSyncTime: 1649800633.52743
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: testArea.R

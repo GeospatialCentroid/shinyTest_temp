@@ -19,6 +19,8 @@ library(bslib)
 library(readr)
 library(data.table)
 library(leaflegend)
+library(shinyBS)
+
 
 # source helpers ----------------------------------------------------------
 lapply(list.files(path = "src",recursive = TRUE, full.names = TRUE), source)
@@ -38,15 +40,19 @@ coal <- readRDS("data/scores/coalVis.rds")
 rural <- readRDS("data/scores/ruralVis.rds")
 descriptors <- read_csv("data/descriptions/indicatorDesc.csv")
 justice40 <- readRDS("data/scores/justice40.rds") %>%
-  dplyr::mutate(popup = paste0("A total of ", Total.threshold.criteria.exceeded," clauses defined this area as disadvantaged."))
+  dplyr::mutate(popup = paste0(
+    "Census Tract ", GEOID ," in ", County_Name," County."    
+    ,br()
+    ,"A total of ", Total.threshold.criteria.exceeded," clauses defined this area as disadvantaged."))
 
 # di community 
 di <- getDI()
 # palette for DI layer 
 diPal <- colorFactor(palette = c(
-  "#fdd18a", "#ade1e9","#51a198","#c095b4"), levels = c("Low Income", "People of Color",
+  "#a6cee3", "#33a02c","#b2df8a","#1f78b4"), levels = c("Low Income", "People of Color",
                                                        "Housing Burden", "More then one category"), di$color
 )
+
 
 colorRamp <- c(  "#f2f0f7"  ,"#cbc9e2"  ,"#9e9ac8"  ,"#756bb1"  ,"#54278f")
 
@@ -149,13 +155,11 @@ ui <- fluidPage(
 
 
   # description of use ------------------------------------------------------
-
   fluidRow(class = "sectionTitle", 
            h2("Understanding the EnviroScreen Tool")
   ),
   tabsetPanel(
-    tabPanel( class = "supportingText", 
-      "EnviroScreen Score",
+    tabPanel( "EnviroScreen Score",
              br(),
              tags$strong("EnviroScreen Score"),
              p(
@@ -167,7 +171,6 @@ ui <- fluidPage(
              ),
              p(
                "Colorado EnviroScreen does NOT:",
-               
                tags$ul(
                  tags$li("Define all areas that might be affected by environmental injustice or specific environmental burdens."),
                  tags$li("Tell us about individuals who have health problems that make them more likely to experience negative effects from environmental exposures."),
@@ -239,8 +242,9 @@ ui <- fluidPage(
     tabPanel("FAQ",
              br(),
              tags$em("Frequently Asked Questions"),
-             p("state."
-             ),
+  
+             tags$iframe(src = "https://docs.google.com/document/d/15XVihyI1_i7oMdQvoT0gbARBQvKhCaPI1FkU2Ua8U_k/edit?usp=sharing", seamless=NA,
+                         width = "100%", height = 800), 
              br(),
     ),
     ),
@@ -350,7 +354,9 @@ ui <- fluidPage(
       tags$div(title="Click here to remove highlighted features",
                actionButton("removeHighlight", "Remove Highlighted Areas")
       )
-    )
+    ),
+    tags$blockquote(textOutput("indicatorDesc"))
+    
   ),
   
   # display map -------------------------------------------------------------
@@ -360,13 +366,13 @@ ui <- fluidPage(
            column(3, br(),br(),br(),br(),
                   plotlyOutput("histEnviroScreen" ,height = "80%", width = "100%")),
            column(1),
-           
 
   ),
 
   # describe indicators -----------------------------------------------------
   # sentence explaining the indicators
-  # 
+  #    # add selection to map button 
+  # tags$blockquote(textOutput("indicatorDesc")),
   # show plots --------------------------------------------------------------
   # plot of the datasets
   br(),
@@ -391,11 +397,7 @@ ui <- fluidPage(
     Blue `Highlight Selection on Map` button in the upper right to view the location on the map."),
 
   ),
-   # add selection to map button 
-  br(),
-  tags$blockquote(textOutput("indicatorDesc")),
 
-  br(),
   
   # Output: Tabset w/ plot, summary, and table ----
   tabsetPanel(type = "tabs",
@@ -405,7 +407,8 @@ ui <- fluidPage(
               tabPanel("Environmental Effects", dataTableOutput("evnEf")),
               tabPanel("Climate vulnerability", dataTableOutput("clim")),
               tabPanel("Sensitive population", dataTableOutput("senPop")),
-              tabPanel("Demographics", dataTableOutput("socEco"))),
+              tabPanel("Demographics", dataTableOutput("socEco")),
+              tabPanel("Extra Evaluations", dataTableOutput("exEval"))),
   # download table option  --------------------------------------------------
   fluidRow(
     column(4,
@@ -508,18 +511,6 @@ server <- function(input, output,session) {
     
 # table output ------------------------------------------------------------   
   # output for datatable
-  
-  # tableData <- reactive({
-  #   geoid1 <- input$mymap_shape_click
-  #   if(is.null(geoid1$id)){
-  #     df1() %>% sf::st_drop_geometry()
-  #   }else{
-  #     ### single features table selection 
-  #     # df1()%>% dplyr::filter(GEOID == geoid1$id)
-  #     ### replacing with single table element, once table reset is developed 
-  #     genTable(tableData = df1(), geoid = input$mymap_shape_click)
-  #   }
-  #   })  
   tableData <- reactive({
     geoid1 <- input$mymap_shape_click
     if(is.null(geoid1$id)){
@@ -534,7 +525,9 @@ server <- function(input, output,session) {
   ### this allows only selection from specific table to be added to map 
   observeEvent(input$gcomponentScore_rows_selected, {
     s1 <- input$gcomponentScore_rows_selected  # typo was on this line
-    RV$Clicks <- tableData()[[1]]%>% setDF() %>% select("GEOID") %>% dplyr::slice(s1) %>% pull()
+    print(s1)
+    RV$Clicks <- tableData()[[1]][[1]][s1]
+    print(RV$Clicks)
   })
   observeEvent(input$componentScore_rows_selected, {
     s1 <- input$componentScore_rows_selected 
@@ -560,7 +553,47 @@ server <- function(input, output,session) {
     s1 <- input$socEco_rows_selected 
     RV$Clicks <- tableData()[[7]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
   })
+  observeEvent(input$exEval_rows_selected, {
+    s1 <- input$exEval_rows_selected 
+    RV$Clicks <- tableData()[[8]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
+  })
   
+  observeEvent(input$mymap_shape_click, {
+    clickId <- input$mymap_shape_click$id
+    
+    
+    dataTableProxy("gcomponentScore") %>%
+      replaceData(tableData()[[1]]) %>%
+      selectRows(which(tableData()[[1]]$GEOID == clickId))
+    
+    
+    dataTableProxy("componentScore") %>%
+      replaceData(tableData()[[2]]) %>%
+      selectRows(which(tableData()[[2]]$GEOID == clickId))
+    
+    dataTableProxy("evnEx") %>%
+      selectRows(which(tableData()[[3]]$GEOID == clickId))
+    
+    
+    dataTableProxy("evnEf") %>%
+      selectRows(which(tableData()[[4]]$GEOID == clickId))
+    
+    
+    dataTableProxy("clim") %>%
+      selectRows(which(tableData()[[5]]$GEOID == clickId))
+    
+    
+    dataTableProxy("senpop") %>%
+      selectRows(which(tableData()[[6]]$GEOID == clickId))
+    
+    
+    dataTableProxy("socEco") %>%
+      selectRows(which(tableData()[[7]]$GEOID == clickId))
+    dataTableProxy("exEval") %>%
+      selectRows(which(tableData()[[8]]$GEOID == clickId))
+    
+    
+  })
 
   # Render the table outputs ------------------------------------------------
 
@@ -572,12 +605,14 @@ server <- function(input, output,session) {
   output$evnEx <- renderDataTable(tableData()[[3]],options = list(autoWidth = TRUE, scrollX = TRUE))
   # enviromental effects Score
   output$evnEf <- renderDataTable(tableData()[[4]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # component Score
+  # climate Score
   output$clim <- renderDataTable(tableData()[[5]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # component Score
+  # Sensitive Population Score
   output$senPop <-  renderDataTable(tableData()[[6]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # component Score
+  # Social Eco Score
   output$socEco <- renderDataTable(tableData()[[7]],options = list(autoWidth = TRUE, scrollX = TRUE))
+  # Extra Evaluations
+  output$exEval <- renderDataTable(tableData()[[8]],options = list(autoWidth = TRUE, scrollX = TRUE))
   
   # download data -----------------------------------------------------------
   # Downloadable csv of selected dataset ----
@@ -642,7 +677,7 @@ server <- function(input, output,session) {
       clearGroup(group = "Indicator Score") %>%
       addPolygons(
         data = ed2,
-        color = "#F9C1AE", #"#454547",
+        color = "#F9C1AE", 
         weight = 0.2,
         smoothFactor = 0.5,
         opacity = 1.0,

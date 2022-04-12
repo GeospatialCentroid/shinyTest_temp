@@ -35,21 +35,25 @@ genTable <- function(tableData, geoid){
   dem <- table1 %>% dplyr::select("GEOID","County Name","Colorado EnviroScreen Score"  ,"Colorado EnviroScreen Score Percentile"
                                   ,"Pollution & Climate Burden","Pollution & Climate Burden Percentile","Socioeconomics & Demographics"
                                   ,"Socioeconomics & Demographics Percentile") 
+  ext <- table1 %>% dplyr::select("GEOID","County Name","Disproportionately Impacted Community","Justice 40 Community","Coal Community",
+                                  "Oil and Gas Community","Rural Community") 
   if(geoid[1] %in% table1$GEOID){
-    formatDT <- function(dataframe){
-      dataframe %>% datatable() %>% formatStyle(
-        "GEOID", target = "row", 
-        backgroundColor = styleRow(c(1), c("yellow")))
-    } 
+    # formatDT <- function(dataframe){
+    #   dataframe %>% datatable() %>% formatStyle(
+    #     "GEOID", target = "row", 
+    #     backgroundColor = styleRow(c(1), c("yellow")))
+    # } 
     
-    gcs <- gcs  %>% formatDT() 
-    cs1 <- cs1 %>% formatDT() 
-    ee1 <- ee1  %>% formatDT() 
-    ee2 <- ee2  %>% formatDT() 
-    clm <- clm  %>% formatDT() 
-    sen <- sen  %>% formatDT() 
-    dem <- dem  %>% formatDT() 
+    gcs <- gcs # %>% formatDT() 
+    cs1 <- cs1 # %>% formatDT() 
+    ee1 <- ee1 # %>% formatDT() 
+    ee2 <- ee2 # %>% formatDT() 
+    clm <- clm # %>% formatDT() 
+    sen <- sen # %>% formatDT() 
+    dem <- dem # %>% formatDT() 
+    ext <- ext # %>% formatDT() 
+    
   }
-  table2 <- list(gcs, cs1, ee1,ee2,clm,sen,dem )
+  table2 <- list(gcs, cs1, ee1,ee2,clm,sen,dem,ext )
   return(table2)
 }
