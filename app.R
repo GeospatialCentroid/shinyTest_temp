@@ -20,6 +20,7 @@ library(readr)
 library(data.table)
 library(leaflegend)
 library(shinyBS)
+library(shinyWidgets)
 
 
 # source helpers ----------------------------------------------------------
@@ -246,7 +247,7 @@ ui <- fluidPage(
              tags$iframe(src = "https://docs.google.com/document/d/15XVihyI1_i7oMdQvoT0gbARBQvKhCaPI1FkU2Ua8U_k/edit?usp=sharing", seamless=NA,
                          width = "100%", height = 800), 
              br(),
-    ),
+    )
     ),
 
 
@@ -398,17 +399,25 @@ ui <- fluidPage(
 
   ),
 
+  radioGroupButtons(inputId = "tableSelect", label = "",
+                    choices = c("Group Component Scores", "Component Score",
+                                "Environmental Exposures", "Environmental Effects",
+                                "Climate Vulnerability", "Sensitive Population",
+                                "Demographics", "Extra Evaluations"),
+                    justified = TRUE),
+  # data table output ----
+  # changed to just single table
+  DT::dataTableOutput("tableAll"),
   
-  # Output: Tabset w/ plot, summary, and table ----
-  tabsetPanel(type = "tabs",
-              tabPanel("Group Component Scores", DT::dataTableOutput("gcomponentScore")),
-              tabPanel("Component Score", DT::dataTableOutput("componentScore")),
-              tabPanel("Environmental exposures", dataTableOutput("evnEx")),
-              tabPanel("Environmental Effects", dataTableOutput("evnEf")),
-              tabPanel("Climate vulnerability", dataTableOutput("clim")),
-              tabPanel("Sensitive population", dataTableOutput("senPop")),
-              tabPanel("Demographics", dataTableOutput("socEco")),
-              tabPanel("Extra Evaluations", dataTableOutput("exEval"))),
+  # tabsetPanel(type = "tabs",
+  #             tabPanel("Group Component Scores", DT::dataTableOutput("gcomponentScore")),
+  #             tabPanel("Component Score", DT::dataTableOutput("componentScore")),
+  #             tabPanel("Environmental exposures", dataTableOutput("evnEx")),
+  #             tabPanel("Environmental Effects", dataTableOutput("evnEf")),
+  #             tabPanel("Climate vulnerability", dataTableOutput("clim")),
+  #             tabPanel("Sensitive population", dataTableOutput("senPop")),
+  #             tabPanel("Demographics", dataTableOutput("socEco")),
+  #             tabPanel("Extra Evaluations", dataTableOutput("exEval"))),
   # download table option  --------------------------------------------------
   fluidRow(
     column(4,
@@ -454,8 +463,6 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output,session) {
 
-  # storing GEOIDs from table selection -------------------------------------
-  RV<-reactiveValues(Clicks=list())
 
   # reactive geometry selection --------------------------------------------------
   # select table
@@ -510,110 +517,44 @@ server <- function(input, output,session) {
   })
     
 # table output ------------------------------------------------------------   
-  # output for datatable
+  # output for datatable based on columns selected
+
   tableData <- reactive({
     geoid1 <- input$mymap_shape_click
     if(is.null(geoid1$id)){
       geoid1 <- 1
     }
-    genTable(tableData = df1(), geoid = geoid1)
+    genTable(tableData = df1(), geoid = geoid1, colSelected = input$tableSelect)
   })
   
+  # storing GEOIDs from table/map selection -------------------------------------
+  RV<-reactiveValues()
   
-  # click observer event ----------------------------------------------------
-  ### each table has it's own observer that assigned to the same variable. 
-  ### this allows only selection from specific table to be added to map 
-  observeEvent(input$gcomponentScore_rows_selected, {
-    s1 <- input$gcomponentScore_rows_selected  # typo was on this line
-    print(s1)
-    RV$Clicks <- tableData()[[1]][[1]][s1]
-    print(RV$Clicks)
-  })
-  observeEvent(input$componentScore_rows_selected, {
-    s1 <- input$componentScore_rows_selected 
-    RV$Clicks <- tableData()[[2]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
-  })
-  observeEvent(input$evnEx_rows_selected, {
-    s1 <- input$evnEx_rows_selected 
-    RV$Clicks <- tableData()[[3]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
-  })
-  observeEvent(input$evnEf_rows_selected, {
-    s1 <- input$evnEf_rows_selected 
-    RV$Clicks <- tableData()[[4]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
-  })
-  observeEvent(input$clim_rows_selected, {
-    s1 <- input$clim_rows_selected 
-    RV$Clicks <- tableData()[[5]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
-  })
-  observeEvent(input$senPop_rows_selected, {
-    s1 <- input$senPop_rows_selected 
-    RV$Clicks <- tableData()[[6]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
-  })
-  observeEvent(input$socEco_rows_selected, {
-    s1 <- input$socEco_rows_selected 
-    RV$Clicks <- tableData()[[7]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
-  })
-  observeEvent(input$exEval_rows_selected, {
-    s1 <- input$exEval_rows_selected 
-    RV$Clicks <- tableData()[[8]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
+  observeEvent(input$tableAll_rows_selected, {
+      RV$select <- isolate(tableData() %>% dplyr::slice(input$tableAll_rows_selected) %>% pull(GEOID))
   })
   
   observeEvent(input$mymap_shape_click, {
-    clickId <- input$mymap_shape_click$id
-    
-    
-    dataTableProxy("gcomponentScore") %>%
-      replaceData(tableData()[[1]]) %>%
-      selectRows(which(tableData()[[1]]$GEOID == clickId))
-    
-    
-    dataTableProxy("componentScore") %>%
-      replaceData(tableData()[[2]]) %>%
-      selectRows(which(tableData()[[2]]$GEOID == clickId))
-    
-    dataTableProxy("evnEx") %>%
-      selectRows(which(tableData()[[3]]$GEOID == clickId))
-    
-    
-    dataTableProxy("evnEf") %>%
-      selectRows(which(tableData()[[4]]$GEOID == clickId))
-    
-    
-    dataTableProxy("clim") %>%
-      selectRows(which(tableData()[[5]]$GEOID == clickId))
-    
-    
-    dataTableProxy("senpop") %>%
-      selectRows(which(tableData()[[6]]$GEOID == clickId))
-    
-    
-    dataTableProxy("socEco") %>%
-      selectRows(which(tableData()[[7]]$GEOID == clickId))
-    dataTableProxy("exEval") %>%
-      selectRows(which(tableData()[[8]]$GEOID == clickId))
-    
-    
+     RV$select <- isolate(input$mymap_shape_click$id)
   })
+
 
   # Render the table outputs ------------------------------------------------
 
-  # group component scores 
-  output$gcomponentScore <- renderDataTable(tableData()[[1]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # component Score
-  output$componentScore <- renderDataTable(tableData()[[2]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # enviromental exposures Score
-  output$evnEx <- renderDataTable(tableData()[[3]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # enviromental effects Score
-  output$evnEf <- renderDataTable(tableData()[[4]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # climate Score
-  output$clim <- renderDataTable(tableData()[[5]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # Sensitive Population Score
-  output$senPop <-  renderDataTable(tableData()[[6]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # Social Eco Score
-  output$socEco <- renderDataTable(tableData()[[7]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # Extra Evaluations
-  output$exEval <- renderDataTable(tableData()[[8]],options = list(autoWidth = TRUE, scrollX = TRUE))
+  output$tableAll <- renderDataTable({
+    DT::datatable(tableData(), 
+                  options = list(autoWidth = TRUE, scrollX = TRUE))
+                  #selection = list(mode = 'multiple', selected = which(tableData()$GEOID %in% RV$select)))
+    })
+    
+  # Table proxy for selection
+  observe({
+    
+    DT::dataTableProxy("tableAll") %>% 
+      selectRows(which(tableData()$GEOID %in% RV$select))
+  })
   
+
   # download data -----------------------------------------------------------
   # Downloadable csv of selected dataset ----
   output$downloadData <- downloadHandler(
@@ -708,7 +649,7 @@ server <- function(input, output,session) {
   })
   # add selected features to map 
   observeEvent(input$button_table, {
-    mapFeatures <- envoData %>% select("GEOID") %>% dplyr::filter(GEOID %in% RV$Clicks)
+    mapFeatures <- envoData %>% select("GEOID") %>% dplyr::filter(GEOID %in% RV$select)
       # add features to map 
       leafletProxy("mymap") %>%
         clearGroup(group = "Table Highlight") %>%
