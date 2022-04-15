@@ -43,13 +43,13 @@ getDI <- function(){
                "<br/><b>Census Block Group: </b>", GEOID,
                "<br/>",
                "<br/><b>40% of Households are Low Income: </b>", FLP_FLA,
-               "<br/><b>Percent Low Income: </b>", Pov_PCT,
+               "<br/><b>Percent Low Income: </b>", round(Pov_PCT*100, digits = 1),
                "<br/>",
                "<br/><b>40% of Households are Minority : </b>", Mn_FLAG,
-               "<br/><b>Percent Minority: </b>", Min_PCT,
+               "<br/><b>Percent Minority: </b>", round(Min_PCT*100, digits = 1),
                "<br/>",
                "<br/><b>40% of Households are Housing Burdened : </b>", Br_FLAG,
-               "<br/><b>Percent Housing Burdened: </b>", HH_Burdened_Pct
+               "<br/><b>Percent Housing Burdened: </b>", round(HH_Burdened_Pct*100, digits = 1)
              )
           )%>%
     mutate(

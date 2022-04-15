@@ -109,18 +109,18 @@ genTable <- function(tableData, geoid, colSelected){
         "County Name",
         "Asthma hospitalization rate Percentile",
         "Asthma hospitalization rate",
-        "Cancer Incidence Percentile",
-        "Cancer Incidence",
-        "Diabetes Incidence Percentile",
-        "Diabetes Incidence",
+        "Cancer prevalence Percentile",
+        "Cancer prevalence",
+        "Diabetes prevalence Percentile",
+        "Diabetes prevalence",
         "Heart disease in adults Percentile",
         "Heart disease in adults",
         "Life expectancy Percentile", 
         "Life expectancy", 
         "Low weight birth rate Percentile",
         "Low weight birth rate",
-        "Mental Health Incidence Percentile",
-        "Mental Health Incidence",
+        "Mental Health Indicator Percentile",
+        "Mental Health Indicator",
         "Population over 64 Percentile",
         "Population over 64",
         "Population under 5 Percentile", 
@@ -144,7 +144,7 @@ genTable <- function(tableData, geoid, colSelected){
         "Percent people of color Percentile",
         "Percent people of color"
       )
-  }  else if(colSelected == "Other Map Layers") {
+  }  else if(colSelected == "Community Classifications") {
     table2 <- table1 %>%  
       select(
         "GEOID",

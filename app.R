@@ -96,7 +96,7 @@ ui <- fluidPage(
   secondary = "#001970", #blue 
   success = "#245d38", # green
   base_font = "Trebuchet MS,Helvetica,sans-serif",
-  heading_font = "museo-sans,sans-serif"
+  heading_font = "Trebuchet MS,sans-serif"
     )%>%
     bslib::bs_add_rules(sass::sass_file("www/style.scss")),
 
@@ -110,12 +110,36 @@ ui <- fluidPage(
              tags$img(
                src="EnviroScreen Logos/co_cdphe_pr_es_white_v.png",
                title = "Colorado Department of Public Health and Environment",
-               width="100%",
+               width="70%",
                height="auto" 
              )
            )
           ),
-    column(8, h1("Colorado EnviroScreen"), h4("Beta Test Version April 2022"))
+    column(8, h1("Colorado EnviroScreen"), p("Open Beta April 2022"))
+  ),
+  br(),
+  fluidRow(class = "links",
+           column(3, ),
+           column(6, 
+                  p(id="links2"
+                    ,tags$b("You’re invited to beta test EnviroScreen")
+                    ,br()
+                    ,"Leave us your feedback by completing the "
+                    ,tags$a(
+                      href = "https://colostate.az1.qualtrics.com/jfe/preview/SV_5gPbsdID0XEwNAa?Q_CHL=preview&Q_SurveyVersionID=current",
+                      "questionnaire.", target = "_blank")
+                    ,br()
+                    ,"Consider joining a virtual"
+                    ,tags$a(
+                      href = "https://calendly.com/ibe-csu/enviroscreen-public-meeting?month=2022-04",
+                      " community meeting",  target = "_blank"
+                    )
+                    , " from 6-7:30 p.m. Monday, April 25 to see a demonstration of and give feedback on Colorado EnviroScreen."
+                    ,br()
+                  )
+           ),
+           column(3),
+
   ),
   
   fluidRow(
@@ -152,7 +176,7 @@ ui <- fluidPage(
   ),
   
   tabsetPanel(
-    tabPanel(title = "EnviroScreen Score",
+    tabPanel(title = "Purpose and Limitations",
              br(),
              p(
                tags$strong("EnviroScreen Score: Purpose and Limitations")
@@ -187,10 +211,10 @@ ui <- fluidPage(
                ,br()
              ),
             tags$img(
-                   src="MapElements.jpg",
+                   id = "mapDesc", 
+                   src="MapElements_3_crop.jpg",
                    title = "Map Elements",
-                   width="100%",
-                   height="auto" 
+                   height="auto"
                ),
             p(
               br()
@@ -459,12 +483,12 @@ ui <- fluidPage(
           ),
           "Sensitive population" = c(
             "Asthma hospitalization rate",
-            "Cancer Incidence",
-            "Diabetes Incidence",
+            "Cancer prevalence",
+            "Diabetes prevalence",
             "Heart disease in adults",
             "Life expectancy",                                       
             "Low weight birth rate",
-            "Mental Health Incidence",
+            "Mental Health Indicator",
             "Population over 64",
             "Population under 5"                                  
           ),
@@ -534,7 +558,7 @@ ui <- fluidPage(
            h2("EnviroScreen Score Data"),
            p("Use the tabs above  the table to filter through different elements of the
     Colorado EnviroScreen Score. You can select specific rows in the table, then hit the
-    Orange `Highlight Selection on Map` button in the upper right to view the location on the map."),
+    Orange `Highlight Selection on Map` button below the table to view the location on the map."),
 
   ),
   fluidRow(class = "dataTableArea",
@@ -542,8 +566,9 @@ ui <- fluidPage(
                     choices = c("Group Component Scores", "Component Score",
                                 "Environmental Exposures", "Environmental Effects",
                                 "Climate Vulnerability", "Sensitive Population",
-                                "Demographics", "Other Map Layers"),
-                    justified = TRUE),
+                                "Demographics", "Community Classifications"),
+                    #justified = TRUE
+                    ),
   # data table output ----
   # changed to just single table
   DT::dataTableOutput("tableAll")
