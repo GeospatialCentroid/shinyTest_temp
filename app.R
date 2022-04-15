@@ -1,12 +1,3 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
 library(sf)
 library(dplyr)
 library(leaflet)
@@ -20,12 +11,12 @@ library(readr)
 library(data.table)
 library(leaflegend)
 library(shinyBS)
-
+library(shinyWidgets)
 
 # source helpers ----------------------------------------------------------
 lapply(list.files(path = "src",recursive = TRUE, full.names = TRUE), source)
 
-version <- 3
+version <- 4
 
 # enviroscreen data
 envoData <- readRDS(paste0("data/scores/allScores_",version,".rds"))%>%
@@ -112,18 +103,19 @@ ui <- fluidPage(
   # Title ------------------------------------------------------------------
   fluidRow(
     class = "titleElement",
-    column(4, 
+    column(4,
+           tags$br(), 
            tags$a(
              href = "https://cdphe.colorado.gov/enviroscreen",
              tags$img(
                src="EnviroScreen Logos/co_cdphe_pr_es_white_v.png",
                title = "Colorado Department of Public Health and Environment",
-               width="90%",
-               height="90%" 
+               width="100%",
+               height="auto" 
              )
            )
           ),
-    column(8, h1("Colorado EnviroScreen"), h4("Beta Test Version February 2022"))
+    column(8, h1("Colorado EnviroScreen"), h4("Beta Test Version April 2022"))
   ),
   
   fluidRow(
@@ -158,100 +150,252 @@ ui <- fluidPage(
   fluidRow(class = "sectionTitle", 
            h2("Understanding the EnviroScreen Tool")
   ),
+  
   tabsetPanel(
-    tabPanel( "EnviroScreen Score",
+    tabPanel(title = "EnviroScreen Score",
              br(),
-             tags$strong("EnviroScreen Score"),
              p(
-               "Colorado EnviroScreen is an environmental justice mapping tool that uses population and environmental factors to calculate an EnviroScreen score.",
-               br(),
-               "A higher EnviroScreen score means the area is more likely to be affected by environmental injustice. There are scores for each county, census tract, and census block group in Colorado. CDPHE expects to make improvements and additions to the tool in response to feedback or as new data become available",
-               br(),
-               "Although EnviroScreen provides a robust measure of cumulative environmental burden, it is not a perfect tool. The tool uses limited environmental and sociodemographic data to calculate the EnviroScreen score.",
+               tags$strong("EnviroScreen Score: Purpose and Limitations")
+               ,br()
+               ,"Colorado EnviroScreen is an environmental health justice mapping tool that uses population and environmental factors to calculate an “EnviroScreen score.” A higher EnviroScreen score means the area is more likely to be affected by environmental health injustice. The tool includes scores for each county, census tract, and census block group in Colorado. CDPHE expects to make improvements and additions to the tool in response to feedback and as new data become available. Please note that areas under the Ute Mountain Ute and Southern Ute Tribal Jurisdictions are not currently represented on the map. Although EnviroScreen provides a robust measure of cumulative environmental burden, it is not a perfect tool. The tool uses limited environmental, health, and sociodemographic data to calculate the EnviroScreen score."
              ),
              p(
-               "Colorado EnviroScreen does NOT:",
-               tags$ul(
-                 tags$li("Define all areas that might be affected by environmental injustice or specific environmental burdens."),
-                 tags$li("Tell us about individuals who have health problems that make them more likely to experience negative effects from environmental exposures."),
-                 tags$li("Take all Environmental exposures into account."),
-                 tags$li("Tell us about smaller areas within a county, census tract, or census block group that may be more vulnerable to environmental exposures."),
+               tags$strong("Colorado EnviroScreen does not:")
+               ,tags$ul(
+                 tags$li("Define all areas that may be affected by environmental health injustice or specific environmental burdens."),
+                 tags$li("Provide information at the individual level from those who have health problems that make them more likely to experience negative effects from environmental exposures."),
+                 tags$li("Take all environmental exposures into account."),
+                 tags$li("Tell us about smaller areas within a census block group that may be more vulnerable to environmental exposures than other areas."),
               )
              ),
              p(
-               "For more information about how to use environmental justice mapping tools, 
-    please review the Climate Equity Data Viewer guide (available in", 
-    tags$a(href = "https://drive.google.com/file/d/1iytdPG5iK2VBNpIy8k6oT6lU6-QKMLOa/view?usp=sharing", "English", target = "_blank"),
-    "and ",
-    tags$a(href = "https://drive.google.com/file/d/17rQ90fNt3DF-0PbySpGjo2tiy9AmDiCc/view?usp=sharing", "Spanish", target = "_blank"),
-    ")."
-             ),
-    ),
-    tabPanel("Using the Map",
-             br(),
-             tags$strong("Using the Map"),
-             p("The default view of the map shows the state of Colorado. Individual counties, census tracts, or census block groups are color-coded, based on their climate equity score. The legend on the right-hand side of the map shows what these colors represent. The lighter the color, the worse the EnviroScreen score."),
-             br(),
-             p(
-               "The map is interactive. You can zoom in and out, drag the map to a different location,  and click on a location to learn more about its EnviroScreen score. Explore these features:"
-             ),
-             p(
+               tags$strong("Colorado EnviroScreen does:"),
                tags$ul(
-                 tags$li("Search for an address, city, ZIP code, or place name by using the magnifying glass icon, typing the location into the search bar, and selecting the location from the populated drop-down list."),
-                 tags$li("Zoom in and out of the map by scrolling up and down with your mouse or trackpad. "),
-                 tags$li("Drag the map to a new location by clicking, holding, and moving your cursor."),
-                 tags$li("Click on a location to view more information for that location in the graph and table below the map.")
-                 ),
-             )
-            ),
-    tabPanel("Understanding the Data",
+                 tags$li("Show which areas in Colorado are more likely to have higher environmental health injustices."),
+                 tags$li("Identify areas in Colorado where government agencies can prioritize resources and work to reduce pollution and other sources of environmental health injustices."),
+                 tags$li("Provide information to empower community members to advocate to improve public health and the environment in their communities."),
+                 tags$li("Identify areas that meet the definition of “Disproportionately Impacted Community” under the Colorado Environmental Justice Act (HB21-1266)."),
+               )
+             ),
+          ),
+    tabPanel(title = "Using the Map",
              br(),
-             tags$strong("Understanding the Data"),
              p(
-               "EnviroScreen displays a cumulative impact EnviroScreen score that is derived from relative rankings (percentiles) of individual data indicators. Individual data indicators are aggregated into topic-based scores. These topic-based scores are aggregated further into the Pollution & Climate Burden and Socioeconomics & Demographics scores. The Pollution & Climate Burden and Socioeconomics & Demographics scores are multiplied together to calculate the EnviroScreen score. The EnviroScreen score is the default data visualized on the map. Sub-component scores and individual datasets are also available for display by selecting from the “Select Layer for Map” dropdown above the map." 
+               tags$strong("Using the Map")
+               ,br()
+               ,"The default view of the map shows the state of Colorado. Individual counties, census tracts, or census block groups are color-coded based on their EnviroScreen score. The legend on the right side of the map shows what each color represents. The lighter the color, the worse the EnviroScreen score. Users can zoom in and out, drag the map to a different location, and click on a location to learn more about its EnviroScreen score and scoring details."
+               ,br()
              ),
-    ),
-    tabPanel("Example",
-             br(),
-             tags$strong("Example"),
-      p("A non-profit group wants to apply for a grant it will use to install more air 
-        pollution monitoring in its community. The grant rules say applicants
-        have to show that their community needs the funds. The group knows science-based 
-        information will strengthen its application. The group uses Colorado EnviroScreen
-        to get more information about their community."
+            tags$img(
+                   src="MapElements.jpg",
+                   title = "Map Elements",
+                   width="100%",
+                   height="auto" 
+               ),
+            p(
+              br()
+              ,"To use the map, follow the steps below."
+             ),
+            tags$h4("Step 1: Select your map settings."),
+            p(
+              tags$strong("First, Select Geographic Scale:")
+              ," Use the drop-down menu to view the map at the county level, census tract level, or census block group level. Proceed to"
+              ,tags$em(" Select Layer for Map.")
+            ),
+            br(),
+            p(
+              tags$strong("Next, Select Layer for Map:")
+              ," The default layer displayed on the map is the overall EnviroScreen Score, which is calculated from a variety of data sources. Click on the drop-down menu and scroll through the options to view the individual data sources that feed into the EnviroScreen score. Proceed to"
+              ,tags$em(" Measure or Percentile.")
+            ),
+            br(),
+            p(
+              tags$strong("Third, Select Measure or Percentile:")
+              ," Choose how to display the selected map layer. Measure displays the actual measurement of the data source and is most meaningful for individual data layers such as ozone or asthma hospitalizations. Percentile is like a ranking; the number represents the percentage of the state’s areas that have a lower score compared to the selected area." 
+            ),
+            br(),
+            p(
+              "Once you have made your selections, click"
+              ,tags$strong(" Update Map.")
+              ,"It may take a moment for the map to load."
+            ),
+            p(
+              tags$em("Note: The")
+              ,tags$strong(" Remove Highlighted Areas")
+              ,tags$em(" button on the right side clears the highlighted areas. Users can highlight areas using the data table at the bottom of the tool.")  
+            ),
+            tags$h4("Step 2: Interact with the map."),
+            p(
+              "Individual counties, census tracts, or census block groups are color-coded based on the map layer selected. The legend on the right side of the map shows what these colors represent. The lighter colors mean greater values, which represent a worse EnviroScreen score. Use the icons in the upper left of the map to zoom in and out, search for a specific address, center the map, customize the background map color, or add additional available map layers."
+              ,br()
+              ,br()
+              ,tags$strong("Learn more about an area")
+              ,br()
+              ,"Click an area on the map to learn more. The pop-up window displays the value selected in the settings toolbar above the map. The graph and table below the map display more area-specific information."
+              ,br()
+              ,br()
+              ,tags$strong("Search for an address")
+              ,br()
+              ,"Search for an address, city, ZIP code, or place name using the magnifying glass icon and “Search using OSM Geocoder” search bar."
+              ,br()
+              ,br()
+              ,tags$strong("Customize and add context (additional available map layers)")
+              ,br()
+              ,"On the left side of the map, customize the display by selecting the background map or by adding additional information about oil and gas, coal power plants, Justice40 areas, or disproportionately impacted communities."
+            ),
+            tags$h4("Step 3: Explore the data in another way."),
+            p(
+              "Learn more about a selected area"
+              ,tags$b(" below the map.")
+              ,br()
+              ,br()
+              ,tags$strong("Bar Charts")
+              ,br()
+              ,"The bar chart on the right side of the map illustrates the overall EnviroScreen score and the bar charts below the map illustrate the scores of each of the five components that make up the overall score. The selected area is displayed in orange. These visualizations illustrate whether an area is more or less affected than other parts of the state for each category."
+              ,br()
+              ,br()
+              ,tags$strong("Data Table")
+              ,br()
+              ,"The area selected in the map also filters the data table below the charts. Explore the data by sorting the table. Select a row or rows to highlight the selection in the map. For example, a user could sort the table to find the areas with the highest climate vulnerability score, select rows in the table, and click “Highlight Selection on Map.” The areas selected in the table will be highlighted on the map."
+            )
         ),
-      p("Here’s how the community group would use the tools in Colorado EnviroScreen:",
-        tags$ol(
-          tags$li("They start by using the search feature (magnifying glass in the upper right of map) to find the census tract in which its community office is located."),
-          tags$li("They click this area on the map and scroll below the map to view additional information."),
-          tags$li("They compare their census tract’s overall and component EnviroScreen scores to compare their community with the rest of the state."),
-          tags$li("They download the data for their census tract at the bottom of the page. "),
-          tags$li("They use this information to write a compelling grant application for community air monitors."),
-        )
-      ), 
-    ),
-    tabPanel("Descriptions",
+    tabPanel(title = "Understanding the Data",
              br(),
-             tags$em("EnviroScreen Score"),
-             p("The EnviroScreen sScore combines population characteristics and with environmental burdens. The score goes from 0 to 100, with the highest score representing the highest burden."
-               ,"The EnviroScreen score is a percentile, which is like a ranking. The number represents how many of the state’s counties, census tracts, or census block groups have a lower score than the geography in question."
-               ,"Suppose a census block group has an EnviroScreen score of 50. Thisat means its EnviroScreen score is higher than 50% of all census block groups in Coloradothe state. A score of 90 means its the EnviroScreen score is higher than 90% of all census block groups in Colorado the state."
+             p(
+               tags$strong("Understanding the Data")
+               ,br()
+               ,br()
+               ,tags$strong("EnviroScreen Score")
+               ,br()
+               ,"Colorado EnviroScreen maps the overlap of environmental exposures and effects, climate vulnerability, sensitive populations, and demographics to understand environmental health injustice in Colorado. The EnviroScreen score is derived from relative rankings (percentiles) of individual data indicators. These individual indicators are aggregated into topic-based sub-components, such as climate vulnerability or demographics. These sub-components are aggregated further into the Pollution & Climate Burden and Socioeconomics & Demographics scores. These two scores are multiplied together to get the EnviroScreen score. The EnviroScreen score is the default data visualized on the map. Sub-component scores and individual datasets are also available for display on the map."
+               ,br()
+               ,"A higher EnviroScreen score means the area is more likely to be affected by environmental health injustices."
              ),
+             p(
+               tags$strong("Component Scores")
+               ,br()
+               ,"Users can view the components that make up the EnviroScreen score by selecting either of the Group Component Scores or any of the Individual Component Scores. Each of these scores is made up of multiple individual indicators, which can also be viewed on their own. These component scores represent the impact associated with the category. Like the overall EnviroScreen score, component scores reflect relative rankings (percentiles) of each input dataset" 
+             ),
+             p(
+               tags$strong("Individual Indicators")
+               ,br()
+               ,"Individual data indicators can also be viewed on the map. In the"
+               ,tags$b(" Select Layer for Map") 
+               ," drop-down menu below, these individual indicators are organized under the component they feed into. For example, measures of air quality can be found under Environmental Exposures."
+               ,br()
+               ,"Each individual data indicator represents something different and uses a different unit of measure. For example, some indicators (such as air quality,) are estimated concentrations while others (such as heart disease) are rates of certain health outcomes."
+             ),
+             p(
+               tags$strong("Data Sources")
+               ,br()
+               ,"Indicators included in Colorado EnviroScreen come from a variety of data sources. Many of these sources are from publicly available datasets from state and federal agencies, such as the US Environmental Protection Agency (EPA), the Centers for Disease Control and Prevention (CDC), the Colorado Department of Public Health and Environment (CDPHE), the Colorado Oil and Gas Conservation Commission (COGCC), and others."
+               ,br()
+               ,"Although there are many indicators included in EnviroScreen, some of these indicators are from a few years ago or represent measurements at a larger geographic scale. There are also some environmental exposures, climate impacts, health outcomes, and demographic factors that are not included in EnviroScreen since there are not any reliable data sources available."
+             ),
+          ),
+    tabPanel(title = "Example Use",
+             br(), 
+            p(
+              tags$strong("Example Use")
+              ,br()
+              ,"Here is just one example of how Colorado EnviroScreen can be used by stakeholders to meet their goals."
+              ,br()
+              ,"A non-profit group is applying for a grant to install more air pollution monitoring in its community. The grant rules specify that applicants must show that their community needs the funds. The group knows science-based information will strengthen its application. The group uses Colorado EnviroScreen to get more information about their community."
+              ,br()
+              ,"Here is how the community group could use Colorado EnviroScreen:"
+              ,tags$ol(
+                tags$li("The non-profit staff navigates to the Colorado EnviroScreen webpage")
+                ,tags$li("They use the “Search” feature to find the census tract in which their office is located.")
+                ,tags$li("They click this area on the map and scroll below the map to view additional information.")
+                ,tags$li("They review how the overall and component EnviroScreen scores for their census tract compare with the rest of the state.")
+                ,tags$li("They download the data for their community at the bottom of the page.")
+                ,tags$li("They use this information to write a compelling grant application for community air monitors.")
+              )
+            ), 
+          ),
+    tabPanel(title =  "Definitions",
              br(),
+             p(
+             tags$strong("Definitions")
+             ,br()
+             ,br()
+             ,tags$strong("EnviroScreen Score")
+             ,br()
+             ,"The EnviroScreen Score combines population characteristics and environmental burdens. The score goes from 0 to 100, with the highest score representing the highest burden."
+             ,br()
+             ,"The EnviroScreen score is a percentile, which is like a ranking. The number represents how many of the state’s counties, census tracts, or census block groups have a lower score than the geography in question."
+             ,br()
+             ,"Suppose a census block group has an EnviroScreen score of 50. This means its EnviroScreen score is higher than 50% of all census block groups in Colorado. A score of 90 means its EnviroScreen score is higher than 90% of all census block groups in Colorado."
+             ,br()
+             ,br()
+             ,tags$strong("Environmental Exposures")
+             ,br()
+             ,"The Environmental Exposures score represents a community’s exposure to certain harmful environmental pollutants relative to the rest of the state. It does not represent all environmental pollutants.It is the average of data for air toxics, fine particles, traffic proximity, ozone, noise, drinking water quality,  lead exposure risk, and other air pollutants. Ranging from 0 to 100, the higher the score, the higher the burden."
+             ,br()
+             ,br()
+             ,tags$strong("Environmental Effects")
+             ,br()
+             ,"This score represents how many facilities that can cause pollution or other health and safety risks are in a community relative to the rest of the state. Because most people are not directly exposed to these sites, this score is weighted half as much as environmental exposures in the overall environmental burden score. The score is the average of data involving proximity to oil and gas facilities, mining locations, National Priority List (Superfund) sites, wastewater discharge facilities, impaired surface waters, and risk management plans (RMPs). Ranging from 0 to 100, the higher the score, the higher the burden."
+             ,br()
+             ,br()
+             ,tags$strong("Climate Burden")
+             ,br()
+             ,"This score represents a community’s risk of drought, flood, extreme heat, and wildfire relative to the rest of the state. Ranging from 0 to 100, the higher the score, the higher the burden."
+             ,br()
+             ,br()
+             ,tags$strong("Sensitive Populations")
+             ,br()
+             ,"This score captures a community’s potential biological susceptibility to environmental exposures and climate risks. For example, air pollution has stronger impacts on older and younger people, and people with chronic conditions such as asthma. The result is calculated using data about asthma, cancer, diabetes, heart disease, low weight birth, mental health, and the numbers of people over 64 years and under 5 years. Ranging from 0 to 100, the higher the score, the higher the burden."
+             ,br()
+             ,br()
+             ,tags$strong("Demographics ")
+             ,br()
+             ,"This score represents a community’s social vulnerability. It is calculated using data about education levels, linguistic isolation, income, housing cost burden, and race & ethnicity. Ranging from 0 to 100, the higher the score, the higher the social vulnerability."
+             ,br()
+             ,br()
+             ,tags$strong("Disproportionately Impacted Community")
+             ,br()
+             ,'This term refers to areas that meet the definition of "Disproportionately Impacted Community” in the Colorado Environmental Justice Act (House Bill 21-1266). The definition includes census block groups where more than 40% of the population are low-income, housing cost-burdened, or people of color. “Low-income” means that median household income is at or below 200% of the federal poverty line. “Housing cost-burdened” means that a household spends more than 30% of its income on housing costs. “People of color” includes all people who do not identify as non-Hispanic white.'
+             ,br()
+             ,br()
+             ,tags$strong("Coal Community")
+             ,br()
+             ,"All census tracts and block groups within counties that have a coal-burning power plant are designated as coal communities."
+             ,br()
+             ,br()
+             ,tags$strong("Oil and Gas Community")
+             ,br()
+             ,"All census tracts and block groups within counties that have active oil and gas operations are designated as oil and gas communities."
+             ,br()
+             ,br()
+             ,tags$strong("Urban/Rural")
+             ,br()
+             ,"The U.S. Census Bureau's `urban areas` are densely populated and include residential, commercial, and other properties; counties that include these urban areas are considered urban. All counties not included within urban centers are considered rural counties."
+             ,br()
+             ,br()
+             ,tags$strong("Justice40")
+             ,br()
+             ,"In early 2022, the White House launched the Justice40 Initiative. The goal of the Justice40 Initiative is to provide 40 percent of the overall benefits of certain Federal investments in seven key areas to disadvantaged communities. These seven key areas are: climate change, clean energy and energy efficiency, clean transit, affordable and sustainable housing, training and workforce development, the remediation and reduction of legacy pollution, and the development of critical clean water infrastructure. According to the definition of Justice40, a community qualifies as “disadvantaged,” if the census tract is above the threshold for one or more environmental or climate indicators and the tract is above the threshold for the socioeconomic indicators."
+             ,br()
+             ,br()
+             ,tags$strong("Bar Charts")
+             ,br()
+             ,"The EnviroScreen Score combines five components. When you click a location on the map, the orange bars in each chart show the score for that location, illustrating how it compares to the rest of Colorado for each component score. Together, the five charts show how the EnviroScreen score is calculated for the selected location."
+             ,br()
+          ),
+
     ),
     tabPanel("FAQ",
              br(),
-             tags$em("Frequently Asked Questions"),
-  
-             tags$iframe(src = "https://docs.google.com/document/d/15XVihyI1_i7oMdQvoT0gbARBQvKhCaPI1FkU2Ua8U_k/edit?usp=sharing", seamless=NA,
-                         width = "100%", height = 800), 
-             br(),
+             p(
+               tags$a(
+                 href = "https://docs.google.com/document/d/1_GEjGbOd3CmXwZu09QJ9oO4ZI8hqXtFwZAAeTsNV5lQ/edit?usp=sharing"
+                 ,tags$em("Frequently Asked Questions")
+                 , target = "_blank"
+               ) 
+             )
+      ),
     ),
-    ),
-
-
-
-
   # Select Reactive Elements ------------------------------------------------
   # content for the reactive elements of the map
   br(), 
@@ -369,10 +513,6 @@ ui <- fluidPage(
 
   ),
 
-  # describe indicators -----------------------------------------------------
-  # sentence explaining the indicators
-  #    # add selection to map button 
-  # tags$blockquote(textOutput("indicatorDesc")),
   # show plots --------------------------------------------------------------
   # plot of the datasets
   br(),
@@ -394,21 +534,21 @@ ui <- fluidPage(
            h2("EnviroScreen Score Data"),
            p("Use the tabs above  the table to filter through different elements of the
     Colorado EnviroScreen Score. You can select specific rows in the table, then hit the
-    Blue `Highlight Selection on Map` button in the upper right to view the location on the map."),
+    Orange `Highlight Selection on Map` button in the upper right to view the location on the map."),
 
   ),
-
+  fluidRow(class = "dataTableArea",
+  radioGroupButtons(inputId = "tableSelect", label = "",
+                    choices = c("Group Component Scores", "Component Score",
+                                "Environmental Exposures", "Environmental Effects",
+                                "Climate Vulnerability", "Sensitive Population",
+                                "Demographics", "Other Map Layers"),
+                    justified = TRUE),
+  # data table output ----
+  # changed to just single table
+  DT::dataTableOutput("tableAll")
+  ),
   
-  # Output: Tabset w/ plot, summary, and table ----
-  tabsetPanel(type = "tabs",
-              tabPanel("Group Component Scores", DT::dataTableOutput("gcomponentScore")),
-              tabPanel("Component Score", DT::dataTableOutput("componentScore")),
-              tabPanel("Environmental exposures", dataTableOutput("evnEx")),
-              tabPanel("Environmental Effects", dataTableOutput("evnEf")),
-              tabPanel("Climate vulnerability", dataTableOutput("clim")),
-              tabPanel("Sensitive population", dataTableOutput("senPop")),
-              tabPanel("Demographics", dataTableOutput("socEco")),
-              tabPanel("Extra Evaluations", dataTableOutput("exEval"))),
   # download table option  --------------------------------------------------
   fluidRow(
     column(4,
@@ -425,7 +565,7 @@ ui <- fluidPage(
   ),
   br(),
   
-  fluidRow(    class = "titleElement", 
+  fluidRow( class = "titleElement", 
                column(8,   
                       h3("Additional Resources"),
                       p(class = "href2",
@@ -443,8 +583,8 @@ ui <- fluidPage(
       tags$img(
         src="EnviroScreen Logos/co_cdphe_pr_es_white_v.png",
         title = "Colorado Department of Public Health and Environment",
-        width="90%",
-        height="90%" 
+        width="100%",
+        height="auto" 
         )
       )
     )
@@ -474,7 +614,7 @@ server <- function(input, output,session) {
               oil=oil, rural = rural, coal = coal, justice40 = justice40)
     })
 
-# indicator summary -------------------------------------------------------
+  # indicator summary -------------------------------------------------------
   # output for indicator summary'
   desc1 <- descriptors
   output$indicatorDesc <- renderText({
@@ -484,7 +624,7 @@ server <- function(input, output,session) {
   })
 
 
-# histogram plots ---------------------------------------------------------
+  # histogram plots ---------------------------------------------------------
   # if input changes reset map value 
   plotGroup <- c( "Colorado EnviroScreen Score", "Environmental exposures","Environmental effects",
                   "Climate vulnerability","Sensitive population","Demographics")
@@ -509,111 +649,43 @@ server <- function(input, output,session) {
     genPlots(dataframe = df1(),parameter = "Demographics", geoid = input$mymap_shape_click)
   })
     
-# table output ------------------------------------------------------------   
-  # output for datatable
+  # table output ------------------------------------------------------------  
+  # output for datatable based on columns selected
+  
   tableData <- reactive({
     geoid1 <- input$mymap_shape_click
     if(is.null(geoid1$id)){
       geoid1 <- 1
     }
-    genTable(tableData = df1(), geoid = geoid1)
+    genTable(tableData = df1(), geoid = geoid1, colSelected = input$tableSelect)
   })
   
+  # storing GEOIDs from table/map selection -------------------------------------
+  RV<-reactiveValues()
   
-  # click observer event ----------------------------------------------------
-  ### each table has it's own observer that assigned to the same variable. 
-  ### this allows only selection from specific table to be added to map 
-  observeEvent(input$gcomponentScore_rows_selected, {
-    s1 <- input$gcomponentScore_rows_selected  # typo was on this line
-    print(s1)
-    RV$Clicks <- tableData()[[1]][[1]][s1]
-    print(RV$Clicks)
-  })
-  observeEvent(input$componentScore_rows_selected, {
-    s1 <- input$componentScore_rows_selected 
-    RV$Clicks <- tableData()[[2]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
-  })
-  observeEvent(input$evnEx_rows_selected, {
-    s1 <- input$evnEx_rows_selected 
-    RV$Clicks <- tableData()[[3]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
-  })
-  observeEvent(input$evnEf_rows_selected, {
-    s1 <- input$evnEf_rows_selected 
-    RV$Clicks <- tableData()[[4]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
-  })
-  observeEvent(input$clim_rows_selected, {
-    s1 <- input$clim_rows_selected 
-    RV$Clicks <- tableData()[[5]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
-  })
-  observeEvent(input$senPop_rows_selected, {
-    s1 <- input$senPop_rows_selected 
-    RV$Clicks <- tableData()[[6]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
-  })
-  observeEvent(input$socEco_rows_selected, {
-    s1 <- input$socEco_rows_selected 
-    RV$Clicks <- tableData()[[7]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
-  })
-  observeEvent(input$exEval_rows_selected, {
-    s1 <- input$exEval_rows_selected 
-    RV$Clicks <- tableData()[[8]]%>% setDF() %>% select("GEOID") %>%dplyr::slice(s1) %>% pull()
+  observeEvent(input$tableAll_rows_selected, {
+    RV$select <- isolate(tableData() %>% dplyr::slice(input$tableAll_rows_selected) %>% pull(GEOID))
   })
   
   observeEvent(input$mymap_shape_click, {
-    clickId <- input$mymap_shape_click$id
-    
-    
-    dataTableProxy("gcomponentScore") %>%
-      replaceData(tableData()[[1]]) %>%
-      selectRows(which(tableData()[[1]]$GEOID == clickId))
-    
-    
-    dataTableProxy("componentScore") %>%
-      replaceData(tableData()[[2]]) %>%
-      selectRows(which(tableData()[[2]]$GEOID == clickId))
-    
-    dataTableProxy("evnEx") %>%
-      selectRows(which(tableData()[[3]]$GEOID == clickId))
-    
-    
-    dataTableProxy("evnEf") %>%
-      selectRows(which(tableData()[[4]]$GEOID == clickId))
-    
-    
-    dataTableProxy("clim") %>%
-      selectRows(which(tableData()[[5]]$GEOID == clickId))
-    
-    
-    dataTableProxy("senpop") %>%
-      selectRows(which(tableData()[[6]]$GEOID == clickId))
-    
-    
-    dataTableProxy("socEco") %>%
-      selectRows(which(tableData()[[7]]$GEOID == clickId))
-    dataTableProxy("exEval") %>%
-      selectRows(which(tableData()[[8]]$GEOID == clickId))
-    
-    
+    RV$select <- isolate(input$mymap_shape_click$id)
+  })
+  
+  
+  # Render the table outputs ------------------------------------------------
+  
+  output$tableAll <- renderDataTable({
+    DT::datatable(tableData(), 
+                  options = list(autoWidth = TRUE, scrollX = TRUE))
+    #selection = list(mode = 'multiple', selected = which(tableData()$GEOID %in% RV$select)))
+  })
+  
+  # Table proxy for selection
+  observe({
+    DT::dataTableProxy("tableAll") %>% 
+      selectRows(which(tableData()$GEOID %in% RV$select))
   })
 
-  # Render the table outputs ------------------------------------------------
-
-  # group component scores 
-  output$gcomponentScore <- renderDataTable(tableData()[[1]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # component Score
-  output$componentScore <- renderDataTable(tableData()[[2]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # enviromental exposures Score
-  output$evnEx <- renderDataTable(tableData()[[3]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # enviromental effects Score
-  output$evnEf <- renderDataTable(tableData()[[4]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # climate Score
-  output$clim <- renderDataTable(tableData()[[5]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # Sensitive Population Score
-  output$senPop <-  renderDataTable(tableData()[[6]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # Social Eco Score
-  output$socEco <- renderDataTable(tableData()[[7]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  # Extra Evaluations
-  output$exEval <- renderDataTable(tableData()[[8]],options = list(autoWidth = TRUE, scrollX = TRUE))
-  
   # download data -----------------------------------------------------------
   # Downloadable csv of selected dataset ----
   output$downloadData <- downloadHandler(
@@ -627,7 +699,7 @@ server <- function(input, output,session) {
   
 
   
-# proxy map elements  -----------------------------------------------------
+  # proxy map elements  -----------------------------------------------------
   observeEvent(input$updateMap, {
     ### helpful source https://stackoverflow.com/questions/37433569/changing-leaflet-map-according-to-input-without-redrawing
     # geography 
@@ -649,10 +721,7 @@ server <- function(input, output,session) {
     ed2 <- envoData[envoData$area == geo, ]
     ed2 <- ed2 %>%
       mutate(visParam = !!as.symbol(indicator))%>%# https://stackoverflow.com/questions/62862705/r-shiny-mutate-replace-how-to-mutate-specific-column-selected-from-selectinput
-      dplyr::select(GEOID, `County Name`, indicator1, indicator2,`Coal Community`,`Oil and Gas Community`,`Rural Community`,visParam)%>%
-      dplyr::mutate("stateAverageValue" = mean(indicator1),
-                    "stateAverageScore" = mean(indicator2))
-    
+      dplyr::select(GEOID, `County Name`, indicator1, indicator2,`Coal Community`,`Oil and Gas Community`,`Rural Community`,visParam)
       
     ed2 <- ed2 %>%
       dplyr::mutate(
@@ -708,7 +777,7 @@ server <- function(input, output,session) {
   })
   # add selected features to map 
   observeEvent(input$button_table, {
-    mapFeatures <- envoData %>% select("GEOID") %>% dplyr::filter(GEOID %in% RV$Clicks)
+    mapFeatures <- envoData %>% select("GEOID") %>% dplyr::filter(GEOID %in% RV$select)
       # add features to map 
       leafletProxy("mymap") %>%
         clearGroup(group = "Table Highlight") %>%
@@ -737,5 +806,4 @@ server <- function(input, output,session) {
 
 # Run the application
 shinyApp(ui = ui, server = server)
-## display in browser for styling elements 
-# options = list(launch.browser = TRUE)
+

@@ -112,6 +112,12 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
                  position = 'topright',
                  group = "Coal Community",
                  labelStyle = "font-size: 16")%>%
+  addLegend("topright",
+              colors = "#fb9a99", 
+              labels = "Justice40 Community",
+              opacity = 1,
+              group = "Justice40"
+    )%>%
   # add control groups ------------------------------------------------------
   addLayersControl(
     baseGroups = c("Light","Dark", "OpenStreetMap"),

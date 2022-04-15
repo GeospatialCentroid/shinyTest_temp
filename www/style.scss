@@ -100,7 +100,7 @@ a.search-button,a.leaflet-control-layers-toggle{
 
 /* Make selection labels bold*/
 label.control-label {
-        font-size: 28px;
+        font-size: 20px;
         font-weight: bold;
 }
 
@@ -131,3 +131,26 @@ label.control-label {
 div.tab-content{
   margin: 10px 50px
 }
+
+
+/*style for data table*/ 
+div.row.dataTableArea{
+  margin: 0px 20px;
+}
+
+
+/* style select tabs for table */
+
+button.btn.radiobtn.btn-default.active{
+  background-color: #5f7774 !important;
+  border-top-left-radius: 10px !important;
+  border-top-right-radius: 10px!important;
+}
+
+button.btn.radiobtn.btn-default{
+  background-color: #739849 !important;
+  border-top-left-radius: 10px !important;
+  border-top-right-radius: 10px!important;
+
+}
+
