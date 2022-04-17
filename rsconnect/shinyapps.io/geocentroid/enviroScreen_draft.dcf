@@ -5,9 +5,9 @@ account: geocentroid
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5307337
-bundleId: 5803816
+bundleId: 5807116
 url: https://geocentroid.shinyapps.io/enviroScreen_draft/
-when: 1650065102.38128
-lastSyncTime: 1650065102.38128
+when: 1650211238.44746
+lastSyncTime: 1650211238.44746
 asMultiple: FALSE
 asStatic: FALSE

@@ -77,12 +77,12 @@ genTable <- function(tableData, geoid, colSelected){
         "Impaired Surface Water",
         "Proximity to hazardous waste facilities Percentile",
         "Proximity to hazardous waste facilities",
-        "Proximiy to Mining and Smelting Percentile",
-        "Proximiy to Mining and Smelting",
+        "Proximity to Mining Percentile",
+        "Proximity to Mining",
         "Proximity to National Priorities List (NPL) sites Percentile",
         "Proximity to National Priorities List (NPL) sites",
-        "Proximiy to Oil and Gas Percentile",
-        "Proximiy to Oil and Gas",
+        "Proximity to Oil and Gas Percentile",
+        "Proximity to Oil and Gas",
         "Proximity to RMP sites Percentile", 
         "Proximity to RMP sites",
         "Wastewater discharge indicator Percentile",
@@ -205,8 +205,8 @@ genTable <- function(tableData, geoid, colSelected){
 #                                   ,"Proximity to National Priorities List (NPL) sites Percentile","Proximity to National Priorities List (NPL) sites"
 #                                   ,"Proximity to RMP sites Percentile","Proximity to RMP sites"
 #                                   ,"Proximity to hazardous waste facilities Percentile","Proximity to hazardous waste facilities"
-#                                   ,"Proximiy to Oil and Gas Percentile","Proximiy to Oil and Gas"
-#                                   ,"Proximiy to Mining and Smelting Percentile","Proximiy to Mining and Smelting"
+#                                   ,"Proximity to Oil and Gas Percentile","Proximity to Oil and Gas"
+#                                   ,"Proximity to Mining Percentile","Proximity to Mining"
 #                                   ,"Impaired Surface Water Percentile","Impaired Surface Water"
 #                                   ) 
 #   clm <- table1 %>% dplyr::select("GEOID","County Name"

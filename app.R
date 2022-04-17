@@ -122,24 +122,30 @@ ui <- fluidPage(
            column(3, ),
            column(6, 
                   p(id="links2"
-                    ,tags$b("You’re invited to beta test EnviroScreen")
+                    ,tags$b("We want to know",
+                            tags$b(" WHAT YOU THINK"),
+                            " about Colorado EnviroScreen!")
                     ,br()
-                    ,"Leave us your feedback by completing the "
+                    ,"Please respond to our"
+                    ,tags$b(" POLL")
+                    ," ("
                     ,tags$a(
-                      href = "https://colostate.az1.qualtrics.com/jfe/preview/SV_5gPbsdID0XEwNAa?Q_CHL=preview&Q_SurveyVersionID=current",
-                      "questionnaire.", target = "_blank")
-                    ,br()
-                    ,"Consider joining a virtual"
+                      href = "https://colostate.az1.qualtrics.com/jfe/form/SV_5gPbsdID0XEwNAa",
+                      " English", target = "_blank")
+                    ,"/"
+                    ,tags$a(
+                      href = "https://colostate.az1.qualtrics.com/jfe/form/SV_ekA4ajdLdxE4JyS",
+                      " Español", target = "_blank")
+                    ," by Sunday, May 1, 2022, and/or register for a virtual"
                     ,tags$a(
                       href = "https://calendly.com/ibe-csu/enviroscreen-public-meeting?month=2022-04",
-                      " community meeting",  target = "_blank"
+                      " COMMUNITY MEETING",  target = "_blank"
                     )
-                    , " from 6-7:30 p.m. Monday, April 25 to see a demonstration of and give feedback on Colorado EnviroScreen."
+                    , " from 6-7:30 p.m. Monday, April 25."
                     ,br()
                   )
            ),
            column(3),
-
   ),
   
   fluidRow(
@@ -469,9 +475,9 @@ ui <- fluidPage(
           "Environmental effects" = c(
             "Impaired Surface Water",
             "Proximity to hazardous waste facilities",
-            "Proximiy to Mining and Smelting",
+            "Proximity to Mining",
             "Proximity to National Priorities List (NPL) sites",
-            "Proximiy to Oil and Gas",
+            "Proximity to Oil and Gas",
             "Proximity to RMP sites",              
             "Wastewater discharge indicator" 
           ),
@@ -589,6 +595,35 @@ ui <- fluidPage(
     )
   ),
   br(),
+  fluidRow(class = "links",
+           column(3, ),
+           column(6, 
+                  p(id="links2"
+                    ,tags$b("We want to know",
+                            tags$b(" WHAT YOU THINK"),
+                            " about Colorado EnviroScreen!")
+                    ,br()
+                    ,"Please respond to our"
+                    ,tags$b(" POLL")
+                    ," ("
+                    ,tags$a(
+                      href = "https://colostate.az1.qualtrics.com/jfe/form/SV_5gPbsdID0XEwNAa",
+                      " English", target = "_blank")
+                    ,"/"
+                    ,tags$a(
+                      href = "https://colostate.az1.qualtrics.com/jfe/form/SV_ekA4ajdLdxE4JyS",
+                      " Español", target = "_blank")
+                    ," by Sunday, May 1, 2022, and/or register for a virtual"
+                    ,tags$a(
+                      href = "https://calendly.com/ibe-csu/enviroscreen-public-meeting?month=2022-04",
+                      " COMMUNITY MEETING",  target = "_blank"
+                    )
+                    , " from 6-7:30 p.m. Monday, April 25."
+                    ,br()
+                  )
+           ),
+           column(3),
+  ),
   
   fluidRow( class = "titleElement", 
                column(8,   
@@ -603,6 +638,7 @@ ui <- fluidPage(
            tags$span(style="color:white","Spanish"), target = "_blank"),
     ")."
                       ), ),
+    
     column(4,tags$a(
       href = "https://cdphe.colorado.gov/enviroscreen",
       tags$img(
@@ -614,6 +650,7 @@ ui <- fluidPage(
       )
     )
   ),
+  
 )
 
 # Define server logic required to draw a histogram
