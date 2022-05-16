@@ -1,4 +1,4 @@
-genPlots <- function(dataframe, parameter, geoid = NULL){
+genPlots <- function(dataframe, parameter, geometry, geoid = NULL){
   # setting text for font elements 
   if(parameter == "Colorado EnviroScreen Score"){
     # font for title  
@@ -26,11 +26,24 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
               b = 20, t = 30,
               pad = 10)
   
+
   
   # filter to input parameter 
   df1 <- dataframe %>% 
     dplyr::select("value" = parameter, GEOID) %>%
     as.data.frame()
+  
+  # condition for y axis label 
+  if(geometry == "County"){
+    yaxisLabel <- "Number of Counties"
+  }
+  if(geometry == "Census Tract"){
+    yaxisLabel <- "Number of Census Tracts"
+  }
+  if(geometry == "Census Block Group"){
+    yaxisLabel <- "Number of Census Block Groups"
+  }
+  
   # construct histograms to get bin splits
   t1 <- hist(df1$value)
   # determine bins of histogram feature
@@ -65,7 +78,7 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
                         tickvals = list(minBin,maxBin),
                         tickmode = "array",
                         tickangle = 45),
-           yaxis = list(title = "Number of Areas"),
+           yaxis = list(title = yaxisLabel),
            plot_bgcolor = bg_color,
            font = fontBody,
            margin = mrg)%>%
@@ -99,7 +112,7 @@ genPlots <- function(dataframe, parameter, geoid = NULL){
                            tickvals = list(minBin,maxBin),
                            tickmode = "array",
                            tickangle = 45),
-        yaxis = list(title = "Number of Areas"),
+        yaxis = list(title = yaxisLabel),
         plot_bgcolor = bg_color, 
         font = fontBody,
         margin = mrg)%>%

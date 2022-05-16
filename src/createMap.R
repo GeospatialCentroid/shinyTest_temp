@@ -9,7 +9,7 @@
 #' @export
 #'
 #'
-createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice40) {
+createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice40, storyMaps) {
 
   map <- leaflet(options = leafletOptions(minZoom = 6)) %>%
     setView( lng = -105.76356278240084
@@ -70,6 +70,15 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
       weight = 1,
       group = "Justice40"
     )%>%
+    addCircleMarkers(
+      data = storyMaps,
+      label = ~Area,
+      popup = ~popup,
+      fillColor = "goldenrod",
+      fillOpacity = 1,
+      stroke = F,
+      group = "Story Maps"
+    )%>%
     # add legend --------------------------------------------------------------
   addLegend(
     "topright",
@@ -114,7 +123,7 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
                  labelStyle = "font-size: 16")%>%
   addLegend("topright",
               colors = "#fb9a99", 
-              labels = "Justice40 Community",
+              labels =  "Justice40 Community",
               opacity = 1,
               group = "Justice40"
     )%>%
@@ -127,7 +136,8 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
       "Rural Community",
       "Oil and Gas Community",
       "Disproportionately Impacted Community",
-      "Justice40"
+      "Justice40",
+      "Story Maps"
     ),
     position = "topleft", 
     options = layersControlOptions(collapsed = TRUE))%>%
@@ -144,7 +154,8 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
         "Rural Community",
         "Oil and Gas Community",
         "Disproportionately Impacted Community",
-        "Justice40"))
+        "Justice40",
+        "Story Maps"))
 
   return(map)
 }

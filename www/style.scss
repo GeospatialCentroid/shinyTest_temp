@@ -71,6 +71,7 @@ a.nav-link{
   justify-content: center !important;
   width: 100%;
   margin-bottom: 10px;
+
 }
 
 
@@ -123,7 +124,7 @@ label.control-label {
 #removeHighlight {
   margin: 25px 30px !important;
 }
-#downloadData, #button_table{
+#downloadData, #downloadData2, #button_table{
   margin: 5px 10px !important;
 }
 
@@ -170,5 +171,12 @@ p#links2{
   margin: 10px, 50px !important;
   color: #FFFFFF;
   
+}
+
+/*images*/
+img{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 

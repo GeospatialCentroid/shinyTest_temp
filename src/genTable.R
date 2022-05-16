@@ -152,6 +152,9 @@ genTable <- function(tableData, geoid, colSelected){
         "Disproportionately Impacted Community",
         "Justice 40 Community","Coal Community",
         "Oil and Gas Community","Rural Community"
+      )%>%
+      dplyr::mutate(
+        "Population" = NA 
       )
   } 
   
