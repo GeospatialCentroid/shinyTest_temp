@@ -57,6 +57,7 @@ a.nav-link{
   color: #FFFFFF !important;
   background-color:  #739849;
   font-size: 18px;
+  border-color: black;
 }
 
 /* stlying for selected tab */
@@ -71,6 +72,7 @@ a.nav-link{
   justify-content: center !important;
   width: 100%;
   margin-bottom: 10px;
+  
 
 }
 
@@ -80,6 +82,8 @@ a.nav-link{
 div.row.titleElement{
   background:#6d3a5d;
   color: #FFFFFF;
+  display: flex;
+  align-items: center;
 }
 
 /*section header elements*/ 
