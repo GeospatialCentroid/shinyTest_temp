@@ -9,7 +9,7 @@
 #'
 #' @examples
 #' 
-addPolyLine <- function(map, sf1, group){
+addPolyLine <- function(map, sf1, group, popup){
   ### data : sf file of poly line feature 
   ### group : name of group to use in feature control.
   output <- addPolylines(map,
@@ -19,6 +19,7 @@ addPolyLine <- function(map, sf1, group){
     weight = 2,
     layerId = group,
     options = pathOptions(pane = "binary"),
+    popup = popup,
     group = group)
   
   return(output)

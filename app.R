@@ -25,7 +25,7 @@ envoData <- readRDS(paste0("data/scores/allScores_",version,".rds"))%>%
   dplyr::select(-"GEOID3")
 
 
-# Additional Data 
+# Additional Data   
 oil <- readRDS("data/scores/oilgasVis.rds") 
 coal <- readRDS("data/scores/coalVis.rds")
 rural <- readRDS("data/scores/ruralVis.rds")

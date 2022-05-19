@@ -10,15 +10,19 @@
 #'
 #'
 createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice40, storyMaps) {
-
+  #story map icon 
+  sm_Icon <- makeIcon("www/StoryMaps.png",
+                      iconWidth = 40,
+                      iconHeight = 40)
+  
   map <- leaflet(options = leafletOptions(minZoom = 6)) %>%
     setView( lng = -105.76356278240084
              , lat = 39.13085942963124
              , zoom = 7 )%>%
     # add z levels ------------------------------------------------------------
   addMapPane("index", zIndex = 408) %>%
-    addMapPane("binary", zIndex = 409) %>%
-    addMapPane("di", zIndex = 410) %>%
+    addMapPane("binary", zIndex = 409) %>% # for the addPolyLine objects
+    addMapPane("elements", zIndex = 410) %>%
     # add tiles ---------------------------------------------------------------
   addProviderTiles("CartoDB.DarkMatter", group = "Dark") %>%
     addProviderTiles("OpenStreetMap", group = "OpenStreetMap")%>%
@@ -49,9 +53,12 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
     layerId = mapData$GEOID,
     group = "Indicator Score"
   )%>%
-    addPolyLine(sf1 = oil, group = "Oil and Gas Community") %>%
-    addPolyLine(sf1 = rural, group = "Rural Community") %>%
-    addPolyLine(sf1 = coal, group = "Coal Community") %>%
+    addPolyLine(sf1 = oil, group = "Oil and Gas Community", 
+                popup = "adding definition") %>%
+    addPolyLine(sf1 = rural, group = "Rural Community", 
+                popup = "adding definition") %>%
+    addPolyLine(sf1 = coal, group = "Coal Community", 
+                popup = "adding definition") %>%
     addPolygons(
       data = di,
       fillColor =  ~diPal(`color`),
@@ -59,7 +66,8 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
       weight = 1,
       fillOpacity = 0.8,
       popup = di$popup,
-      group = "Disproportionately Impacted Community"
+      group = "Disproportionately Impacted Community",
+      options = pathOptions(pane = "elements")
     )%>%
     addPolygons(
       data = justice40,
@@ -68,16 +76,19 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
       fillOpacity = 0.8,
       color = "#636363",
       weight = 1,
-      group = "Justice40"
+      group = "Justice40",
+      options = pathOptions(pane = "elements")
     )%>%
-    addCircleMarkers(
+    addMarkers(
       data = storyMaps,
       label = ~Area,
       popup = ~popup,
-      fillColor = "goldenrod",
-      fillOpacity = 1,
-      stroke = F,
-      group = "Story Maps"
+      # fillColor = "goldenrod",
+      # fillOpacity = 1,
+      # stroke = F,
+      group = "Story Maps",
+      options = pathOptions(pane = "elements"),
+      icon = sm_Icon
     )%>%
     # add legend --------------------------------------------------------------
   addLegend(
@@ -89,45 +100,45 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
     layerId = "firstLegend",
     group = "Indicator Score",
     na.label = "No Data"
-
+    
     # labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))
   ) %>%
-  addLegend("topright",
-            colors = c("#a6cee3", "#33a02c","#b2df8a","#1f78b4"), 
-            title = "Disproportionately Impacted Community",
-            labels = c("Low Income", "People of Color",
-                       "Housing Burden", "More then one category"),
-            opacity = 1,
-            group = "Disproportionately Impacted Community"
-            )%>%
-  addLegendImage(images = "www/oilGas.png",
-                 labels = "Oil and Gas Community",
-                 width = 25,
-                 height = 25,
-                 position = 'topright',
-                 group = "Oil and Gas Community",
-                 labelStyle = "font-size: 16")%>%
-  addLegendImage(images = "www/rural.png",
-                 labels = "Rural Community",
-                 width = 25,
-                 height = 25,
-                 position = 'topright',
-                 group = "Rural Community",
-                 labelStyle = "font-size: 16")%>%
-  addLegendImage(images = "www/coal.png",
-                 labels = "Coal Community",
-                 width = 25,
-                 height = 25,
-                 position = 'topright',
-                 group = "Coal Community",
-                 labelStyle = "font-size: 16")%>%
-  addLegend("topright",
+    addLegend("topright",
+              colors = c("#a6cee3", "#33a02c","#b2df8a","#1f78b4"), 
+              title = "Disproportionately Impacted Community",
+              labels = c("Low Income", "People of Color",
+                         "Housing Burden", "More than one category"),
+              opacity = 1,
+              group = "Disproportionately Impacted Community"
+    )%>%
+    addLegendImage(images = "www/oilGas.png",
+                   labels = "Oil and Gas Community",
+                   width = 25,
+                   height = 25,
+                   position = 'topright',
+                   group = "Oil and Gas Community",
+                   labelStyle = "font-size: 16")%>%
+    addLegendImage(images = "www/rural.png",
+                   labels = "Rural Community",
+                   width = 25,
+                   height = 25,
+                   position = 'topright',
+                   group = "Rural Community",
+                   labelStyle = "font-size: 16")%>%
+    addLegendImage(images = "www/coal.png",
+                   labels = "Coal Community",
+                   width = 25,
+                   height = 25,
+                   position = 'topright',
+                   group = "Coal Community",
+                   labelStyle = "font-size: 16")%>%
+    addLegend("topright",
               colors = "#fb9a99", 
               labels =  "Justice40 Community",
               opacity = 1,
               group = "Justice40"
     )%>%
-  # add control groups ------------------------------------------------------
+    # add control groups ------------------------------------------------------
   addLayersControl(
     baseGroups = c("Light","Dark", "OpenStreetMap"),
     overlayGroups = c(
@@ -156,6 +167,6 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
         "Disproportionately Impacted Community",
         "Justice40",
         "Story Maps"))
-
+  
   return(map)
 }

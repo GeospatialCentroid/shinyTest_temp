@@ -57,7 +57,8 @@ a.nav-link{
   color: #FFFFFF !important;
   background-color:  #739849;
   font-size: 18px;
-  border-color: black;
+  border-color: black !important;
+  border-width: 2px;
 }
 
 /* stlying for selected tab */
