@@ -55,8 +55,8 @@ a{
 
 /* stlying for all tabset panels */
 a.nav-link{
-  color: #FFFFFF !important;
-  background-color:  #739849;
+  color: #FFFFFF; 
+  background-color: #739849;
   font-size: 18px;
   border-color: #3f5657 !important;
   border-width: 1px;
@@ -76,8 +76,6 @@ a.nav-link{
   justify-content: center !important;
   width: 100%;
   margin-bottom: 10px;
-  
-
 }
 
 
@@ -96,11 +94,7 @@ div.row.sectionTitle{
   color: #FFFFFF;
   margin: 10px;
 }
-
-
-div.row.plotArea{
-}
-
+  
 
 /* Make map buttons yellow*/
 a.search-button,a.leaflet-control-layers-toggle{
