@@ -43,12 +43,13 @@ shiny-text-output shiny-bound-output{
 
 /* active page button on table*/ 
 .page-item.active .page-link{
-  background-color: #739849 !important;
+  background-color: #739849;
 }
 
 
 /* text color for hyperlink blue */
-a{color: #0000FF;
+a{
+  color: #0000FF;
   text-decoration: underline;
 }
 
@@ -57,13 +58,15 @@ a.nav-link{
   color: #FFFFFF !important;
   background-color:  #739849;
   font-size: 18px;
-  border-color: black !important;
-  border-width: 2px;
+  border-color: #3f5657 !important;
+  border-width: 1px;
 }
 
 /* stlying for selected tab */
-.nav-tabs .nav-link.active, .nav-tabs>li>a.active,{
-    background: #5f7774;
+//.nav-tabs .nav-link.active, .nav-tabs>li>a.active,{
+//This change in element ID fixed the tabset color issue when running on different machines
+.nav-tabs>li.active>a{
+    background-color: #5f7774 !important;
     color: #FFFFFF !important;
 }
 
@@ -151,12 +154,14 @@ button.btn.radiobtn.btn-default.active{
   background-color: #5f7774 !important;
   border-top-left-radius: 10px !important;
   border-top-right-radius: 10px!important;
+  border-color: #3f5657 !important;
 }
 
 button.btn.radiobtn.btn-default{
   background-color: #739849 !important;
   border-top-left-radius: 10px !important;
   border-top-right-radius: 10px!important;
+  border-color: #3f5657 !important;
 
 }
 

@@ -190,7 +190,7 @@ ui <- fluidPage(
                  tags$li("Provide information to empower community members to advocate to improve public health and the environment in their communities."),
                  tags$li("Identify areas that meet the definition of “Disproportionately Impacted Community” under the Colorado Environmental Justice Act (HB21-1266)."),
                )
-             ),
+             )
           ),
     tabPanel(title = "How to Use the Map",
              br(),
@@ -320,7 +320,7 @@ ui <- fluidPage(
                ,"Indicators included in Colorado EnviroScreen come from a variety of data sources. Many of these sources are from publicly available datasets from state and federal agencies, such as the US Environmental Protection Agency (EPA), the Centers for Disease Control and Prevention (CDC), the Colorado Department of Public Health and Environment (CDPHE), the Colorado Oil and Gas Conservation Commission (COGCC), and others."
                ,br()
                ,"Although there are many indicators included in EnviroScreen, some of these indicators are from a few years ago or represent measurements at a larger geographic scale. There are also some environmental exposures, climate impacts, health outcomes, and demographic factors that are not included in EnviroScreen since there are not any reliable data sources available."
-             ),
+             )
           ),
     tabPanel(title = "Example Use",
              br(), 
@@ -340,7 +340,7 @@ ui <- fluidPage(
                 ,tags$li("They download the data for their community at the bottom of the page.")
                 ,tags$li("They use this information to write a compelling grant application for community air monitors.")
               )
-            ), 
+            )
           ),
     tabPanel(title =  "Definitions",
              br(),
@@ -411,7 +411,7 @@ ui <- fluidPage(
              ,br()
              ,"The EnviroScreen Score combines five components. When you click a location on the map, the orange bars in each chart show the score for that location, illustrating how it compares to the rest of Colorado for each component score. Together, the five charts show how the EnviroScreen score is calculated for the selected location."
              ,br()
-          ),
+          )
 
     ),
     tabPanel("Tool Development",
@@ -441,7 +441,7 @@ ui <- fluidPage(
                  , target = "_blank"
                ) 
              )
-      ),
+      )
     ),
   # Select Reactive Elements ------------------------------------------------
   # content for the reactive elements of the map
