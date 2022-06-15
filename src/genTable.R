@@ -21,28 +21,28 @@ genTable <- function(tableData, geoid, colSelected){
       select(
         "GEOID",
         "County Name",
-        "Colorado EnviroScreen Score Percentile",
-        "Colorado EnviroScreen Score",
-        "Pollution & Climate Burden Percentile",
-        "Pollution & Climate Burden",
-        "Socioeconomics & Demographics Percentile",
-        "Socioeconomics & Demographics"
+        "EnviroScreen Score Percentile",
+        "EnviroScreen Score",
+        "Pollution and Climate Burden Percentile",
+        "Pollution and Climate Burden Score",
+        "Health and Social Factors Percentile",
+        "Health and Social Factors Score"
       )
   } else if(colSelected == "Component Score") {
     table2 <-  table1 %>% 
       select(
         "GEOID",
         "County Name",
-        "Environmental exposures Percentile",
-        "Environmental exposures",
-        "Environmental effects Percentile",
-        "Environmental effects",
-        "Climate vulnerability Percentile",
-        "Climate vulnerability",
-        "Sensitive population Percentile",
-        "Sensitive population",
+        "Environmental Exposures Percentile",
+        "Environmental Exposures Score",
+        "Environmental Effects Percentile",
+        "Environmental Effects Score",
+        "Climate Burden Percentile",
+        "Climate Burden Score",
+        "Sensitive Populations Percentile",
+        "Sensitive Populations Score",
         "Demographics Percentile",
-        "Demographics"
+        "Demographics Score"
       )
   } else if(colSelected == "Environmental Exposures") {
     table2 <-  table1 %>% 
@@ -51,20 +51,20 @@ genTable <- function(tableData, geoid, colSelected){
         "County Name",
         "Air toxics emissions Percentile",
         "Air toxics emissions",
-        "Diesel PM Percentile", 
-        "Diesel PM",
-        "Drinking Water Violations Percentile",
-        "Drinking Water Violations",
+        "Diesel particulate matter (PM) Percentile", 
+        "Diesel particulate matter (PM)",
+        "Drinking water regulations Percentile",
+        "Drinking water regulations",
         "Lead exposure risk Percentile",
         "Lead exposure risk",
         "Noise Percentile",
         "Noise",
-        "Other Air Pollutants Percentile",
-        "Other Air Pollutants",
+        "Other air pollutants Percentile",
+        "Other air pollutants",
         "Ozone Percentile",
         "Ozone",
-        "Particles Percentile",
-        "Particles" ,  
+        "Fine particle pollution Percentile",
+        "Fine particle pollution" ,  
         "Traffic proximity & volume Percentile",
         "Traffic proximity & volume"
       )
@@ -73,18 +73,18 @@ genTable <- function(tableData, geoid, colSelected){
       select(
         "GEOID",
         "County Name",
-        "Impaired Surface Water Percentile",
-        "Impaired Surface Water",
+        "Impaired streams and rivers Percentile",
+        "Impaired streams and rivers",
         "Proximity to hazardous waste facilities Percentile",
         "Proximity to hazardous waste facilities",
-        "Proximity to Mining Percentile",
-        "Proximity to Mining",
-        "Proximity to National Priorities List (NPL) sites Percentile",
-        "Proximity to National Priorities List (NPL) sites",
-        "Proximity to Oil and Gas Percentile",
-        "Proximity to Oil and Gas",
-        "Proximity to RMP sites Percentile", 
-        "Proximity to RMP sites",
+        "Proximity to mining locations Percentile",
+        "Proximity to mining locations",
+        "Proximity to National Priorities List sites Percentile",
+        "Proximity to National Priorities List sites",
+        "Proximity to oil and gas Percentile",
+        "Proximity to oil and gas",
+        "Proximity to Risk Management Plan sites Percentile", 
+        "Proximity to Risk Management Plan sites",
         "Wastewater discharge indicator Percentile",
         "Wastewater discharge indicator"
       )
@@ -95,8 +95,8 @@ genTable <- function(tableData, geoid, colSelected){
         "County Name",
         "Drought Percentile",
         "Drought",
-        "Extreme Heat Days Percentile",
-        "Extreme Heat Days",
+        "Extreme heat days Percentile",
+        "Extreme heat days",
         "Floodplains Percentile",
         "Floodplains",
         "Wildfire risk Percentile",
@@ -117,10 +117,10 @@ genTable <- function(tableData, geoid, colSelected){
         "Heart disease in adults",
         "Life expectancy Percentile", 
         "Life expectancy", 
-        "Low weight birth rate Percentile",
-        "Low weight birth rate",
-        "Mental Health Indicator Percentile",
-        "Mental Health Indicator",
+        "Low birth weight Percentile",
+        "Low birth weight",
+        "Mental health indicator Percentile",
+        "Mental health indicator",
         "Population over 64 Percentile",
         "Population over 64",
         "Population under 5 Percentile", 
@@ -131,8 +131,8 @@ genTable <- function(tableData, geoid, colSelected){
       select(
         "GEOID",
         "County Name",
-        "Housing Cost Burdened Percentile",
-        "Housing Cost Burdened",
+        "Housing cost burdened Percentile",
+        "Housing cost burdened",
         "Percent disability Percentile",
         "Percent disability",
         "Percent less than high school education Percentile", 
@@ -150,8 +150,8 @@ genTable <- function(tableData, geoid, colSelected){
         "GEOID",
         "County Name",
         "Disproportionately Impacted Community",
-        "Justice 40 Community","Coal Community",
-        "Oil and Gas Community","Rural Community", 
+        "Justice40","Coal Community",
+        "Oil and Gas Community","Urban/Rural", 
         "Total Population"
       )
   } 
@@ -161,95 +161,3 @@ genTable <- function(tableData, geoid, colSelected){
 }
 
 
-
-
-
-# old version 
-# genTable <- function(tableData, geoid){ 
-#   # primary table. 
-#   table1 <- tableData %>% sf::st_drop_geometry()
-#   # sort table if geoid has been selected 
-#   if(geoid[1] %in% table1$GEOID){
-#     #sort table by GEOID 
-#     table1 <- setorder(x = table1, GEOID, na.last= TRUE)
-#     
-#     feature <- grep(pattern = geoid[1], x = table1$GEOID)
-#     # order based on selected values 
-#     order2 <- c(feature:nrow(table1), 1:(feature-1))
-#     
-#     table1 <- table1[order2, ]
-#   }
-#   
-#   gcs <- table1 %>% dplyr::select("GEOID","County Name"
-#                                   ,"Colorado EnviroScreen Score Percentile", "Colorado EnviroScreen Score"  
-#                                   ,"Pollution & Climate Burden Percentile","Pollution & Climate Burden"
-#                                   ,"Socioeconomics & Demographics Percentile","Socioeconomics & Demographics"
-#                                   ) 
-#   cs1 <- table1 %>% dplyr::select("GEOID","County Name"
-#                                   ,"Environmental exposures Percentile","Environmental exposures"
-#                                   ,"Environmental effects Percentile","Environmental effects"                                       
-#                                   , "Climate vulnerability Percentile","Climate vulnerability"
-#                                   , "Sensitive population Percentile","Sensitive population"                                        
-#                                   ,"Demographics Percentile","Demographics") 
-#   ee1 <- table1 %>% dplyr::select("GEOID","County Name"
-#                                   ,"Ozone Percentile","Ozone"
-#                                   ,"Particles Percentile","Particles"
-#                                   ,"Lead exposure risk Percentile","Lead exposure risk"
-#                                   ,"Diesel PM Percentile","Diesel PM","Diesel PM Percentile"
-#                                   ,"Traffic proximity & volume Percentile","Traffic proximity & volume"
-#                                   ,"Air toxics emissions Percentile","Air toxics emissions"
-#                                   ,"Other Air Pollutants Percentile","Other Air Pollutants"
-#                                   ,"Drinking Water Violations Percentile","Drinking Water Violations"
-#                                   ,"Noise Percentile","Noise") 
-#   ee2 <- table1 %>% dplyr::select("GEOID","County Name"
-#                                   ,"Wastewater discharge indicator Percentile","Wastewater discharge indicator"
-#                                   ,"Proximity to National Priorities List (NPL) sites Percentile","Proximity to National Priorities List (NPL) sites"
-#                                   ,"Proximity to RMP sites Percentile","Proximity to RMP sites"
-#                                   ,"Proximity to hazardous waste facilities Percentile","Proximity to hazardous waste facilities"
-#                                   ,"Proximity to Oil and Gas Percentile","Proximity to Oil and Gas"
-#                                   ,"Proximity to Mining Percentile","Proximity to Mining"
-#                                   ,"Impaired Surface Water Percentile","Impaired Surface Water"
-#                                   ) 
-#   clm <- table1 %>% dplyr::select("GEOID","County Name"
-#                                   ,"Wildfire risk Percentile","Wildfire risk"                                                                                    
-#                                   ,"Floodplains Percentile","Floodplains"                                                                                        
-#                                   ,"Drought Percentile","Drought"                                                                                                
-#                                   ,"Extreme Heat Days Percentile","Extreme Heat Days"                                           
-#                                   ) 
-#   sen <- table1 %>% dplyr::select("GEOID","County Name"
-#                                   ,"Population under 5 Percentile","Population under 5"                                                                          
-#                                   ,"Population over 64 Percentile","Population over 64"                                                                          
-#                                   ,"Heart disease in adults Percentile","Heart disease in adults"                                                                
-#                                   ,"Asthma hospitalization rate Percentile","Asthma hospitalization rate"                                                        
-#                                   ,"Life expectancy Percentile","Life expectancy"                                                                                
-#                                   ,"Low weight birth rate Percentile","Low weight birth rate"                                                                    
-#                                   ,"Cancer Incidence Percentile","Cancer Incidence"                                                                              
-#                                   ,"Diabetes Incidence Percentile","Diabetes Incidence"                                                                          
-#                                   ,"Mental Health Incidence Percentile","Mental Health Incidence"
-#                                   )                                       
-#   dem <- table1 %>% dplyr::select("GEOID","County Name"
-#                                   ,"Percent people of color Percentile","Percent people of color"                                                                
-#                                   ,"Percent less than high school education Percentile","Percent less than high school education"                      
-#                                   ,"Percent low income Percentile" ,"Percent low income"                                                                         
-#                                   ,"Percent linguistic isolation Percentile","Percent linguistic isolation"                                                      
-#                                   ,"Percent disability Percentile","Percent disability"                                                                          
-#                                   ,"Housing Cost Burdened Percentile","Housing Cost Burdened"
-#                                   ) 
-#   ext <- table1 %>% dplyr::select("GEOID","County Name","Disproportionately Impacted Community","Justice 40 Community","Coal Community",
-#                                   "Oil and Gas Community","Rural Community") 
-# 
-#   # if(geoid[1] %in% table1$GEOID){
-#   # 
-#   #   gcs <- gcs # %>% formatDT() 
-#   #   cs1 <- cs1 # %>% formatDT() 
-#   #   ee1 <- ee1 # %>% formatDT() 
-#   #   ee2 <- ee2 # %>% formatDT() 
-#   #   clm <- clm # %>% formatDT() 
-#   #   sen <- sen # %>% formatDT() 
-#   #   dem <- dem # %>% formatDT() 
-#   #   ext <- ext # %>% formatDT() 
-#   #   
-#   # }
-#   table2 <- list(gcs, cs1, ee1,ee2,clm,sen,dem,ext )
-#   return(table2)
-# }

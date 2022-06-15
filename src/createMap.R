@@ -41,7 +41,7 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
     smoothFactor = 0.5,
     opacity = 1.0,
     fillOpacity = 0.5,
-    fillColor = ~ palMap(`Colorado EnviroScreen Score Percentile`),
+    fillColor = ~ palMap(`EnviroScreen Score Percentile`),
     # https://stackoverflow.com/questions/48953149/dynamic-color-fill-for-polygon-using-leaflet-in-shiny-not-working
     highlightOptions = highlightOptions(
       color = "white",
@@ -55,7 +55,7 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
   )%>%
     addPolyLine(sf1 = oil, group = "Oil and Gas Community", 
                 popup = "adding definition") %>%
-    addPolyLine(sf1 = rural, group = "Rural Community", 
+    addPolyLine(sf1 = rural, group = "Urban/Rural", 
                 popup = "adding definition") %>%
     addPolyLine(sf1 = coal, group = "Coal Community", 
                 popup = "adding definition") %>%
@@ -119,11 +119,11 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
                    group = "Oil and Gas Community",
                    labelStyle = "font-size: 16")%>%
     addLegendImage(images = "www/rural.png",
-                   labels = "Rural Community",
+                   labels = "Urban/Rural",
                    width = 25,
                    height = 25,
                    position = 'topright',
-                   group = "Rural Community",
+                   group = "Urban/Rural",
                    labelStyle = "font-size: 16")%>%
     addLegendImage(images = "www/coal.png",
                    labels = "Coal Community",
@@ -144,7 +144,7 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
     overlayGroups = c(
       "Indicator Score",
       "Coal Community",
-      "Rural Community",
+      "Urban/Rural",
       "Oil and Gas Community",
       "Disproportionately Impacted Community",
       "Justice40",
@@ -162,7 +162,7 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
     hideGroup(
       group = c(
         "Coal Community",
-        "Rural Community",
+        "Urban/Rural",
         "Oil and Gas Community",
         "Disproportionately Impacted Community",
         "Justice40",

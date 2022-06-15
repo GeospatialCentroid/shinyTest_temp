@@ -1,6 +1,6 @@
 genPlots <- function(dataframe, parameter, geometry, geoid = NULL){
   # setting text for font elements 
-  if(parameter == "Colorado EnviroScreen Score"){
+  if(parameter == "EnviroScreen Score"){
     # font for title  
     fontHeader <- list(
       family = "museo-sans",
@@ -50,14 +50,16 @@ genPlots <- function(dataframe, parameter, geometry, geoid = NULL){
   df1$bins <-  findInterval(x = df1$value, vec = t1$breaks)
   # set title for the plot 
   title <- parameter
+  xlabel <- "test"
   
-  if(parameter %in% c("Sensitive population")){
+  if(parameter %in% c("Sensitive Populations Score")){
     xlabel <- "Susceptibility"
   }
-  if(parameter %in% c("Demographics")){
+  if(parameter %in% c("Demographics Score")){
     xlabel <- "Vulnerability"
   }
-  if(parameter %in% c("Colorado EnviroScreen Score", "Environmental exposures","Environmental effects","Climate vulnerability")){
+  if(parameter %in% c("EnviroScreen Score", "Environmental Exposures Score",
+                      "Environmental Effects Score","Climate Burden Score")){
     xlabel <- "Burden"
   }
 
