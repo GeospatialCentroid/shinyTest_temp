@@ -59,7 +59,7 @@ genPlots <- function(dataframe, parameter, geometry, geoid = NULL){
     xlabel <- "Vulnerability"
   }
   if(parameter %in% c("EnviroScreen Score", "Environmental Exposures Score",
-                      "Environmental Effects Score","Climate Burden Score")){
+                      "Environmental Effects Score","Climate Vulnerability Score")){
     xlabel <- "Burden"
   }
 

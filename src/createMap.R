@@ -54,11 +54,11 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
     group = "Indicator Score"
   )%>%
     addPolyLine(sf1 = oil, group = "Oil and Gas Community", 
-                popup = "adding definition") %>%
-    addPolyLine(sf1 = rural, group = "Urban/Rural", 
-                popup = "adding definition") %>%
+                popup = "<strong>Definition: </strong> Counties that have active oil and gas operations.")%>%
+    addPolyLine(sf1 = rural, group = "Rural", 
+                popup = "<strong>Definition: </strong> Counties that do not contain a U.S. Census Bureau's urban area") %>%
     addPolyLine(sf1 = coal, group = "Coal Community", 
-                popup = "adding definition") %>%
+                popup = "<strong>Definition: </strong> Counties that have a coal-burning power plant.") %>%
     addPolygons(
       data = di,
       fillColor =  ~diPal(`color`),
@@ -119,11 +119,11 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
                    group = "Oil and Gas Community",
                    labelStyle = "font-size: 16")%>%
     addLegendImage(images = "www/rural.png",
-                   labels = "Urban/Rural",
+                   labels = "Rural",
                    width = 25,
                    height = 25,
                    position = 'topright',
-                   group = "Urban/Rural",
+                   group = "Rural",
                    labelStyle = "font-size: 16")%>%
     addLegendImage(images = "www/coal.png",
                    labels = "Coal Community",
@@ -144,7 +144,7 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
     overlayGroups = c(
       "Indicator Score",
       "Coal Community",
-      "Urban/Rural",
+      "Rural",
       "Oil and Gas Community",
       "Disproportionately Impacted Community",
       "Justice40",
@@ -162,7 +162,7 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
     hideGroup(
       group = c(
         "Coal Community",
-        "Urban/Rural",
+        "Rural",
         "Oil and Gas Community",
         "Disproportionately Impacted Community",
         "Justice40",

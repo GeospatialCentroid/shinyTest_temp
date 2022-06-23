@@ -13,6 +13,8 @@ library(leaflegend)
 library(shinyBS)
 library(shinyWidgets)
 
+
+
 # source helpers ----------------------------------------------------------
 lapply(list.files(path = "src",recursive = TRUE, full.names = TRUE), source)
 
@@ -40,8 +42,12 @@ justice40 <- readRDS("data/scores/justice40.rds") %>%
     ,br()
     ,br()
     ,paste0("<strong>Definition: </strong>")
-    ,"In early 2022, the White House launched the Justice40 Initiative. The goal of the Justice40 Initiative is to provide 40 percent of the overall benefits of certain Federal investments in seven key areas to disadvantaged communities. These seven key areas are: climate change, clean energy and energy efficiency, clean transit, affordable and sustainable housing, training and workforce development, the remediation and reduction of legacy pollution, and the development of critical clean water infrastructure. According to the definition of Justice40, a community qualifies as “disadvantaged,” if the census tract is above the threshold for one or more environmental or climate indicators and the tract is above the threshold for the socioeconomic indicators."
-    ))
+    ,paste0("Learn more about the ", 
+            tags$a(href = "https://screeningtool.geoplatform.gov/en/about", 
+                   "Justice40 Initiative.", target = "_blank")
+      )
+    )
+  )
 
 # di community 
 di <- getDI()
@@ -89,7 +95,7 @@ histData <- envoData %>%
     ,"Health and Social Factors Score"                                      
     ,"Environmental Exposures Score"                                
     ,"Environmental Effects Score"                                   
-    ,"Climate Burden Score"                                  
+    ,"Climate Vulnerability Score"                                  
     ,"Sensitive Populations Score"                                   
     ,"Demographics Score"
   )
@@ -134,7 +140,7 @@ ui <- fluidPage(
   br(),
   fluidRow(
     p(HTML("</br><a href='#map'>Jump to Map</a>")),
-    p("Colorado Enviroscreen is an interactive environmental justice mapping tool and health screening tool for Colorado. It was developed for the Colorado Department of Public Health and Environment (CDPHE) by a team from Colorado State University. Colorado EnviroScreen Version 1.0 launched on June XX, 2022. You can learn more about Colorado EnviroScreen on CDPHE’s ",
+    p("Colorado Enviroscreen is an interactive environmental justice mapping tool and health screening tool for Colorado. It was developed for the Colorado Department of Public Health and Environment (CDPHE) by a team from Colorado State University. Colorado EnviroScreen Version 1.0 launched on June 28, 2022. You can learn more about Colorado EnviroScreen on CDPHE’s ",
       tags$a(href = "https://cdphe.colorado.gov/enviroscreen", "Colorado EnviroScreen webpage.", target = "_blank"),
       "You can send feedback about Colorado EnviroScreen to CDPHE by emailing cdphe_ej@state.co.us"    
     )
@@ -426,7 +432,7 @@ ui <- fluidPage(
              )
              ,tags$strong("Pollution and Climate Burden score")
              ,p(
-               "The Pollution and Climate Burden score combines the scores from the following components: Environmental Exposures, Environmental Effects, and Climate Burden. The score ranges from 0 to 100, with the highest score representing the environmentally burdened populations."
+               "The Pollution and Climate Burden score combines the scores from the following components: Environmental Exposures, Environmental Effects, and Climate Vulnerability. The score ranges from 0 to 100, with the highest score representing the environmentally burdened populations."
              )
              ,tags$strong("Health and Social Factors score")
              ,p(
@@ -440,9 +446,9 @@ ui <- fluidPage(
              ,p(
                "The environmental effects score represents how many hazardous or toxic sites are in a community relative to the rest of the state. The score ranges from 0 to 100, with a higher score being worse. The score is the average of data on proximity to mining, oil and gas operations, impaired surface waters, wastewater discharge facilities, Superfund sites, facilities that use hazardous chemicals, and facilities that generate, treat, store, or dispose of hazardous wastes. As most people are not directly exposed to these sites, this score is weighted half as much as environmental exposures in the overall Pollution and Climate Burden score."
              )
-             ,tags$strong("Climate Burden")
+             ,tags$strong("Climate Vulnerability")
              ,p(
-               "This climate burden score represents a community’s risk of drought, flood, extreme heat, and wildfire compared to the rest of the state. The score ranges from 0 to 100, the higher the score, the higher the burden."
+               "This Climate Vulnerability score represents a community’s risk of drought, flood, extreme heat, and wildfire compared to the rest of the state. The score ranges from 0 to 100, the higher the score, the higher the burden."
              )
              ,tags$strong("Sensitive Populations")
              ,p(
@@ -465,7 +471,7 @@ ui <- fluidPage(
              ,p(
                "All census tracts and block groups within counties that have active oil and gas operations are designated as oil and gas communities. Proximity to oil and gas is also included in EnviroScreen as a part of the environmental effect component."
               )
-             ,tags$strong("Urban/Rural")
+             ,tags$strong("Rural")
              ,p(
                "The U.S. Census Bureau's 'urban areas' are densely populated and include residential, commercial, and other properties. Counties that include these urban areas are considered urban. All counties not included within urban centers are considered rural counties. This data is not part of the EnviroScreen components or score, and does not influence the results presented in the map, charts or table. "
              )
@@ -767,10 +773,10 @@ ui <- fluidPage(
         label = "Indicator",
         choices = list(
           "EnviroScreen Score" = "EnviroScreen Score",
-          "Group Component Scores" = c("Pollution and Climate Burden Score", "Health and Social Factors Score"),
+          "Group Component Scores" = c("Pollution and Climate Vulnerability Score", "Health and Social Factors Score"),
           "Individual Component Scores" =c("Environmental Exposures Score",
                                            "Environmental Effects Score",
-                                           "Climate Burden Score",
+                                           "Climate Vulnerability Score",
                                            "Sensitive Populations Score",
                                            "Demographics Score"),
           "Environmental exposures" = c("Air toxics emissions",
@@ -925,7 +931,12 @@ ui <- fluidPage(
                         "Code and data repositories are available ",
                         tags$a(href= "https://geospatialcentroid.github.io/Colorado_EnviroScreen/",
                                tags$span(style="color:white","here"), target = "_blank")
-      )
+      ),
+                      p(class = "href2",
+                        "Download EnviroScreen data for GIS ",
+                        tags$a(href= "https://cdphe.colorado.gov/enviroscreen",
+                               tags$span(style="color:white","here."), target = "_blank")
+                      )
     ),
     
     column(4,tags$a(
@@ -989,7 +1000,7 @@ server <- function(input, output,session) {
   # histogram plots ---------------------------------------------------------
   # if input changes reset map value 
   plotGroup <- c( "EnviroScreen Score", "Environmental Exposures Score",
-                  "Environmental Effects Score","Climate Burden Score",
+                  "Environmental Effects Score","Climate Vulnerability Score",
                   "Sensitive Population Score","Demographics Score")
   
   ### need individual output objects for each plot 
@@ -1003,7 +1014,7 @@ server <- function(input, output,session) {
     genPlots(dataframe = df1(),parameter = "Environmental Effects Score",geometry = input$Geom, geoid = input$mymap_shape_click)
   })
   output$histClimate<- renderPlotly({
-    genPlots(dataframe = df1(),parameter = "Climate Burden Score",geometry = input$Geom, geoid = input$mymap_shape_click)
+    genPlots(dataframe = df1(),parameter = "Climate Vulnerability Score",geometry = input$Geom, geoid = input$mymap_shape_click)
   })
   output$histSocial<- renderPlotly({
     genPlots(dataframe = df1(),parameter = "Sensitive Populations Score",geometry = input$Geom, geoid = input$mymap_shape_click)
@@ -1101,7 +1112,7 @@ server <- function(input, output,session) {
     ed2 <- envoData[envoData$area == geo, ]
     ed2 <- ed2 %>%
       mutate(visParam = !!as.symbol(indicator))%>%# https://stackoverflow.com/questions/62862705/r-shiny-mutate-replace-how-to-mutate-specific-column-selected-from-selectinput
-      dplyr::select(GEOID, `County Name`, indicator1, indicator2,`Coal Community`,`Oil and Gas Community`,`Urban/Rural`,visParam)
+      dplyr::select(GEOID, `County Name`, indicator1, indicator2,`Coal Community`,`Oil and Gas Community`,`Rural`,visParam)
       
     ed2 <- ed2 %>%
       dplyr::mutate(
@@ -1112,7 +1123,7 @@ server <- function(input, output,session) {
                    "<br/><b>Score:</b> ", round(!!as.symbol(indicator2), digits =  0)),
           paste0("<br/><b>Coal Community:</b> ", `Coal Community`),
           paste0("<br/><b>Oil and Gas Community:</b> ", `Oil and Gas Community`),
-          paste0("<br/><b>Urban/Rural:</b> ", `Urban/Rural`)
+          paste0("<br/><b>Rural:</b> ", `Rural`)
       )
     )
     

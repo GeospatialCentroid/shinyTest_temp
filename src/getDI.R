@@ -9,17 +9,6 @@
 #' 
 #' 
 #' 
-
-# Add categories and specific visualization parameters 
-# Will need to add custom legend as well
-# low income : rgb(253,209,138)   #fdd18a
-# 
-# people of color : id="rgb(173,225,233)"   #ade1df
-# 
-# housing burden : rgb(81,161,152) #51a198
-# 
-# more then one categoy :rgb(192,149,180) #c095b4
-# 
 getDI <- function(){
   
   diCommunity <- readRDS("data/scores/diCommunities.rds")%>%
@@ -49,8 +38,14 @@ getDI <- function(){
                "<br/><b>Percent Minority: </b>", round(Min_PCT*100, digits = 1),
                "<br/>",
                "<br/><b>40% of Households are Housing Burdened : </b>", Br_FLAG,
-               "<br/><b>Percent Housing Burdened: </b>", round(HH_Burdened_Pct*100, digits = 1)
-             )
+               "<br/><b>Percent Housing Burdened: </b>", round(HH_Burdened_Pct*100, digits = 1),
+               "<br/>",
+               "<br/>",
+               "<strong>Definition: </strong>",
+               "Learn more about Colorado's ",
+                tags$a(href = "https://cdphe.colorado.gov/environmental-justice", 
+                          "Disproportionately Impacted Communities.", target = "_blank")
+            )
           )%>%
     mutate(
       color = as.factor(case_when(

@@ -20,11 +20,11 @@ getStoryMaps <- function(){
   # generate dataframe 
   df <- data.frame(
     Area = c(
-      "Four Corners",
+      "Four Corners", # remove
       "San Luis Valley",
       "Arkansas Valley",
       "Commerce City/North Denver",
-      "Greeley",
+      "Greeley", # remove 
       "Pueblo"),
     Address  = c(
       "125 Mike Wash Rd. Towaoc, Colorado, 81334",
@@ -67,13 +67,18 @@ getStoryMaps <- function(){
       "https://cdphe.colorado.gov/enviroscreen"
     )
   )%>%
-    dplyr::mutate(popup = 
-      paste0(
+    dplyr::mutate(popup = case_when(
+      Area %in% c("Pueblo", "Arkansas Valley") ~  paste0(
         "Learn more about the environmental justice story in the ", `Area`, " region",
-        paste0("<a href=",storyMap,"> on this Story Map.</a>"))
+        paste0("<a href=",storyMap,"> on this Story Map.</a>")),
+      TRUE ~ "Coming soon"
+      )
     )%>%
     sf::st_as_sf(coords = c("Lon","Lat"),remove = FALSE)%>%
     sf::st_set_crs(value = 4326)
+  
+  # subset features that will not be present at release 
+  df <- df %>% dplyr::filter(!Area %in% c("Four Corners","Greeley"))
   
   return(df)
 }

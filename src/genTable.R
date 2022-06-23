@@ -37,8 +37,8 @@ genTable <- function(tableData, geoid, colSelected){
         "Environmental Exposures Score",
         "Environmental Effects Percentile",
         "Environmental Effects Score",
-        "Climate Burden Percentile",
-        "Climate Burden Score",
+        "Climate Vulnerability Percentile",
+        "Climate Vulnerability Score",
         "Sensitive Populations Percentile",
         "Sensitive Populations Score",
         "Demographics Percentile",
@@ -151,7 +151,7 @@ genTable <- function(tableData, geoid, colSelected){
         "County Name",
         "Disproportionately Impacted Community",
         "Justice40","Coal Community",
-        "Oil and Gas Community","Urban/Rural", 
+        "Oil and Gas Community","Rural", 
         "Total Population"
       )
   } 
