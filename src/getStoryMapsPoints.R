@@ -61,10 +61,10 @@ getStoryMaps <- function(){
     storyMap = c(
       "https://cdphe.colorado.gov/enviroscreen",
       "https://cdphe.colorado.gov/enviroscreen",
+      "https://storymaps.arcgis.com/stories/820a90b4ee784af5ad813eb5ddcb61af",
       "https://cdphe.colorado.gov/enviroscreen",
       "https://cdphe.colorado.gov/enviroscreen",
-      "https://cdphe.colorado.gov/enviroscreen",
-      "https://cdphe.colorado.gov/enviroscreen"
+      "https://storymaps.arcgis.com/stories/0ef3038fda624133ba3c517462ed0e8d"
     )
   )%>%
     dplyr::mutate(popup = case_when(
