@@ -23,46 +23,46 @@ version <- 4
 # enviroscreen data
 envoData <- readRDS(paste0("data/scores/allScores_",version,".rds"))%>%
   dplyr::mutate(visParam = `EnviroScreen Score Percentile`)%>%
-  dplyr::select("County Name", "GEOID", everything())%>% 
+  dplyr::select("County Name", "GEOID", everything())%>%
   dplyr::select(-"GEOID3")
 
 
-# Additional Data   
-oil <- readRDS("data/scores/oilgasVis.rds") 
+# Additional Data
+oil <- readRDS("data/scores/oilgasVis.rds")
 coal <- readRDS("data/scores/coalVis.rds")
 rural <- readRDS("data/scores/ruralVis.rds")
-descriptors <- read_csv("data/descriptions/indicatorDesc.csv") %>% 
+descriptors <- read_csv("data/descriptions/indicatorDesc.csv") %>%
   dplyr::select(1:6)%>%
   `colnames<-`(c("Indicator", "Source", "Date", "Units", "Measured_Geography", "Description"))
 justice40 <- readRDS("data/scores/justice40.rds") %>%
   dplyr::mutate(popup = paste0(
-    "Census Tract ", GEOID ," in ", County_Name," County."    
+    "Census Tract ", GEOID ," in ", County_Name," County."
     ,br()
     ,"A total of ", Total.threshold.criteria.exceeded," clauses defined this area as disadvantaged."
     ,br()
     ,br()
     ,paste0("<strong>Definition: </strong>")
-    ,paste0("Learn more about the ", 
-            tags$a(href = "https://screeningtool.geoplatform.gov/en/about", 
+    ,paste0("Learn more about the ",
+            tags$a(href = "https://screeningtool.geoplatform.gov/en/about",
                    "Justice40 Initiative.", target = "_blank")
       )
     )
   )
 
-# di community 
+# di community
 di <- getDI()
-# storyMap Locations 
+# storyMap Locations
 sm <- getStoryMaps()
 
-# palette for DI layer 
+# palette for DI layer
 diPal <- colorFactor(palette = c(
   "#a6cee3", "#33a02c","#b2df8a","#1f78b4"), levels = c("Low Income", "People of Color",
                                                        "Housing Burden", "More then one category"), di$color
 )
 
-### light as low 
+### light as low
 #colorRamp <- c(  "#f2f0f7"  ,"#cbc9e2"  ,"#9e9ac8"  ,"#756bb1"  ,"#54278f")
-### dark as low 
+### dark as low
 colorRamp <- c( "#54278f","#756bb1","#9e9ac8","#cbc9e2","#f2f0f7")
 
 
@@ -89,19 +89,19 @@ histData <- envoData %>%
   sf::st_drop_geometry()%>%
   dplyr::filter(area == "County")%>%
   dplyr::select(
-    "GEOID"                                                   
-    ,"EnviroScreen Score"                            
-    ,"Pollution and Climate Burden Score"                           
-    ,"Health and Social Factors Score"                                      
-    ,"Environmental Exposures Score"                                
-    ,"Environmental Effects Score"                                   
-    ,"Climate Vulnerability Score"                                  
-    ,"Sensitive Populations Score"                                   
+    "GEOID"
+    ,"EnviroScreen Score"
+    ,"Pollution and Climate Burden Score"
+    ,"Health and Social Factors Score"
+    ,"Environmental Exposures Score"
+    ,"Environmental Effects Score"
+    ,"Climate Vulnerability Score"
+    ,"Sensitive Populations Score"
     ,"Demographics Score"
   )
 
-# set empty parameter for histogram funciton 
-## set to non GEOID number for the histogram generate on loading. 
+# set empty parameter for histogram funciton
+## set to non GEOID number for the histogram generate on loading.
 geoidMap <- "100"
 
 
@@ -113,8 +113,8 @@ ui <- fluidPage(
   bootswatch = "flatly",
   #bg = "#FFFFFF",
   #fg = "#000",
-  primary = "#245d38",# green 
-  secondary = "#001970", #blue 
+  primary = "#245d38",# green
+  secondary = "#001970", #blue
   success = "#245d38", # green
   base_font = "Trebuchet MS,Helvetica,sans-serif",
   heading_font = "Trebuchet MS,sans-serif"
@@ -125,14 +125,14 @@ ui <- fluidPage(
   fluidRow(
     class = "titleElement",
     column(4,
-           tags$br(), 
+           tags$br(),
            tags$a(
              href = "https://cdphe.colorado.gov/enviroscreen",
              tags$img(
                src="EnviroScreen Logos/co_cdphe_pr_es_white_v.png",
                title = "Colorado Department of Public Health and Environment",
                width="70%",
-               height="auto" 
+               height="auto"
              )
            )
           ),
@@ -143,7 +143,7 @@ ui <- fluidPage(
     p(HTML("</br><a href='#map'>Jump to Map</a>")),
     p("Colorado Enviroscreen is an interactive environmental justice mapping tool and health screening tool for Colorado. It was developed for the Colorado Department of Public Health and Environment (CDPHE) by a team from Colorado State University. Colorado EnviroScreen Version 1.0 launched on June 28, 2022. You can learn more about Colorado EnviroScreen on CDPHE’s ",
       tags$a(href = "https://cdphe.colorado.gov/enviroscreen", "Colorado EnviroScreen webpage.", target = "_blank"),
-      "You can send feedback about Colorado EnviroScreen to CDPHE by emailing cdphe_ej@state.co.us"    
+      "You can send feedback about Colorado EnviroScreen to CDPHE by emailing cdphe_ej@state.co.us"
     )
   ),
   fluidRow(
@@ -179,10 +179,10 @@ ui <- fluidPage(
 
 
   # description of use ------------------------------------------------------
-  fluidRow(class = "sectionTitle", 
+  fluidRow(class = "sectionTitle",
            h2("Understanding the EnviroScreen Tool")
   ),
-  
+
   tabsetPanel(
     tabPanel(title = "Purpose and limitations"
              ,br()
@@ -215,7 +215,7 @@ ui <- fluidPage(
              br()
             ,p("The default view of the map shows the state of Colorado. Individual counties, census tracts, or census block groups are color-coded based on their EnviroScreen score. The legend on the right side of the map shows what each color represents. The darker the color, the worse the EnviroScreen score. Users can zoom in and out, drag the map to a different location, and click on a location to learn more about its EnviroScreen score and how the score was calculated.")
             ,tags$img(
-                   id = "mapDesc", 
+                   id = "mapDesc",
                    src="MapElements_3_crop.jpg",
                    title = "Map Elements",
                    height="auto"
@@ -292,17 +292,17 @@ ui <- fluidPage(
                , " (y axis) represents the number of areas in Colorado that share the same range of burden as the selected area."
                ,br()
                ,br()
-               , "The" 
+               , "The"
                ,tags$strong(" horizontal location of the bar")
                ," (x axis) represents the burden category (based on the percentile rank). If the bar is more towards the left, it represents a less burdened area compared to the rest of Colorado. If the bar is more towards the right, it represents a more burdened area compared to the rest of Colorado."
                ,br()
                ,br()
                ,"When an area is selected in the map this is displayed in orange in the charts. Orange bars represent where the selected area is located in the distribution of the overall EnviroScreen score and individual components."
-  
+
              )
-             #insert image 
+             #insert image
               ,tags$img(
-                id = "histoDesc", 
+                id = "histoDesc",
                 src="histoDesc.png",
                 title = "Bar Charts Elements",
                 height="auto"
@@ -348,9 +348,9 @@ ui <- fluidPage(
                ,tags$strong(" 'Download Data from Current Geography'")
                ," box."
                )
-             #insert image 
+             #insert image
              ,tags$img(
-               id = "dataTable", 
+               id = "dataTable",
                src="dataTable.png",
                title = "Data Table Elements",
                height="auto"
@@ -368,9 +368,9 @@ ui <- fluidPage(
                ,br()
                ,"A higher EnviroScreen score means the area is more likely to be affected by environmental health injustices."
              )
-             #insert image 
+             #insert image
              ,tags$img(
-               id = "scoreDesc", 
+               id = "scoreDesc",
                src="scoreDesc.png",
                title = "Score Calculation",
                height="auto")
@@ -392,7 +392,7 @@ ui <- fluidPage(
                ,br()
                ,"Although EnviroScreen contains many indicators, some of these indicators are from a few years ago or represent measurements at a larger geographic scale. There are also some environmental exposures, climate impacts, health outcomes, and demographic factors that we could not include in EnviroScreen because there are no reliable data sources available. "
              )
-             ,tags$strong("Data limitations") 
+             ,tags$strong("Data limitations")
              ,p(
                "The data included in EnviroScreen has several limitations due to the use of secondary data. Secondary data refers to data that is collected by someone other than the primary user. Moreover, the indicators used were often compiled from different years, making it difficult to compare the data sets. Furthermore, not all data was originally available at the same geographical scale. Some data were reported at the county level (2 indicators), others at the census tract level (9 indicators), and others at the census block group level or in a smaller geographical scale (20 indicators). Finally, although the tool aims to provide a comprehensive description of environmental injustices, indicators were not always available in a geographical information system format. Given this, Colorado EnviroScreen provides a limited representation of environmental injustices based on data availability. For more information, please consult the technical user guide."
              )
@@ -512,13 +512,36 @@ ui <- fluidPage(
     tabPanel("Additional Resources"
              ,h4("Colorado EnviroScreen supporting materials")
              ,p(
-               "Basic user guide (English |Spanish)"
+               "Basic user guide ("
+               ,tags$a(
+                 href = "https://drive.google.com/file/d/1aXfZiJtv2-6lfSQeQYfMupIICEXwidiC/view?usp=sharing"
+                 ,tags$em("English")
+                 , target = "_blank"
+               )
+               ," | "
+               ,tags$a(
+                 href = "https://drive.google.com/file/d/1aXfZiJtv2-6lfSQeQYfMupIICEXwidiC/view?usp=sharing"
+                 ,tags$em("Spanish")
+                 , target = "_blank"
+               )
+               ,")"
                ,br()
                ,br()
-               ,"Technical user guide (currently only available in English)."
+               ,"Technical user guide (currently only available in"
+               ,tags$a(
+                 href = "https://drive.google.com/file/d/1aXfZiJtv2-6lfSQeQYfMupIICEXwidiC/view?usp=sharing"
+                 ,tags$em("English")
+                 , target = "_blank"
+               )
+               ,")."
                ,br()
                ,br()
-               ,"Community engagement executive summary"
+               ,"Community engagement executive "
+               ,tags$a(
+                 href = "https://drive.google.com/file/d/1aXfZiJtv2-6lfSQeQYfMupIICEXwidiC/view?usp=sharing"
+                 ,tags$em("summary")
+                 , target = "_blank"
+               )
              )
              ,h4("CDPHE programs")
              ,p(
@@ -740,13 +763,13 @@ ui <- fluidPage(
                  href = "https://docs.google.com/document/d/1_GEjGbOd3CmXwZu09QJ9oO4ZI8hqXtFwZAAeTsNV5lQ/edit?usp=sharing"
                  ,tags$em("Frequently Asked Questions")
                  , target = "_blank"
-               ) 
+               )
              )
       )
     ),
   # Select Reactive Elements ------------------------------------------------
   # content for the reactive elements of the map
-  br(), 
+  br(),
   fluidRow(class = "sectionTitle",id = "map",
     # action button : update map elements
     column(2,
@@ -754,7 +777,7 @@ ui <- fluidPage(
            actionButton(inputId = "updateMap", "Update Map"),
        ),
     ),
-    # select geography  
+    # select geography
     column(2,
       tags$div(title="Click here to select area to display on the map",
                selectInput(
@@ -781,43 +804,43 @@ ui <- fluidPage(
                                            "Sensitive Populations Score",
                                            "Demographics Score"),
           "Environmental exposures" = c("Air toxics emissions",
-                                        "Diesel particulate matter (PM)", 
+                                        "Diesel particulate matter (PM)",
                                         "Drinking water regulations",
                                         "Lead exposure risk",
                                         "Noise",
                                         "Other air pollutants",
                                         "Ozone",
-                                        "Fine particle pollution" ,                                
-                                       "Traffic proximity & volume"                                        
+                                        "Fine particle pollution" ,
+                                       "Traffic proximity & volume"
                                       ),
           "Environmental effects" = c("Impaired streams and rivers",
                                       "Proximity to hazardous waste facilities",
                                       "Proximity to mining locations",
                                       "Proximity to National Priorities List sites",
                                       "Proximity to oil and gas",
-                                      "Proximity to Risk Management Plan sites",              
-                                      "Wastewater discharge indicator" 
+                                      "Proximity to Risk Management Plan sites",
+                                      "Wastewater discharge indicator"
           ),
           "Climate vulnerability" = c("Drought",
                                       "Extreme heat days",
                                       "Floodplains",
-                                      "Wildfire risk"                                          
+                                      "Wildfire risk"
           ),
           "Sensitive population" = c("Asthma hospitalization rate",
                                       "Cancer prevalence",
                                       "Diabetes prevalence",
                                       "Heart disease in adults",
-                                      "Life expectancy",                                       
+                                      "Life expectancy",
                                       "Low birth weight",
                                       "Mental health indicator",
                                       "Population over 64",
-                                      "Population under 5"                                  
+                                      "Population under 5"
           ),
           "Demographics" = c("Housing cost burdened",
                               "Percent disability",
-                              "Percent less than high school education",                                
+                              "Percent less than high school education",
                               "Percent linguistic isolation",
-                              "Percent low income", 
+                              "Percent low income",
                               "Percent people of color"
           )
         ),
@@ -844,9 +867,9 @@ ui <- fluidPage(
       )
     ),
     tags$blockquote(textOutput("indicatorDesc"))
-    
+
   ),
-  
+
   # display map -------------------------------------------------------------
   fluidRow(tags$style(type = "text/css", "#mymap {height: calc(100vh - 250px) !important;}"), #style = {"background-color:#4d3a7d;"},
            column(1),
@@ -871,7 +894,7 @@ ui <- fluidPage(
     p("The EnviroScreen score combines five components: Environmental exposures, Environmental effects, Climate vulnerability, Sensitive population, and Demographics. When you click a location on the map, the orange bars in this chart show the score for that location. The orange bars show how the location compares to the rest of Colorado for each component score. Together, the charts show how the EnviroScreen score is calculated for the selected location.")
   ),
   br(),
-  
+
   # show reactive table -----------------------------------------------------
   # table showing the results
   fluidRow(class = "sectionTitle",
@@ -893,7 +916,7 @@ ui <- fluidPage(
   # changed to just single table
   DT::dataTableOutput("tableAll")
   ),
-  
+
   # download table option  --------------------------------------------------
   fluidRow(
     column(3,
@@ -914,39 +937,39 @@ ui <- fluidPage(
     )
   ),
   br(),
-  
-  fluidRow( class = "titleElement", 
-               column(4,   
+
+  fluidRow( class = "titleElement",
+               column(4,
                       h3("Additional Resources"),
                       p(class = "href2",
-                        "For more information about how to use environmental justice mapping tools, 
-    please review the Climate Equity Data Viewer guide (available in", 
-    tags$a(href = "https://drive.google.com/file/d/1iytdPG5iK2VBNpIy8k6oT6lU6-QKMLOa/view?usp=sharing",
+                        "For more information about how to use the EnviroScreen environmental justice mapping tool,
+    please review the user guide (available in",
+    tags$a(href = "https://drive.google.com/file/d/1aXfZiJtv2-6lfSQeQYfMupIICEXwidiC/view?usp=sharing",
            tags$span(style="color:white","English"), target = "_blank"),
     "and ",
-    tags$a(href = "https://drive.google.com/file/d/17rQ90fNt3DF-0PbySpGjo2tiy9AmDiCc/view?usp=sharing",
+    tags$a(href = "https://drive.google.com/file/d/1JCpkoNdEn4w5TiK0GgSIJmQDaZSuPP13/view?usp=sharing",
            tags$span(style="color:white","Spanish"), target = "_blank"),
     ")."
                       ),
                       p(class = "href2",
                         "Code and data repositories are available ",
-                        tags$a(href= "https://geospatialcentroid.github.io/Colorado_EnviroScreen/",
+                        tags$a(href= "https://geospatialcentroid.github.io/COEnviroScreen",
                                tags$span(style="color:white","here"), target = "_blank")
       ),
                       p(class = "href2",
                         "Download EnviroScreen data for GIS ",
-                        tags$a(href= "https://cdphe.colorado.gov/enviroscreen",
+                        tags$a(href= "https://data-cdphe.opendata.arcgis.com/",
                                tags$span(style="color:white","here."), target = "_blank")
                       )
     ),
-    
+
     column(4,tags$a(
       href = "https://cdphe.colorado.gov/enviroscreen",
       tags$img(
         src="EnviroScreen Logos/co_cdphe_pr_es_white_v.png",
         title = "Colorado Department of Public Health and Environment",
         width="100%",
-        height="auto" 
+        height="auto"
         )
       )
     ),
@@ -961,7 +984,7 @@ ui <- fluidPage(
     )
     )
   ),
-  
+
 )
 
 # Define server logic required to draw a histogram
@@ -978,10 +1001,10 @@ server <- function(input, output,session) {
   })
 
     # generate map ------------------------------------------------------------
-  ### tie all this into an external function just to clean up the server script. I want the 
-  ### server to be focused on reactive coded not the static stuff. 
+  ### tie all this into an external function just to clean up the server script. I want the
+  ### server to be focused on reactive coded not the static stuff.
    output$mymap <- renderLeaflet({
-     # render leaflet object 
+     # render leaflet object
      createMap(mapData = mapData, di = di, diPal = diPal,
               pal = colorRamp, palMap = palMap,
               oil=oil, rural = rural, coal = coal, justice40 = justice40,
@@ -999,12 +1022,12 @@ server <- function(input, output,session) {
 
 
   # histogram plots ---------------------------------------------------------
-  # if input changes reset map value 
+  # if input changes reset map value
   plotGroup <- c( "EnviroScreen Score", "Environmental Exposures Score",
                   "Environmental Effects Score","Climate Vulnerability Score",
                   "Sensitive Population Score","Demographics Score")
-  
-  ### need individual output objects for each plot 
+
+  ### need individual output objects for each plot
   output$histEnviroScreen <- renderPlotly({
     genPlots(dataframe = df1(),parameter = "EnviroScreen Score", geometry = input$Geom, geoid = input$mymap_shape_click)
   })
@@ -1023,10 +1046,10 @@ server <- function(input, output,session) {
   output$histDemo<- renderPlotly({
     genPlots(dataframe = df1(),parameter = "Demographics Score",geometry = input$Geom, geoid = input$mymap_shape_click)
   })
-    
-  # table output ------------------------------------------------------------  
+
+  # table output ------------------------------------------------------------
   # output for datatable based on columns selected
-  
+
   tableData <- reactive({
     geoid1 <- input$mymap_shape_click
     if(is.null(geoid1$id)){
@@ -1087,34 +1110,34 @@ server <- function(input, output,session) {
       write.csv(descriptors, file, row.names = FALSE)
     }
   )
-  
-  
 
-  
+
+
+
   # proxy map elements  -----------------------------------------------------
   observeEvent(input$updateMap, {
     ### helpful source https://stackoverflow.com/questions/37433569/changing-leaflet-map-according-to-input-without-redrawing
-    # geography 
-    geo <- input$Geom 
-    
-    # indicator 
+    # geography
+    geo <- input$Geom
+
+    # indicator
     in1 <- input$Indicator
     indicator1 <- in1
     indicator2 <- paste0(in1," Percentile")
-    
+
     if(input$Percentile == "Measured Value"){
-      indicator <- indicator1 
+      indicator <- indicator1
     }
     if(input$Percentile == "Percentile Rank"){
       indicator <- indicator2
     }
-    
-    # filter and assign visparam 
+
+    # filter and assign visparam
     ed2 <- envoData[envoData$area == geo, ]
     ed2 <- ed2 %>%
       mutate(visParam = !!as.symbol(indicator))%>%# https://stackoverflow.com/questions/62862705/r-shiny-mutate-replace-how-to-mutate-specific-column-selected-from-selectinput
       dplyr::select(GEOID, `County Name`, indicator1, indicator2,`Coal Community`,`Oil and Gas Community`,`Rural`,visParam)
-      
+
     ed2 <- ed2 %>%
       dplyr::mutate(
         popup = paste0(
@@ -1127,18 +1150,18 @@ server <- function(input, output,session) {
           paste0("<br/><b>Rural:</b> ", `Rural`)
       )
     )
-    
-    # palette 
+
+    # palette
     pal1 <- leaflet::colorNumeric(palette = colorRamp,
                                   domain = ed2$visParam,
                                   reverse = TRUE)
-    # legend labels 
+    # legend labels
     labels1 <- defineLegend(in1)
     leafletProxy("mymap") %>%
       clearGroup(group = "Indicator Score") %>%
       addPolygons(
         data = ed2,
-        color = "#F9C1AE", 
+        color = "#F9C1AE",
         weight = 0.2,
         smoothFactor = 0.5,
         opacity = 1.0,
@@ -1153,7 +1176,7 @@ server <- function(input, output,session) {
         ),
         options = pathOptions(pane = "index"),
         group = "Indicator Score"
-        
+
       )%>%
       removeControl(layerId = "firstLegend")%>%
       addLegend(
@@ -1167,27 +1190,27 @@ server <- function(input, output,session) {
         # labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))
       )
   })
-  # add selected features to map 
+  # add selected features to map
   observeEvent(input$button_table, {
     mapFeatures <- envoData %>% select("GEOID") %>% dplyr::filter(GEOID %in% RV$select)
-      # add features to map 
+      # add features to map
       leafletProxy("mymap") %>%
         clearGroup(group = "Table Highlight") %>%
         addPolygons(
           data = mapFeatures,
           fillColor = "#fffb17",
           fillOpacity = 0.3,
-          color = "#fffb17", 
+          color = "#fffb17",
           options = pathOptions(pane = "index"),
           group = "Table Highlight"
         )
     })
-  
-  # remov-e selected features from map 
+
+  # remov-e selected features from map
   observeEvent(input$removeHighlight, {
-    # add features to map 
+    # add features to map
     leafletProxy("mymap") %>%
-      clearGroup(group = "Table Highlight") 
+      clearGroup(group = "Table Highlight")
   })
 
   # click observer event ----------------------------------------------------
@@ -1198,4 +1221,3 @@ server <- function(input, output,session) {
 
 # Run the application
 shinyApp(ui = ui, server = server)
-
