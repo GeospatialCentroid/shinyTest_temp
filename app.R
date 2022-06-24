@@ -108,6 +108,7 @@ geoidMap <- "100"
 
 # UI  ---------------------------------------------------------------------
 ui <- fluidPage(
+  tags$head(includeHTML(("GoogleAnalytics.html"))),
   theme = bslib::bs_theme(
   bootswatch = "flatly",
   #bg = "#FFFFFF",
