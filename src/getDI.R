@@ -41,10 +41,9 @@ getDI <- function(){
                "<br/><b>Percent Housing Burdened: </b>", round(HH_Burdened_Pct*100, digits = 1),
                "<br/>",
                "<br/>",
-               "<strong>Definition: </strong>",
-               "Learn more about Colorado's ",
+               "Read more about Colorado’s definition of Disproportionately Impacted Communities in the ",
                 tags$a(href = "https://cdphe.colorado.gov/environmental-justice", 
-                          "Disproportionately Impacted Communities.", target = "_blank")
+                          "Environmental Justice Act.", target = "_blank")
             )
           )%>%
     mutate(

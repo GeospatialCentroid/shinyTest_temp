@@ -23,9 +23,9 @@ genTable <- function(tableData, geoid, colSelected){
         "County Name",
         "EnviroScreen Score Percentile",
         "EnviroScreen Score",
-        "Pollution and Climate Burden Percentile",
+        "Pollution and Climate Burden Score Percentile",
         "Pollution and Climate Burden Score",
-        "Health and Social Factors Percentile",
+        "Health and Social Factors Score Percentile",
         "Health and Social Factors Score"
       )
   } else if(colSelected == "Component Score") {
@@ -33,15 +33,15 @@ genTable <- function(tableData, geoid, colSelected){
       select(
         "GEOID",
         "County Name",
-        "Environmental Exposures Percentile",
+        "Environmental Exposures Score Percentile",
         "Environmental Exposures Score",
-        "Environmental Effects Percentile",
+        "Environmental Effects Score Percentile",
         "Environmental Effects Score",
-        "Climate Vulnerability Percentile",
+        "Climate Vulnerability Score Percentile",
         "Climate Vulnerability Score",
-        "Sensitive Populations Percentile",
+        "Sensitive Populations Score Percentile",
         "Sensitive Populations Score",
-        "Demographics Percentile",
+        "Demographics Score Percentile",
         "Demographics Score"
       )
   } else if(colSelected == "Environmental Exposures") {
