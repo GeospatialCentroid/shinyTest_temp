@@ -970,7 +970,7 @@ ui <- fluidPage(
       ),
                       p(class = "href2",
                         "Download EnviroScreen data for GIS ",
-                        tags$a(href= "https://data-cdphe.opendata.arcgis.com/",
+                        tags$a(href= "https://data-cdphe.opendata.arcgis.com/search?collection=Dataset&tags=environmental%20justice",
                                tags$span(style="color:white","here."), target = "_blank")
                       )
     ),
