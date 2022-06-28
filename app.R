@@ -966,7 +966,7 @@ ui <- fluidPage(
                       p(class = "href2",
                         "Code and data repositories are available ",
                         tags$a(href= "https://geospatialcentroid.github.io/COEnviroScreen",
-                               tags$span(style="color:white","here"), target = "_blank")
+                               tags$span(style="color:white","here."), target = "_blank")
       ),
                       p(class = "href2",
                         "Download EnviroScreen data for GIS ",
