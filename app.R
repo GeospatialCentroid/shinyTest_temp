@@ -140,7 +140,7 @@ ui <- fluidPage(
   br(),
   fluidRow(
     p(HTML("</br><a href='#map'>Jump to Map</a>")),
-    p("Colorado Enviroscreen is an interactive environmental justice mapping tool and health screening tool for Colorado. It was developed for the Colorado Department of Public Health and Environment (CDPHE) by a team from Colorado State University. Colorado EnviroScreen Version 1.0 launched on June 29, 2022. You can learn more about Colorado EnviroScreen on CDPHE’s ",
+    p("Colorado EnviroScreen is an interactive environmental justice mapping tool and health screening tool for Colorado. It was developed for the Colorado Department of Public Health and Environment (CDPHE) by a team from Colorado State University. Colorado EnviroScreen Version 1.0 launched on June 29, 2022. You can learn more about Colorado EnviroScreen on CDPHE’s ",
       tags$a(href = "https://cdphe.colorado.gov/enviroscreen", "Colorado EnviroScreen webpage.", target = "_blank"),
       "You can send feedback about Colorado EnviroScreen to CDPHE by emailing ",
       tags$a(href = "cdphe_ej@state.co.us", "cdphe_ej@state.co.us", target = "_blank"),
@@ -957,8 +957,8 @@ ui <- fluidPage(
            tags$span(style="color:white","English"), target = "_blank"),
     "and ",
     tags$a(href = "https://drive.google.com/file/d/1JCpkoNdEn4w5TiK0GgSIJmQDaZSuPP13/view?usp=sharing",
-           tags$span(style="color:white","Spanish"), target = "_blank"),
-    ") or the "
+           tags$span(style="color:white","Spanish)"), target = "_blank"),
+    " or the "
     ,tags$a(href = "https://drive.google.com/file/d/1aZfZnLeEPxvpFBILOFGpYGKLQbDxhMMF/view",
            tags$span(style="color:white","technical documentation "), target = "_blank")
     ,"(currently available only in English)."
