@@ -658,8 +658,8 @@ ui <- fluidPage(
              ,p(
                "Colorado Hazard Mapping and Risk Map portal"
                ,tags$a(
-                 href = "https://www.codot.gov/"
-                 ,tags$em("https://www.codot.gov/")
+                 href = "https://coloradohazardmapping.com/"
+                 ,tags$em("https://coloradohazardmapping.com/")
                  , target = "_blank"
                )
              )
