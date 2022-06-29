@@ -143,8 +143,7 @@ ui <- fluidPage(
     p("Colorado EnviroScreen is an interactive environmental justice mapping tool and health screening tool for Colorado. It was developed for the Colorado Department of Public Health and Environment (CDPHE) by a team from Colorado State University. Colorado EnviroScreen Version 1.0 launched on June 29, 2022. You can learn more about Colorado EnviroScreen on CDPHE’s ",
       tags$a(href = "https://cdphe.colorado.gov/enviroscreen", "Colorado EnviroScreen webpage.", target = "_blank"),
       "You can send feedback about Colorado EnviroScreen to CDPHE by emailing ",
-      tags$a(href = "cdphe_ej@state.co.us", "cdphe_ej@state.co.us", target = "_blank"),
-      "."
+      tags$a(href = "cdphe_ej@state.co.us", "cdphe_ej@state.co.us.", target = "_blank"),
     )
   ),
   fluidRow(
@@ -166,8 +165,8 @@ ui <- fluidPage(
   ),
   fluidRow(
     p("Click here for more information about the ",
-      tags$a(href = "https://cdphe.colorado.gov/environment/toxicology-and-environmental-epidemiology", "connection between the environment and our health", target = "_blank"),
-      ", and to learn about CDPHE’s work to ",
+      tags$a(href = "https://cdphe.colorado.gov/environment/toxicology-and-environmental-epidemiology", "connection between the environment and our health,", target = "_blank"),
+      " and to learn about CDPHE’s work to ",
       tags$a(href = "https://cdphe.colorado.gov/environmental-justice", "advance environmental justice", target = "_blank"),
       " and to ",
       tags$a(href = "https://cdphe.colorado.gov/air-pollution/climate-change#equity", "advance climate equity.", target = "_blank"),
@@ -503,7 +502,8 @@ ui <- fluidPage(
               ,"The team at CSU worked tirelessly to develop and build the EnviroScreen tool, with input from the community, stakeholders, and CDPHE. Moving forward, CDPHE will own and maintain the tool."
               ,br()
               ,br()
-              ,"Questions or comments about Colorado EnviroScreen should be sent to cdphe_ej@state.co.us."
+              ,"Questions or comments about Colorado EnviroScreen should be sent to ",
+              tags$a(href = "cdphe_ej@state.co.us", "cdphe_ej@state.co.us.", target = "_blank")
              )
              ,br()
              ,tags$strong("Community engagement")
@@ -517,37 +517,35 @@ ui <- fluidPage(
                ,"After the team created a basic version of Colorado EnviroScreen, they facilitated a closed-wave beta test in which more than 100 users tested the tool. In this beta, the team gathered feedback through a bilingual online questionnaire and interviews with individuals representing important groups of Colorado EnviroScreen users. After improving Colorado EnviroScreen based on feedback from the first round of beta testing, the team facilitated a public beta test. During the public beta test, many community members across Colorado shared their ideas through a bilingual online questionnaire and a public meeting. At every stage, the development team reviewed the feedback received and integrated it into the tool as much as possible."
              )
     ),
-    tabPanel("Additional Resources"
+    tabPanel("Additional resources"
              ,h4("Colorado EnviroScreen supporting materials")
              ,p(
-               "Basic user guide ("
+               "Basic user guide "
                ,tags$a(
                  href = "https://drive.google.com/file/d/1aXfZiJtv2-6lfSQeQYfMupIICEXwidiC/view?usp=sharing"
-                 ,tags$em("English")
+                 ,tags$em("(English")
                  , target = "_blank"
                )
-               ," | "
+               ,"|"
                ,tags$a(
                  href = "https://drive.google.com/file/d/1aXfZiJtv2-6lfSQeQYfMupIICEXwidiC/view?usp=sharing"
-                 ,tags$em("Spanish")
+                 ,tags$em("Spanish)")
                  , target = "_blank"
                )
-               ,")"
                ,br()
                ,br()
-               ,"Technical documentation (currently only available in"
+               ,"Technical documentation "
                ,tags$a(
                  href = "https://drive.google.com/file/d/1aXfZiJtv2-6lfSQeQYfMupIICEXwidiC/view?usp=sharing"
-                 ,tags$em("English")
+                 ,tags$em("(currently only available in English)")
                  , target = "_blank"
                )
-               ,")."
                ,br()
                ,br()
-               ,"Community engagement "
+               ,"Community engagement report "
                ,tags$a(
                  href = "https://drive.google.com/file/d/1aXfZiJtv2-6lfSQeQYfMupIICEXwidiC/view?usp=sharing"
-                 ,tags$em("executive summary")
+                 ,tags$em("(currently only available in English)")
                  , target = "_blank"
                )
              )
@@ -616,14 +614,6 @@ ui <- fluidPage(
                  , target = "_blank"
                )
              )
-             ,p(
-               "CDPHE Commerce City & North Denver Information"
-               ,tags$a(
-                 href = "https://coloradohazardmapping.com/"
-                 ,tags$em("https://coloradohazardmapping.com/")
-                 , target = "_blank"
-               )
-             )
              ,h4("Other state agencies")
              ,p(
                "Colorado Department of Natural Resources"
@@ -668,8 +658,8 @@ ui <- fluidPage(
              ,p(
                "Colorado Hazard Mapping and Risk Map portal"
                ,tags$a(
-                 href = "https://www.codot.gov/"
-                 ,tags$em("https://www.codot.gov/")
+                 href = "https://coloradohazardmapping.com/"
+                 ,tags$em("https://coloradohazardmapping.com/")
                  , target = "_blank"
                )
              )
