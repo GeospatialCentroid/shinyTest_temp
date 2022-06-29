@@ -528,7 +528,7 @@ ui <- fluidPage(
                )
                ,"|"
                ,tags$a(
-                 href = "https://drive.google.com/file/d/1aXfZiJtv2-6lfSQeQYfMupIICEXwidiC/view?usp=sharing"
+                 href = "https://drive.google.com/file/d/1JCpkoNdEn4w5TiK0GgSIJmQDaZSuPP13/view?usp=sharing"
                  ,tags$em("Spanish)")
                  , target = "_blank"
                )
@@ -536,7 +536,7 @@ ui <- fluidPage(
                ,br()
                ,"Technical documentation "
                ,tags$a(
-                 href = "https://drive.google.com/file/d/1aXfZiJtv2-6lfSQeQYfMupIICEXwidiC/view?usp=sharing"
+                 href = "https://drive.google.com/file/d/1aZfZnLeEPxvpFBILOFGpYGKLQbDxhMMF/view?usp=sharing"
                  ,tags$em("(currently only available in English)")
                  , target = "_blank"
                )
@@ -544,7 +544,7 @@ ui <- fluidPage(
                ,br()
                ,"Community engagement report "
                ,tags$a(
-                 href = "https://drive.google.com/file/d/1aXfZiJtv2-6lfSQeQYfMupIICEXwidiC/view?usp=sharing"
+                 href = "https://drive.google.com/file/d/1aaRCQA0SpKlU-ynz7RYVkmeWayfEncgB/view?usp=sharing"
                  ,tags$em("(currently only available in English)")
                  , target = "_blank"
                )
