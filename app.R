@@ -517,7 +517,7 @@ ui <- fluidPage(
                ,"After the team created a basic version of Colorado EnviroScreen, they facilitated a closed-wave beta test in which more than 100 users tested the tool. In this beta, the team gathered feedback through a bilingual online questionnaire and interviews with individuals representing important groups of Colorado EnviroScreen users. After improving Colorado EnviroScreen based on feedback from the first round of beta testing, the team facilitated a public beta test. During the public beta test, many community members across Colorado shared their ideas through a bilingual online questionnaire and a public meeting. At every stage, the development team reviewed the feedback received and integrated it into the tool as much as possible."
              )
     ),
-    tabPanel("Additional Resources"
+    tabPanel("Additional resources"
              ,h4("Colorado EnviroScreen supporting materials")
              ,p(
                "Basic user guide "
@@ -611,14 +611,6 @@ ui <- fluidPage(
                ,tags$a(
                  href = "https://cdphe.colorado.gov/cc-nd"
                  ,tags$em("https://cdphe.colorado.gov/cc-nd")
-                 , target = "_blank"
-               )
-             )
-             ,p(
-               "CDPHE Commerce City & North Denver Information"
-               ,tags$a(
-                 href = "https://coloradohazardmapping.com/"
-                 ,tags$em("https://coloradohazardmapping.com/")
                  , target = "_blank"
                )
              )
