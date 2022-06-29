@@ -137,6 +137,17 @@ ui <- fluidPage(
           ),
     column(8, h1("Colorado EnviroScreen"), p("June 2022"))
   ),
+  fluidRow(
+    class= "banner",
+    h3("View the active version of the EnviroScreen application at the following two locations"
+    ,br()
+    ,tags$a(href = "https://teeo-cdphe.shinyapps.io/COEnviroScreen_English/",
+             "English", target = "_blank")
+    ,br()
+    ,tags$a(href = "https://teeo-cdphe.shinyapps.io/COEnviroScreen_Spanish/",
+           "Spanish", target = "_blank"))
+    ,br()  
+  ),
   br(),
   fluidRow(
     p(HTML("</br><a href='#map'>Jump to Map</a>")),
