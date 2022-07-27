@@ -1,9 +1,11 @@
 # Colorado EnviroScreen Shiny App - English
 
-View shiny app [here](https://teeo-cdphe.shinyapps.io/COEnviroScreen_English/)
+View the Shiny app <a href="https://teeo-cdphe.shinyapps.io/COEnviroScreen_English/" target="_blank">here.</a>
 
 The English language inplemention for the Colorado EnviroScreen web mapping application. For more information about the code base supporting this work please visit the project landing [page](https://geospatialcentroid.github.io/COEnviroScreen/).
 
+
+The repository contains the data and code base for the English language implemention for the Colorado EnviroScreen web mapping application. For more information about the code base supporting this application, please visit the Colorado EnviroScreen repositories <a href="https://geospatialcentroid.github.io/COEnviroScreen/" target="_blank">landing page.</a>
 
 ## About the Colorado EnviroScreen project
 
