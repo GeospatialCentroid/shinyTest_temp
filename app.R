@@ -135,7 +135,7 @@ ui <- fluidPage(
              )
            )
           ),
-    column(8, h1("Colorado EnviroScreen"), p("June 2022"))
+    column(8, h1("Colorado EnviroScreen"), p("August 2022"))
   ),
   br(),
   fluidRow(
