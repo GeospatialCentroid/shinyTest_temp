@@ -60,7 +60,7 @@ getStoryMaps <- function(){
     ),
     storyMap = c(
       "https://cdphe.colorado.gov/enviroscreen",
-      "https://cdphe.colorado.gov/enviroscreen",
+      "https://storymaps.arcgis.com/stories/be0841e4066f476bad136f320bd478c8",
       "https://storymaps.arcgis.com/stories/820a90b4ee784af5ad813eb5ddcb61af",
       "https://cdphe.colorado.gov/enviroscreen",
       "https://cdphe.colorado.gov/enviroscreen",
@@ -68,7 +68,7 @@ getStoryMaps <- function(){
     )
   )%>%
     dplyr::mutate(popup = case_when(
-      Area %in% c("Pueblo", "Arkansas Valley") ~  paste0(
+      Area %in% c("San Luis Valley","Pueblo", "Arkansas Valley") ~  paste0(
         "Learn more about the environmental justice story in the ", `Area`, " region",
         paste0("<a href=",storyMap,"> on this Story Map.</a>")),
       TRUE ~ "Coming soon"
