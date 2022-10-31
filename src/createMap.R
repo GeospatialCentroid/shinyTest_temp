@@ -9,7 +9,8 @@
 #' @export
 #'
 #'
-createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice40, storyMaps) {
+createMap <- function(mapData,pal, palMap, diPal, #oil, rural, coal, 
+                      di, justice40, storyMaps) {
   #story map icon 
   sm_Icon <- makeIcon("www/StoryMaps.png",
                       iconWidth = 40,
@@ -53,12 +54,12 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
     layerId = mapData$GEOID,
     group = "Indicator Score"
   )%>%
-    addPolyLine(sf1 = oil, group = "Oil and Gas Community", 
-                popup = "<strong>Definition: </strong> Counties that have active oil and gas operations.")%>%
-    addPolyLine(sf1 = rural, group = "Rural", 
-                popup = "<strong>Definition: </strong> Counties that do not contain a U.S. Census Bureau's urban area") %>%
-    addPolyLine(sf1 = coal, group = "Coal Community", 
-                popup = "<strong>Definition: </strong> Counties that have a coal-burning power plant.") %>%
+    # addPolyLine(sf1 = oil, group = "Oil and Gas Community", 
+    #             popup = "<strong>Definition: </strong> Counties that have active oil and gas operations.")%>%
+    # addPolyLine(sf1 = rural, group = "Rural", 
+    #             popup = "<strong>Definition: </strong> Counties that do not contain a U.S. Census Bureau's urban area") %>%
+    # addPolyLine(sf1 = coal, group = "Coal Community", 
+    #             popup = "<strong>Definition: </strong> Counties that have a coal-burning power plant.") %>%
     addPolygons(
       data = di,
       fillColor =  ~diPal(`color`),
@@ -111,27 +112,27 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
               opacity = 1,
               group = "Disproportionately Impacted Community"
     )%>%
-    addLegendImage(images = "www/oilGas.png",
-                   labels = "Oil and Gas Community",
-                   width = 25,
-                   height = 25,
-                   position = 'topright',
-                   group = "Oil and Gas Community",
-                   labelStyle = "font-size: 16")%>%
-    addLegendImage(images = "www/rural.png",
-                   labels = "Rural",
-                   width = 25,
-                   height = 25,
-                   position = 'topright',
-                   group = "Rural",
-                   labelStyle = "font-size: 16")%>%
-    addLegendImage(images = "www/coal.png",
-                   labels = "Coal Community",
-                   width = 25,
-                   height = 25,
-                   position = 'topright',
-                   group = "Coal Community",
-                   labelStyle = "font-size: 16")%>%
+    # addLegendImage(images = "www/oilGas.png",
+    #                labels = "Oil and Gas Community",
+    #                width = 25,
+    #                height = 25,
+    #                position = 'topright',
+    #                group = "Oil and Gas Community",
+    #                labelStyle = "font-size: 16")%>%
+    # addLegendImage(images = "www/rural.png",
+    #                labels = "Rural",
+    #                width = 25,
+    #                height = 25,
+    #                position = 'topright',
+    #                group = "Rural",
+    #                labelStyle = "font-size: 16")%>%
+    # addLegendImage(images = "www/coal.png",
+    #                labels = "Coal Community",
+    #                width = 25,
+    #                height = 25,
+    #                position = 'topright',
+    #                group = "Coal Community",
+    #                labelStyle = "font-size: 16")%>%
     addLegend("topright",
               colors = "#fb9a99", 
               labels =  "Justice40 Community",
@@ -143,9 +144,9 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
     baseGroups = c("Light","Dark", "OpenStreetMap"),
     overlayGroups = c(
       "Indicator Score",
-      "Coal Community",
-      "Rural",
-      "Oil and Gas Community",
+      # "Coal Community",
+      # "Rural",
+      # "Oil and Gas Community",
       "Disproportionately Impacted Community",
       "Justice40",
       "Story Maps"
@@ -161,9 +162,9 @@ createMap <- function(mapData,pal, palMap, diPal, oil, rural, coal, di, justice4
     # hide layers (off when stating)
     hideGroup(
       group = c(
-        "Coal Community",
-        "Rural",
-        "Oil and Gas Community",
+        # "Coal Community",
+        # "Rural",
+        # "Oil and Gas Community",
         "Disproportionately Impacted Community",
         "Justice40",
         "Story Maps"))

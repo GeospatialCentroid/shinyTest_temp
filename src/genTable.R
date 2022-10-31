@@ -150,8 +150,10 @@ genTable <- function(tableData, geoid, colSelected){
         "GEOID",
         "County Name",
         "Disproportionately Impacted Community",
-        "Justice40","Coal Community",
-        "Oil and Gas Community","Rural", 
+        "Justice40",
+        # "Coal Community",
+        # "Oil and Gas Community",
+        # "Rural", 
         "Total Population"
       )
   } 

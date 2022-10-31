@@ -28,16 +28,16 @@ getDI <- function(){
     )%>%
     mutate(popup =
              paste0(
-               "<br/><strong>Disproportionally Impacted Community: </strong>",
+               "<br/><strong>Disproportionately Impacted Community: </strong>",
                "<br/><b>Census Block Group: </b>", GEOID,
                "<br/>",
-               "<br/><b>40% of Households are Low Income: </b>", FLP_FLA,
+               "<br/><b>Over 40% of Households are Low Income: </b>", FLP_FLA,
                "<br/><b>Percent Low Income: </b>", round(Pov_PCT*100, digits = 1),
                "<br/>",
-               "<br/><b>40% of Households are Minority : </b>", Mn_FLAG,
-               "<br/><b>Percent Minority: </b>", round(Min_PCT*100, digits = 1),
+               "<br/><b>Over 40% of Households are People of Color:  </b>", Mn_FLAG,
+               "<br/><b>Percent People of Color: </b>", round(Min_PCT*100, digits = 1),
                "<br/>",
-               "<br/><b>40% of Households are Housing Burdened : </b>", Br_FLAG,
+               "<br/><b>Over 40% of Households are Housing Burdened: </b>", Br_FLAG,
                "<br/><b>Percent Housing Burdened: </b>", round(HH_Burdened_Pct*100, digits = 1),
                "<br/>",
                "<br/>",
