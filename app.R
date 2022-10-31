@@ -270,7 +270,7 @@ ui <- fluidPage(
               ,"The base map options provide different background maps (e.g., light, dark, or with streets and points of interest). The base map options do not influence the ranks or measures presented in the tool."
               ,br()
               ,br()
-              ,"The additional map layers provide information about areas that produce oil and gas, have coal power plants, are rural communities, are areas designated by the federal government as Justice40 areas, or are areas that meet CDPHE’s definition of disproportionately impacted communities. The additional map layers options only provide additional context. The additional map layer options are not part of the EnviroScreen methods and do not influence the ranks or measures presented in the tool."
+              ,"The additional map layers provide information about areas designated by the federal government as Justice40 areas or areas that meet CDPHE’s definition of disproportionately impacted communities. The additional map layers options only provide additional context. The additional map layer options are not part of the EnviroScreen methods and do not influence the ranks or measures presented in the tool."
             ),
             tags$h4("Step 3: Explore the data in another way."),
             p(
@@ -427,10 +427,10 @@ ui <- fluidPage(
              ,p(
                "This Climate Vulnerability score represents a community’s risk of drought, flood, extreme heat, and wildfire compared to the rest of the state. The score ranges from 0 to 100; the higher the score, the higher the burden."
              )
-             ,tags$strong("Coal Community")
-             ,p(
-               "All census tracts and block groups within counties that have a coal-burning power plant are designated as coal communities. This data is not part of the EnviroScreen components or score, and does not influence the results presented in the map, charts or table. "
-             )
+             # ,tags$strong("Coal Community")
+             # ,p(
+             #   "All census tracts and block groups within counties that have a coal-burning power plant are designated as coal communities. This data is not part of the EnviroScreen components or score, and does not influence the results presented in the map, charts or table. "
+             # )
              ,tags$strong("Demographics score")
              ,p(
                
@@ -471,18 +471,18 @@ ui <- fluidPage(
              ,p(
                "In 2021, the White House launched the Justice40 Initiative. The goal of the Justice40 Initiative is to provide 40 percent of the overall benefits of Federal investments in seven key areas to disadvantaged communities. These seven key areas are: climate change, clean energy and energy efficiency, clean transit, affordable and sustainable housing, training and workforce development, the remediation and reduction of legacy pollution, and the development of critical clean water infrastructure. According to the definition of Justice40, a community qualifies as “disadvantaged,” if the census tract is above the threshold for one or more environmental or climate indicators and the tract is above the threshold for the socioeconomic indicators. This definition is not part of the EnviroScreen components or score, and does not influence the results presented in the map, charts or table. "
              )
-             ,tags$strong("Oil and Gas Community")
-             ,p(
-               "All census tracts and block groups within counties that have active oil and gas operations are designated as oil and gas communities. Proximity to oil and gas is also included in EnviroScreen as a part of the environmental effect component."
-             )
+             # ,tags$strong("Oil and Gas Community")
+             # ,p(
+             #   "All census tracts and block groups within counties that have active oil and gas operations are designated as oil and gas communities. Proximity to oil and gas is also included in EnviroScreen as a part of the environmental effect component."
+             # )
              ,tags$strong("Pollution and Climate Burden score")
              ,p(
                "The Pollution and Climate Burden score combines the scores from the following components: Environmental Exposures, Environmental Effects, and Climate Vulnerability. The score ranges from 0 to 100, with the highest score representing the most environmentally burdened populations."
              )
-             ,tags$strong("Rural")
-             ,p(
-               "The U.S. Census Bureau's 'urban areas' are densely populated and include residential, commercial, and other properties. Counties that include these urban areas are considered urban. All counties not included within urban centers are considered rural counties. This data is not part of the EnviroScreen components or score, and does not influence the results presented in the map, charts or table. "
-             )
+             # ,tags$strong("Rural")
+             # ,p(
+             #   "The U.S. Census Bureau's 'urban areas' are densely populated and include residential, commercial, and other properties. Counties that include these urban areas are considered urban. All counties not included within urban centers are considered rural counties. This data is not part of the EnviroScreen components or score, and does not influence the results presented in the map, charts or table. "
+             # )
              ,tags$strong("Sensitive Populations score")
              ,p(
                "The sensitive populations score captures how at risk a community is to environmental exposures and climate impacts as it relates to health. For example, air pollution has stronger impacts on older and younger people, and people with chronic conditions such as asthma. The score ranges from 0 to 100, with a higher score being worse. The score is calculated using data on asthma hospitalization rate, cancer prevalence, diabetes prevalence, heart disease prevalence, life expectancy, low birth weight rate, mental health, population over 65, and population under 5."
@@ -1009,7 +1009,8 @@ server <- function(input, output,session) {
      # render leaflet object
      createMap(mapData = mapData, di = di, diPal = diPal,
               pal = colorRamp, palMap = palMap,
-              oil=oil, rural = rural, coal = coal, justice40 = justice40,
+              #oil=oil, rural = rural, coal = coal, 
+              justice40 = justice40,
               storyMap = sm)
     })
 
@@ -1101,7 +1102,11 @@ server <- function(input, output,session) {
       paste(input$Geom, "_data.csv", sep = "")
     },
     content = function(file) {
-      write.csv(df1() %>% sf::st_drop_geometry() %>% select(-"visParam"), file, row.names = FALSE)    }
+      write.csv(df1() %>% sf::st_drop_geometry() %>% select(-"visParam", 
+                                                            -"Coal Community",
+                                                            -"Oil and Gas Community",
+                                                            -"Rural"), 
+                file, row.names = FALSE)    }
   )
   # Downloadable csv of data description ----
   output$downloadData2 <- downloadHandler(
@@ -1138,7 +1143,9 @@ server <- function(input, output,session) {
     ed2 <- envoData[envoData$area == geo, ]
     ed2 <- ed2 %>%
       mutate(visParam = !!as.symbol(indicator))%>%# https://stackoverflow.com/questions/62862705/r-shiny-mutate-replace-how-to-mutate-specific-column-selected-from-selectinput
-      dplyr::select(GEOID, `County Name`, indicator1, indicator2,`Coal Community`,`Oil and Gas Community`,`Rural`,visParam)
+      dplyr::select(GEOID, `County Name`, indicator1, indicator2,
+                    #`Coal Community`,`Oil and Gas Community`,`Rural`,
+                    visParam)
 
     ed2 <- ed2 %>%
       dplyr::mutate(
@@ -1146,10 +1153,11 @@ server <- function(input, output,session) {
           "<br/><strong>", as.character(in1),"</strong>", # needs to be text
           paste0("<br/><strong>",`County Name`,"</strong>"),
           paste0("<br/><b>Measured:</b> ", round(!!as.symbol(indicator1), digits = 2),
-                   "<br/><b>Score:</b> ", round(!!as.symbol(indicator2), digits =  0)),
-          paste0("<br/><b>Coal Community:</b> ", `Coal Community`),
-          paste0("<br/><b>Oil and Gas Community:</b> ", `Oil and Gas Community`),
-          paste0("<br/><b>Rural:</b> ", `Rural`)
+                   "<br/><b>Score (percentile):</b> ", round(!!as.symbol(indicator2), digits =  0))
+          # ,
+          # paste0("<br/><b>Coal Community:</b> ", `Coal Community`),
+          # paste0("<br/><b>Oil and Gas Community:</b> ", `Oil and Gas Community`),
+          # paste0("<br/><b>Rural:</b> ", `Rural`)
       )
     )
 
