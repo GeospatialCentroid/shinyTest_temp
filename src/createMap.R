@@ -97,7 +97,7 @@ createMap <- function(mapData,pal, palMap, diPal, #oil, rural, coal,
     colors = pal,
     title = "Est. Values",
     labels = c("Most Burdened", "", "", "", "Least Burdened"),
-    opacity = 1,
+    opacity = .5,
     layerId = "firstLegend",
     group = "Indicator Score",
     na.label = "No Data"
@@ -109,7 +109,7 @@ createMap <- function(mapData,pal, palMap, diPal, #oil, rural, coal,
               title = "Disproportionately Impacted Community",
               labels = c("Low Income", "People of Color",
                          "Housing Burden", "More than one category"),
-              opacity = 1,
+              opacity = .8,
               group = "Disproportionately Impacted Community"
     )%>%
     # addLegendImage(images = "www/oilGas.png",
@@ -136,7 +136,7 @@ createMap <- function(mapData,pal, palMap, diPal, #oil, rural, coal,
     addLegend("topright",
               colors = "#fb9a99", 
               labels =  "Justice40 Community",
-              opacity = 1,
+              opacity = .8,
               group = "Justice40"
     )%>%
     # add control groups ------------------------------------------------------
