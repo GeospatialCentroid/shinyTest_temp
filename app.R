@@ -1174,7 +1174,7 @@ server <- function(input, output,session) {
         color = "#F9C1AE",
         weight = 0.2,
         smoothFactor = 0.5,
-        opacity = 1.0,
+        opacity = .5,
         layerId = ed2$GEOID,
         fillOpacity = 0.5,
         fillColor =  ~pal1(ed2$visParam),
@@ -1194,7 +1194,7 @@ server <- function(input, output,session) {
         colors = colorRamp,
         title = "Est. Values",
         labels = labels1,
-        opacity = 1,
+        opacity = .5,
         layerId = "firstLegend",
         group = "Indicator Score"
         # labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))
