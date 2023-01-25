@@ -55,8 +55,8 @@ sm <- getStoryMaps()
 
 # palette for DI layer
 diPal <- colorFactor(palette = c(
-  "#a6cee3", "#33a02c","#b2df8a","#1f78b4"), levels = c("Low Income", "People of Color",
-                                                       "Housing Burden", "More then one category"), di$color
+  "#a6cee3", "#33a02c","#b2df8a", "#fc8d62", "#1f78b4"), levels = c("Low Income", "People of Color",
+                                                       "Housing Burden", "EnviroScreen Score", "More then one category"), di$color
 )
 
 ### light as low
@@ -415,7 +415,7 @@ ui <- fluidPage(
                 tags$li("The non-profit staff goes to the Colorado EnviroScreen webpage.")
                 ,tags$li("They use the “Search” feature in the map to find the census tract in which their community is located. ")
                 ,tags$li("They click the area on the map and visualize the results in the charts and table to view additional information. ")
-                ,tags$li(" They review how the overall EnviroScreen, component and indicator scores for their census tract compare with the rest of the state. ")
+                ,tags$li("They review how the overall EnviroScreen, component and indicator scores for their census tract compare with the rest of the state. ")
                 ,tags$li("They download the data for their community at the bottom of the page. ")
                 ,tags$li("They use this information to write a compelling grant application for community air monitors.")
               )
@@ -438,7 +438,7 @@ ui <- fluidPage(
              )
              ,tags$strong("Disproportionately Impacted Community")
              ,p(
-               "This term refers to areas that meet the definition of “Disproportionately Impacted Community” in the Colorado Environmental Justice Act (House Bill 21-1266). The definition includes census block groups where more than 40% of the population are low-income, housing cost-burdened, or people of color. “Low-income” means that median household income is at or below 200% of the federal poverty line. “Housing cost-burdened” means that a household spends more than 30% of its income on housing costs. “People of color” includes all people who do not identify as non-Hispanic white. This definition is not part of the EnviroScreen components or score, and does not influence the results presented in the map, charts or table."
+               "This term refers to areas that meet the definition of “Disproportionately Impacted Community” in the Colorado Environmental Justice Act (House Bill 21-1266). The definition includes census block groups where more than 40% of the population are low-income, housing cost-burdened, or people of color. “Low-income” means that median household income is at or below 200% of the federal poverty line. “Housing cost-burdened” means that a household spends more than 30% of its income on housing costs. “People of color” includes all people who do not identify as non-Hispanic white. This also includes census block groups that experience higher rates of cumulative impacts, which is represented by an EnviroScreen Score (Percentile) above 80. This definition is not part of the EnviroScreen components or score, and does not influence the results presented in the map, charts or table."
              )
              ,tags$strong("Environmental Effects score")
              ,p(
@@ -1143,15 +1143,15 @@ server <- function(input, output,session) {
     ed2 <- envoData[envoData$area == geo, ]
     ed2 <- ed2 %>%
       mutate(visParam = !!as.symbol(indicator))%>%# https://stackoverflow.com/questions/62862705/r-shiny-mutate-replace-how-to-mutate-specific-column-selected-from-selectinput
-      dplyr::select(GEOID, `County Name`, indicator1, indicator2,
+      dplyr::select(GEOID, `County Name`, indicator1, indicator2, area,
                     #`Coal Community`,`Oil and Gas Community`,`Rural`,
                     visParam)
 
     ed2 <- ed2 %>%
       dplyr::mutate(
-        popup = paste0(
-          "<br/><strong>", as.character(in1),"</strong>", # needs to be text
+        popup = paste0("<strong>", as.character(in1),"</strong>", # needs to be text
           paste0("<br/><strong>",`County Name`,"</strong>"),
+          paste0("<br/><strong>", area, " GEOID: </strong>", GEOID),
           paste0("<br/><b>Measured:</b> ", round(!!as.symbol(indicator1), digits = 2),
                    "<br/><b>Score (percentile):</b> ", round(!!as.symbol(indicator2), digits =  0))
           # ,
