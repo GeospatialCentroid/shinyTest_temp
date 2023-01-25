@@ -13,8 +13,7 @@ initialMapData <- function(data1){
                   `County Name`, visParam,`Coal Community`,`Oil and Gas Community`,
                   `Rural`)%>%
     dplyr::mutate(
-    popup = paste0(
-          "<br/><strong>Enviroscreen Score</strong>", # needs to be text
+    popup = paste0("<strong>Enviroscreen Score</strong>", # needs to be text
           paste0("<br/><strong>",`County Name`,"</strong>"),
           paste0("<br/><b>Measured:</b> ", round(`EnviroScreen Score`, digits = 2),
             "<br/><b>Score (percentile):</b> ", as.character(round(`EnviroScreen Score Percentile`), digits =  0))
