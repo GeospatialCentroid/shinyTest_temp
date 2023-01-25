@@ -105,10 +105,10 @@ createMap <- function(mapData,pal, palMap, diPal, #oil, rural, coal,
     # labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))
   ) %>%
     addLegend("topright",
-              colors = c("#a6cee3", "#33a02c","#b2df8a","#1f78b4"), 
+              colors = c("#a6cee3", "#33a02c","#b2df8a", "#fc8d62", "#1f78b4"), 
               title = "Disproportionately Impacted Community",
               labels = c("Low Income", "People of Color",
-                         "Housing Burden", "More than one category"),
+                         "Housing Burden", "EnviroScreen Score", "More than one category"),
               opacity = .8,
               group = "Disproportionately Impacted Community"
     )%>%
