@@ -24,6 +24,10 @@ getDI <- function(){
       Br_FLAG = case_when(
         Burdened_FLAG == 1 ~ "Yes",
         Burdened_FLAG == 0 ~ "No"
+      ),
+      Sc_FLAG = case_when(
+        Score_FLAG == 1 ~ "Yes",
+        Score_FLAG == 0 ~ "No"
       )
     )%>%
     mutate(popup =
@@ -40,17 +44,21 @@ getDI <- function(){
                "<br/><b>Over 40% of Households are Housing Burdened: </b>", Br_FLAG,
                "<br/><b>Percent Housing Burdened: </b>", round(HH_Burdened_Pct*100, digits = 1),
                "<br/>",
+               "<br/><b>EnviroScreen Score (Percentile) is over 80: </b>", Sc_FLAG,
+               "<br/><b>EnviroScreen score (Percentile): </b>", round(EnviroScreen_Pctl, digits = 1),
                "<br/>",
-               "Read more about Colorado’s definition of Disproportionately Impacted Communities in the ",
+               "<br/>",
+               "Read more about Colorado's definition of Disproportionately Impacted Communities in the ",
                 tags$a(href = "https://cdphe.colorado.gov/environmental-justice", 
                           "Environmental Justice Act.", target = "_blank")
             )
           )%>%
     mutate(
       color = as.factor(case_when(
-        Mn_FLAG == "Yes" & FLP_FLA == "No" & Br_FLAG == "No" ~ "People of Color",
-        Mn_FLAG == "No" & FLP_FLA == "Yes" & Br_FLAG == "No" ~ "Low Income",
-        Mn_FLAG == "No" & FLP_FLA == "No" & Br_FLAG == "Yes" ~ "Housing Burden",
+        Mn_FLAG == "Yes" & FLP_FLA == "No" & Br_FLAG == "No" & Sc_FLAG == "No" ~ "People of Color",
+        Mn_FLAG == "No" & FLP_FLA == "Yes" & Br_FLAG == "No" & Sc_FLAG == "No"~ "Low Income",
+        Mn_FLAG == "No" & FLP_FLA == "No" & Br_FLAG == "Yes" & Sc_FLAG == "No"~ "Housing Burden",
+        Mn_FLAG == "No" & FLP_FLA == "No" & Br_FLAG == "No" & Sc_FLAG == "Yes"~ "EnviroScreen Score",
         TRUE ~ "More then one category"
       ))
     )%>%

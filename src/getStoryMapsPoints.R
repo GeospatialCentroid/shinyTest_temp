@@ -62,13 +62,13 @@ getStoryMaps <- function(){
       "https://cdphe.colorado.gov/enviroscreen",
       "https://storymaps.arcgis.com/stories/be0841e4066f476bad136f320bd478c8",
       "https://storymaps.arcgis.com/stories/820a90b4ee784af5ad813eb5ddcb61af",
-      "https://cdphe.colorado.gov/enviroscreen",
+      "https://storymaps.arcgis.com/stories/3be4e7f804a04a5487286cbf8efc491e",
       "https://cdphe.colorado.gov/enviroscreen",
       "https://storymaps.arcgis.com/stories/0ef3038fda624133ba3c517462ed0e8d"
     )
   )%>%
     dplyr::mutate(popup = case_when(
-      Area %in% c("San Luis Valley","Pueblo", "Arkansas Valley") ~  paste0(
+      Area %in% c("San Luis Valley","Pueblo", "Arkansas Valley", "Commerce City/North Denver") ~  paste0(
         "Learn more about the environmental justice story in the ", `Area`, " region",
         paste0("<a href=",storyMap,"> on this Story Map.</a>")),
       TRUE ~ "Coming soon"
