@@ -28,9 +28,9 @@ envoData <- readRDS(paste0("data/scores/allScores_",version,".rds"))%>%
 
 
 # Additional Data
-oil <- readRDS("data/scores/oilgasVis.rds")
-coal <- readRDS("data/scores/coalVis.rds")
-rural <- readRDS("data/scores/ruralVis.rds")
+# oil <- readRDS("data/scores/oilgasVis.rds")
+# coal <- readRDS("data/scores/coalVis.rds")
+# rural <- readRDS("data/scores/ruralVis.rds")
 descriptors <- read_csv("data/descriptions/indicatorDesc.csv") %>%
   dplyr::select(1:6)%>%
   `colnames<-`(c("Indicator", "Source", "Date", "Units", "Measured_Geography", "Description"))
@@ -48,15 +48,33 @@ justice40 <- readRDS("data/scores/justice40.rds") %>%
     )
   )
 
-# di community
+# di communities
 di <- getDI()
+
+di_2023 <- getDI_2023()
+
+di_AQCC <- getDI_AQCC()
+
+di_MHC <- getDI_MHC()
+
 # storyMap Locations
 sm <- getStoryMaps()
 
 # palette for DI layer
 diPal <- colorFactor(palette = c(
   "#a6cee3", "#33a02c","#b2df8a", "#fc8d62", "#1f78b4"), levels = c("Low Income", "People of Color",
-                                                       "Housing Burden", "EnviroScreen Score", "More then one category"), di$color
+                                                       "Housing Burden", "EnviroScreen Score", "More than one category"), di$color
+)
+
+diPal_2023 <- colorFactor(palette = c(
+ '#332288', '#88CCEE', '#44AA99', '#117733', '#999933', '#DDCC77', '#CC6677', '#882255'), levels = c("Low Income", "People of Color",
+                                                                    "Housing Burden", "Linguistically isolated", 
+                                                                    "Federally identified (CEJST)", "Tribal Lands", 
+                                                                    "EnviroScreen Score", "More than one category"), di_2023$color
+)
+
+diPal_AQCC <- colorFactor(palette = c("#d95f02", "#1b9e77"), 
+                          levels = c("Socioeconomically Vulnerable Community", "Cumulatively Impacted Community"), di_AQCC$color
 )
 
 ### light as low
@@ -135,7 +153,7 @@ ui <- fluidPage(
              )
            )
           ),
-    column(8, h1("Colorado EnviroScreen"), p("August 2022"))
+    column(8, h1("Colorado EnviroScreen"), p("May 2023"))
   ),
   br(),
   fluidRow(
@@ -152,7 +170,7 @@ ui <- fluidPage(
     tags$ul(
         tags$li("Identifies areas with current and past environmental inequities."),
         tags$li("Pinpoints areas where disproportionately impacted communities have a greater health burden and/or face more environmental risks."),
-        tags$li("Identifies geographically disproportionately impacted communities based on the definition in Colorado’s Environmental Justice Act (House Bill 21-1266).")
+        tags$li("Identifies geographic areas that meet the definition of disproportionately impacted communities under Colorado law (House Bill 23-1233, C.R.S. § 24-4-109(2)(b)(II)).")
       )
   ),
   fluidRow(
@@ -193,7 +211,7 @@ ui <- fluidPage(
                  tags$li("Show which areas in Colorado are more likely to have higher environmental health injustices."),
                  tags$li("Identify areas in Colorado where government agencies can prioritize resources and work to reduce pollution and other sources of environmental injustice."),
                  tags$li("Provide information to empower communities to advocate to improve public health and the environment."),
-                 tags$li("Identify areas that meet the definition of “Disproportionately Impacted Community” under the Colorado Environmental Justice Act (HB21-1266)."),
+                 tags$li("Identify geographic areas that meet the definition of disproportionately impacted communities under Colorado law (House Bill 23-1233, C.R.S. § 24-4-109(2)(b)(II))."),
               )
              )
              ,p(
@@ -270,7 +288,7 @@ ui <- fluidPage(
               ,"The base map options provide different background maps (e.g., light, dark, or with streets and points of interest). The base map options do not influence the ranks or measures presented in the tool."
               ,br()
               ,br()
-              ,"The additional map layers provide information about areas designated by the federal government as Justice40 areas or areas that meet CDPHE’s definition of disproportionately impacted communities. The additional map layers options only provide additional context. The additional map layer options are not part of the EnviroScreen methods and do not influence the ranks or measures presented in the tool."
+              ,"The additional map layers provide information about areas designated by the federal government as disadvantaged in the Climate and Economic Justice Screening Tool (CEJST) for purposes of distributing Justice40 funding. Other layers show  areas that meet the current and prior definitions of disproportionately impacted communities that apply to all state agencies, including CDPHE. Not that mobile home parks are part of the current definition of disproportionately impacted community includes mobile home parks, which are displayed in a separate layer because they are point sources rather than census block groups. Another, separate layer shows areas where the Air Quality Control Commission (AQCC) Regulation (Reg.) Number 3, which governs permitting in disproportionately impacted communities, applies. The additional map layers options only provide additional context. The additional map layer options are not part of the EnviroScreen methods and do not influence the ranks or measures presented in the tool."
             ),
             tags$h4("Step 3: Explore the data in another way."),
             p(
@@ -423,6 +441,10 @@ ui <- fluidPage(
           ),
     tabPanel(title =  "Definitions",
              br()
+             ,tags$strong("AQCC Reg. 3 - Disproportionately Impacted Community")
+             ,p(
+               "This term refers to areas that are subject to Air Quality Control Commission (AQCC) Regulation (Reg.) Number 3, which is a rule that requires stronger permitting protections for facilities located in disproportionately impacted communities.  This includes most of the areas that meet the broader statewide definition of disproportionately impacted community, but does not include areas that meet the federal definition of disadvantaged community in the Climate and Economic Justice Screening Tool, the Ute Mountain Ute and Southern Ute Reservations, and mobile home parks."
+             )
              ,tags$strong("Climate Vulnerability score")
              ,p(
                "This Climate Vulnerability score represents a community’s risk of drought, flood, extreme heat, and wildfire compared to the rest of the state. The score ranges from 0 to 100; the higher the score, the higher the burden."
@@ -438,7 +460,11 @@ ui <- fluidPage(
              )
              ,tags$strong("Disproportionately Impacted Community")
              ,p(
-               "This term refers to areas that meet the definition of “Disproportionately Impacted Community” in the Colorado Environmental Justice Act (House Bill 21-1266). The definition includes census block groups where more than 40% of the population are low-income, housing cost-burdened, or people of color. “Low-income” means that median household income is at or below 200% of the federal poverty line. “Housing cost-burdened” means that a household spends more than 30% of its income on housing costs. “People of color” includes all people who do not identify as non-Hispanic white. This also includes census block groups that experience higher rates of cumulative impacts, which is represented by an EnviroScreen Score (Percentile) above 80. This definition is not part of the EnviroScreen components or score, and does not influence the results presented in the map, charts or table."
+               "This term refers to areas that meet the definition of “Disproportionately Impacted Community” under Colorado law. House Bill 23-1233 adopted a definition that applies to all state agencies, including CDPHE.  The definition includes census block groups where more than 40% of the population are low-income (meaning that median household income is at or below 200% of the federal poverty line), 50% of the households are housing cost-burdened (meaning that a household spends more than 30% of its income on housing costs like rent or a mortgage), 40% of the population are people of color (including all people who do not identify as non-Hispanic white), or 20% of households are linguistically isolated (meaning that all members of a household that are 14 years old or older have difficulty with speaking English. Also included in this definition are mobile home communities, the Ute Mountain Ute and Southern Ute Indian Reservations, and all areas that qualify as disadvantaged in the federal Climate and Economic Justice Screening Tool. The definition also includes census block groups that experience higher rates of cumulative impacts, which is represented by an EnviroScreen Score (Percentile) above 80. This definition is not part of the EnviroScreen components or score, and does not influence the results presented in the map, charts or table. Both areas that meet the current definition of of disproportionately impacted community that was adopted in May 2023 by HB23-1233, and the prior definition (which only included the race, income, housing cost burden, and EnviroScreen score above the 80th percentile) are shown in Colorado EnviroScreen."
+             )
+             ,tags$strong("Federal CEJST (Justice40)")
+             ,p(
+               "In 2021, the White House directed the Council on Environmental Quality to develop the Climate and Economic Justice Screening Tool (CEJST). The tool identifies communities that are considered disadvantaged due to burdens related to climate change, energy, health, housing, legacy pollution, transportation, water and wastewater, and workforce development. Federal agencies use the federal CEJST map to identify communities that will benefit from programs in the Justice40 Initiative. The goal of the Justice40 Initiative is to provide 40% of the overall benefits of investments in climate, clean energy, and related areas  to disadvantaged communities.  This definition is not part of the EnviroScreen components or score, and does not influence the results presented in the map, charts or table. Areas that the federal Climate and Economic Justice Screening Tool identifies as disadvantaged also meet the definition of disproportionately impacted community under Colorado law."
              )
              ,tags$strong("Environmental Effects score")
              ,p(
@@ -466,10 +492,6 @@ ui <- fluidPage(
              ,tags$strong("Health and Social Factors score")
              ,p(
                "The Health and Social Factors score combines the Sensitive Populations and Demographics scores. The score ranges from 0 to 100, with the highest score representing the most susceptible and vulnerable populations."
-             )
-             ,tags$strong("Justice40")
-             ,p(
-               "In 2021, the White House launched the Justice40 Initiative. The goal of the Justice40 Initiative is to provide 40 percent of the overall benefits of Federal investments in seven key areas to disadvantaged communities. These seven key areas are: climate change, clean energy and energy efficiency, clean transit, affordable and sustainable housing, training and workforce development, the remediation and reduction of legacy pollution, and the development of critical clean water infrastructure. According to the definition of Justice40, a community qualifies as “disadvantaged,” if the census tract is above the threshold for one or more environmental or climate indicators and the tract is above the threshold for the socioeconomic indicators. This definition is not part of the EnviroScreen components or score, and does not influence the results presented in the map, charts or table. "
              )
              # ,tags$strong("Oil and Gas Community")
              # ,p(
@@ -1008,6 +1030,9 @@ server <- function(input, output,session) {
    output$mymap <- renderLeaflet({
      # render leaflet object
      createMap(mapData = mapData, di = di, diPal = diPal,
+               di_2023 = di_2023, diPal_2023 = diPal_2023,
+               di_AQCC = di_AQCC, diPal_AQCC = diPal_AQCC,
+               di_MHC = di_MHC,
               pal = colorRamp, palMap = palMap,
               #oil=oil, rural = rural, coal = coal, 
               justice40 = justice40,
@@ -1102,10 +1127,12 @@ server <- function(input, output,session) {
       paste(input$Geom, "_data.csv", sep = "")
     },
     content = function(file) {
-      write.csv(df1() %>% sf::st_drop_geometry() %>% select(-"visParam", 
-                                                            -"Coal Community",
-                                                            -"Oil and Gas Community",
-                                                            -"Rural"), 
+      write.csv(df1() %>% sf::st_drop_geometry() %>% select(-"visParam"
+                                                            # , 
+                                                            # -"Coal Community",
+                                                            # -"Oil and Gas Community",
+                                                            # -"Rural"
+                                                            ), 
                 file, row.names = FALSE)    }
   )
   # Downloadable csv of data description ----
