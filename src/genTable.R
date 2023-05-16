@@ -149,7 +149,9 @@ genTable <- function(tableData, geoid, colSelected){
       select(
         "GEOID",
         "County Name",
-        "Disproportionately Impacted Community",
+        "Disproportionately Impacted Community (May 2023)",
+        "AQCC Reg 3 Disproportionately Impacted Community",
+        "Prior Disproportionately Impacted Community (January 2023-May 2023)",
         "Justice40",
         # "Coal Community",
         # "Oil and Gas Community",

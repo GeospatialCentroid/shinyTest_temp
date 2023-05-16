@@ -10,8 +10,9 @@ initialMapData <- function(data1){
   d1 <- data1 %>%
     dplyr::filter(area == "County")%>%
     dplyr::select(GEOID,"EnviroScreen Score",  "EnviroScreen Score Percentile", 
-                  `County Name`, visParam,`Coal Community`,`Oil and Gas Community`,
-                  `Rural`)%>%
+                  `County Name`, visParam
+                  # ,`Coal Community`,`Oil and Gas Community`, `Rural`
+                  )%>%
     dplyr::mutate(
     popup = paste0("<strong>Enviroscreen Score</strong>", # needs to be text
           paste0("<br/><strong>",`County Name`,"</strong>"),

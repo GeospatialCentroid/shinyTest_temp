@@ -32,7 +32,7 @@ getDI <- function(){
     )%>%
     mutate(popup =
              paste0(
-               "<br/><strong>Disproportionately Impacted Community: </strong>",
+               "<br/><strong>Prior Disproportionately Impacted Community (Jan 2023 - May 2023): </strong>",
                "<br/><b>Census Block Group: </b>", GEOID,
                "<br/>",
                "<br/><b>Over 40% of Households are Low Income: </b>", FLP_FLA,
@@ -59,9 +59,10 @@ getDI <- function(){
         Mn_FLAG == "No" & FLP_FLA == "Yes" & Br_FLAG == "No" & Sc_FLAG == "No"~ "Low Income",
         Mn_FLAG == "No" & FLP_FLA == "No" & Br_FLAG == "Yes" & Sc_FLAG == "No"~ "Housing Burden",
         Mn_FLAG == "No" & FLP_FLA == "No" & Br_FLAG == "No" & Sc_FLAG == "Yes"~ "EnviroScreen Score",
-        TRUE ~ "More then one category"
+        TRUE ~ "More than one category"
       ))
     )%>%
     as('sf')
   return(diCommunity)
+  
 }

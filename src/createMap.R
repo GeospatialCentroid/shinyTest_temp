@@ -9,8 +9,9 @@
 #' @export
 #'
 #'
-createMap <- function(mapData,pal, palMap, diPal, #oil, rural, coal, 
-                      di, justice40, storyMaps) {
+createMap <- function(mapData,pal, palMap, di, diPal, #oil, rural, coal, 
+                      di_2023, diPal_2023, di_AQCC, diPal_AQCC, 
+                      di_MHC, justice40, storyMaps) {
   #story map icon 
   sm_Icon <- makeIcon("www/StoryMaps.png",
                       iconWidth = 40,
@@ -60,6 +61,38 @@ createMap <- function(mapData,pal, palMap, diPal, #oil, rural, coal,
     #             popup = "<strong>Definition: </strong> Counties that do not contain a U.S. Census Bureau's urban area") %>%
     # addPolyLine(sf1 = coal, group = "Coal Community", 
     #             popup = "<strong>Definition: </strong> Counties that have a coal-burning power plant.") %>%
+  
+    addPolygons(
+      data = di_2023,
+      fillColor =  ~diPal_2023(`color`),
+      color = "#454547",
+      weight = 1,
+      fillOpacity = 0.8,
+      popup = di_2023$popup,
+      group = "Disproportionately Impacted Community (May 2023)",
+      options = pathOptions(pane = "elements")
+    )%>%
+    addPolygons(
+      data = di_AQCC,
+      fillColor =  ~diPal_AQCC(`color`),
+      color = "#454547",
+      weight = 1,
+      fillOpacity = 0.8,
+      popup = di_AQCC$popup,
+      group = "AQCC Reg. 3 - Disproportionately Impacted Community",
+      options = pathOptions(pane = "elements")
+    )%>%    
+    leaflet::addCircleMarkers(
+      data = di_MHC,
+      label = ~Park.Name,
+      popup = ~popup,
+      fillColor = "goldenrod",
+      fillOpacity = 1,
+      radius = 4,
+      stroke = F,
+      group = "DI Community: Mobile Home Communities",
+      options = pathOptions(pane = "elements")
+    )%>%  
     addPolygons(
       data = di,
       fillColor =  ~diPal(`color`),
@@ -67,9 +100,9 @@ createMap <- function(mapData,pal, palMap, diPal, #oil, rural, coal,
       weight = 1,
       fillOpacity = 0.8,
       popup = di$popup,
-      group = "Disproportionately Impacted Community",
+      group = "Prior Disproportionately Impacted Community (January 2023-May 2023)",
       options = pathOptions(pane = "elements")
-    )%>%
+    )%>%  
     addPolygons(
       data = justice40,
       popup = justice40$popup,
@@ -77,7 +110,7 @@ createMap <- function(mapData,pal, palMap, diPal, #oil, rural, coal,
       fillOpacity = 0.8,
       color = "#636363",
       weight = 1,
-      group = "Justice40",
+      group = "Federal CEJST (Justice40)",
       options = pathOptions(pane = "elements")
     )%>%
     addMarkers(
@@ -105,12 +138,35 @@ createMap <- function(mapData,pal, palMap, diPal, #oil, rural, coal,
     # labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))
   ) %>%
     addLegend("topright",
-              colors = c("#a6cee3", "#33a02c","#b2df8a", "#fc8d62", "#1f78b4"), 
-              title = "Disproportionately Impacted Community",
+              colors = c('#332288', '#88CCEE', '#44AA99', '#117733', '#999933', '#DDCC77', '#CC6677', '#882255'), 
+              title = "Disproportionately Impacted Community (May 2023)",
               labels = c("Low Income", "People of Color",
-                         "Housing Burden", "EnviroScreen Score", "More than one category"),
+                         "Housing Burden", "Linguistically Isolated", 
+                         "Federal CEJST (Justice40)", "Tribal Lands", 
+                         "EnviroScreen Score", "More than one category"),
               opacity = .8,
-              group = "Disproportionately Impacted Community"
+              group = "Disproportionately Impacted Community (May 2023)"
+    )%>%
+    addLegend("topright",
+              colors = "goldenrod",
+              title = "DI Community: Mobile Home Communities",
+              label = "Mobile Home Community",
+              opacity = 1,
+              group = "DI Community: Mobile Home Communities"
+    )%>%
+    addLegend("topright",
+              colors = c("#d95f02", "#1b9e77"), 
+              title = "AQCC Reg. 3 - Disproportionately Impacted Community",
+              labels = c("Socioeconomically Vulnerable Community", "Cumulatively Impacted Community"),
+              opacity = .8,
+              group = "AQCC Reg. 3 - Disproportionately Impacted Community"
+    )%>%
+    addLegend("topright",
+              colors = c("#a6cee3", "#33a02c","#b2df8a", "#fc8d62", "#1f78b4"),
+              title = "Prior Disproportionately Impacted Community (January 2023-May 2023)",
+              labels = c("Low Income", "People of Color", "Housing Burden", "EnviroScreen Score", "More than one category"),
+              opacity = .8,
+              group = "Prior Disproportionately Impacted Community (January 2023-May 2023)"
     )%>%
     # addLegendImage(images = "www/oilGas.png",
     #                labels = "Oil and Gas Community",
@@ -135,9 +191,9 @@ createMap <- function(mapData,pal, palMap, diPal, #oil, rural, coal,
     #                labelStyle = "font-size: 16")%>%
     addLegend("topright",
               colors = "#fb9a99", 
-              labels =  "Justice40 Community",
+              labels =  "Federal CEJST (Justice40)",
               opacity = .8,
-              group = "Justice40"
+              group = "Federal CEJST (Justice40)"
     )%>%
     # add control groups ------------------------------------------------------
   addLayersControl(
@@ -147,9 +203,12 @@ createMap <- function(mapData,pal, palMap, diPal, #oil, rural, coal,
       # "Coal Community",
       # "Rural",
       # "Oil and Gas Community",
-      "Disproportionately Impacted Community",
-      "Justice40",
-      "Story Maps"
+      "Disproportionately Impacted Community (May 2023)",
+      "DI Community: Mobile Home Communities",
+      "AQCC Reg. 3 - Disproportionately Impacted Community",
+      "Federal CEJST (Justice40)",
+      "Story Maps",
+      "Prior Disproportionately Impacted Community (January 2023-May 2023)"
     ),
     position = "topleft", 
     options = layersControlOptions(collapsed = TRUE))%>%
@@ -165,8 +224,11 @@ createMap <- function(mapData,pal, palMap, diPal, #oil, rural, coal,
         # "Coal Community",
         # "Rural",
         # "Oil and Gas Community",
-        "Disproportionately Impacted Community",
-        "Justice40",
+        "Disproportionately Impacted Community (May 2023)",
+        "DI Community: Mobile Home Communities",
+        "AQCC Reg. 3 - Disproportionately Impacted Community",
+        "Prior Disproportionately Impacted Community (January 2023-May 2023)",
+        "Federal CEJST (Justice40)",
         "Story Maps"))
   
   return(map)
