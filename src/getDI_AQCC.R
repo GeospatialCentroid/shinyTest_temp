@@ -50,7 +50,7 @@ getDI_AQCC <- function(){
                "<br/><b>Over 50% of Households are Housing Burdened: </b>", Br_FLAG,
                "<br/><b>Percent Housing Burdened: </b>", round(HH_Burdened_Pct*100, digits = 1),
                "<br/>",
-               "<br/><b>Over 20% of the Population is Linguistically Isolated: </b>", Br_FLAG,
+               "<br/><b>Over 20% of the Population is Linguistically Isolated: </b>", Ling_FLAG,
                "<br/><b>Percent Linguistic Isolation: </b>", round(LingIso_PCT*100, digits = 1),
                "<br/>",
                "<br/><b>Cumulative Impacts:</b>",
