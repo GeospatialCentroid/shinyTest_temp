@@ -1,5 +1,5 @@
 #' generate di community 
-#' @description : produces a sf object of disporpotionally impacted communities
+#' @description : produces a sf object of disproportionately impacted communities
 #'
 #' @return : sf object 
 #' @export
@@ -42,35 +42,49 @@ getDI_2023 <- function(){
         Score_FLAG == 0 ~ "No"
       )
     )%>%
-    mutate(popup =
-             paste0(
-               "<br/><strong>Current Disproportionately Impacted Community (May 2023): </strong>",
-               "<br/><b>Census Block Group: </b>", GEOID,
-               "<br/>",
-               "<br/><b>Over 40% of the Population is Low Income: </b>", FLP_FLA,
-               "<br/><b>Percent Low Income: </b>", round(Pov_PCT*100, digits = 1),
-               "<br/>",
-               "<br/><b>Over 40% of the Population are People of Color:  </b>", Mn_FLAG,
-               "<br/><b>Percent People of Color: </b>", round(Min_PCT*100, digits = 1),
-               "<br/>",
-               "<br/><b>Over 50% of Households are Housing Burdened: </b>", Br_FLAG,
-               "<br/><b>Percent Housing Burdened: </b>", round(HH_Burdened_Pct*100, digits = 1),
-               "<br/>",
-               "<br/><b>Over 20% of the Population is Linguistically Isolated: </b>", Ling_FLAG,
-               "<br/><b>Percent Linguistic Isolation: </b>", round(LingIso_PCT*100, digits = 1),
-               "<br/>",
-               "<br/><b>Area under Tribal Jurisdiction: </b>", Trib_FLAG,
-               "<br/>",
-               "<br/><b>Area qualifies as Disadvantaged in the federal Climate and Economic Justice Screening Tool: </b>", J40_FLAG,
-               "<br/>",
-               "<br/><b>EnviroScreen Score (Percentile) is over 80: </b>", Sc_FLAG,
-               "<br/><b>EnviroScreen score (Percentile): </b>", round(EnviroScreen_Pctl, digits = 1),
-               "<br/>",
-               "<br/>",
-               "Read more about Colorado's definition of Disproportionately Impacted Communities on the ",
-               tags$a(href = "https://cdphe.colorado.gov/environmental-justice", 
-                      "CDPHE Environmental Justice Program website.", target = "_blank")
-             )
+    mutate(popup =  
+             if_else(TribalLands_FLAG ==1, 
+               paste0( 
+                 "<br/><strong>Current Disproportionately Impacted Community (May 2023): </strong>",
+                 "<br/><b>Census Block Group: </b>", GEOID,
+                 "<br/>",
+                 "<br/><b>Area under Tribal Jurisdiction: </b>", Trib_FLAG,
+                 "<br/>",
+                 "<br/>",
+                 "Read more about Colorado's definition of Disproportionately Impacted Communities on the ",
+                 tags$a(href = "https://cdphe.colorado.gov/environmental-justice", 
+                        "CDPHE Environmental Justice Program website.", target = "_blank")),
+                 paste0(
+                   "<br/><strong>Current Disproportionately Impacted Community (May 2023): </strong>",
+                   "<br/><b>Census Block Group: </b>", GEOID,
+                   "<br/>",
+                   "<br/><b>Over 40% of the Population is Low Income: </b>", FLP_FLA,
+                   "<br/><b>Percent Low Income: </b>", round(Pov_PCT*100, digits = 1),
+                   "<br/>",
+                   "<br/><b>Over 40% of the Population are People of Color:  </b>", Mn_FLAG,
+                   "<br/><b>Percent People of Color: </b>", round(Min_PCT*100, digits = 1),
+                   "<br/>",
+                   "<br/><b>Over 50% of Households are Housing Burdened: </b>", Br_FLAG,
+                   "<br/><b>Percent Housing Burdened: </b>", round(HH_Burdened_Pct*100, digits = 1),
+                   "<br/>",
+                   "<br/><b>Over 20% of the Population is Linguistically Isolated: </b>", Ling_FLAG,
+                   "<br/><b>Percent Linguistic Isolation: </b>", round(LingIso_PCT*100, digits = 1),
+                   "<br/>",
+                   "<br/><b>Area under Tribal Jurisdiction: </b>", Trib_FLAG,
+                   "<br/>",
+                   "<br/><b>Area qualifies as Disadvantaged in the federal Climate and Economic Justice Screening Tool: </b>", J40_FLAG,
+                   "<br/>",
+                   "<br/><b>EnviroScreen Score (Percentile) is over 80: </b>", Sc_FLAG,
+                   "<br/><b>EnviroScreen score (Percentile): </b>", round(EnviroScreen_Pctl, digits = 1),
+                   "<br/>",
+                   "<br/>",
+                   "Read more about Colorado's definition of Disproportionately Impacted Communities on the ",
+                   tags$a(href = "https://cdphe.colorado.gov/environmental-justice", 
+                          "CDPHE Environmental Justice Program website.", target = "_blank"))
+             ) 
+                   
+             
+           
     )%>%
     mutate(
       color = as.factor(case_when(
@@ -79,7 +93,7 @@ getDI_2023 <- function(){
         Br_FLAG == "Yes" & DI_communityCount == 1 ~ "Housing Burden",
         Ling_FLAG == "Yes" & DI_communityCount == 1 ~ "Linguistically isolated",
         J40_FLAG == "Yes" & DI_communityCount == 1 ~ "Federally identified (CEJST)",
-        Trib_FLAG == "Yes" & DI_communityCount == 1 ~ "Tribal Lands",
+        Trib_FLAG == "Yes" ~ "Tribal Lands",
         Sc_FLAG == "Yes" & DI_communityCount == 1 ~ "EnviroScreen Score",
         TRUE ~ "More than one category"
       ))
